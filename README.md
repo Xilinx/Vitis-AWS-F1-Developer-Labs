@@ -13,11 +13,14 @@ Welcome to the SDAccel AWS F1 Developer Labs. By going through these labs you wi
 
 In order to run the SDAccel AWS F1 Developer Labs, you will need the following:
 
-* **An AWS account**: if you do not already have an Amazon Web Services (AWS) account, create one here: [https://aws.amazon.com/](https://aws.amazon.com)
-* **Access to AWS F1 instances**: by default, AWS users do not have access to F1 instances. You need to request and be granted access to F1 instances before you can start using these instance. 
+<details>
+<summary><strong>An AWS account</strong> <i>(expand for details)</i></summary><p>
+If you do not already have an Amazon Web Services (AWS) account, create one here: [https://aws.amazon.com/](https://aws.amazon.com)
+<p></details><br>
 
 <details>
-<summary><strong>Step-by-step instructions</strong> <i>(expand for details)</i></summary><p>
+<summary><strong>Access to AWS F1 instances</strong> <i>(expand for details)</i></summary><p>
+By default, AWS users do not have access to F1 instances. You need to request and be granted access to F1 instances before you can start using these instance. Here are the steps to do so:
 
 * Open the Service Limit Increase form: [http://aws.amazon.com/contact-us/ec2-request](http://aws.amazon.com/contact-us/ec2-request)
 * Make sure your account name is correct
@@ -29,7 +32,6 @@ In order to run the SDAccel AWS F1 Developer Labs, you will need the following:
 
 Requests are typically processed by AWS in 24 to 48 hours.
 <p></details><br>
-
 
 ### Usage Instructions
 
