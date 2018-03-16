@@ -38,3 +38,9 @@ In addition, the examples below are also very good resources to get familiarized
 | Examples | **Matrix Multiply** | This GEMM-compatible library provide 2TOPs on 16-bit date types. [**Click here**](https://github.com/Xilinx/gemx). |
 | Examples | **Data Analytics** | The SQL search example running on F1 is 6 to 10x faster than CPU. [**Click here**](https://github.com/Xilinx/data-analytics). |
 | F1 App | **Automata Processing** | REAPR is flexible end-to-end framework for automata processing developed by University of Virginia. REAPR is 44x faster than Hyperscan on F1, and 6x faster than GPU. An F1 AMI will be available soon. Check [**http://cap.virginia.edu/**](http://cap.virginia.edu) for updates. |
+
+---------------------------------------
+
+<p align="center"><b>
+Return to the beginning of this module: <a href="./modules/module_01/README.md">Introduction to the SDAccel Flow</a>
+</b></p>
