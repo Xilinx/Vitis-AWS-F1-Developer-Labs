@@ -1,6 +1,5 @@
 # SDAccel AWS F1 Developer Labs
----------------------------------------
-### Introduction
+
 
 Welcome to the SDAccel AWS F1 Developer Labs. By going through these labs you will gain hands-on experience with AWS F1 and learn how to develop accelerated applications using the Xilinx SDAccel development environment.
 
