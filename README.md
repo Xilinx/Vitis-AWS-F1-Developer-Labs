@@ -45,7 +45,7 @@ These steps explain how start an EC2 F1 instance configured with the SDAccel AWS
 
 #### Choose an F1 instance
 1. Select a **f1.2xlarge** instance
-1. Click **Next: Configure Instance Details**. _Do not click 'Review and Launch'_
+1. Click **Next: Configure Instance Details**.
 
 #### Configure the instance password
 1. At the bottom of the page, open the **Advanced Details** section and add the following user data as text:
@@ -87,7 +87,7 @@ The instance you just started is preconfigured with remote desktop protocol (RDP
     - Password: **sdaccel_labs**   
 1. Click **Ok**.
 
-You should now be connected to the remote F1 instance running Centos 7 and SDAccel AWS F1 Developer Labs AMI.
+You should now be connected to the remote F1 instance running Centos 7 and the SDAccel AWS F1 Developer Labs AMI.
 
 #### Open the lab instructions on the remote F1 instance
 
@@ -100,7 +100,7 @@ You should now be connected to the remote F1 instance running Centos 7 and SDAcc
 #### Download the Developer Labs contents
 
 1. Open a new terminal by right-clicking anywhere in the Desktop area and selecting **Open Terminal**.
-1. In the terminal, 'git clone' the SDAccel-AWS-F1-Developer repository to download the files for the Xilinx Developer Lab.
+1. In the terminal, 'git clone' the SDAccel-AWS-F1-Developer repository to download the files for the Developer Labs.
     ```bash  
     cd ~
     git clone https://github.com/Xilinx/SDAccel-AWS-F1-Developer-Labs.git

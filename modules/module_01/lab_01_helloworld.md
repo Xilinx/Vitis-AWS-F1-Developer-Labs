@@ -29,7 +29,7 @@ The "hello world" example is an OpenCL application with a simple vector-addition
 1.  Compile the host application
 
     ```bash
-    # Go to the example directory
+    # Go to the lab directory
     cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_01/helloworld
 
     # Compile the host application (./helloworld)
