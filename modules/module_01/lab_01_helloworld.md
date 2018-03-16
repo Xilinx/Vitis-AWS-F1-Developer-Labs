@@ -1,7 +1,5 @@
 ## Running the "Hello World" Example
 
-The "hello world" example is an OpenCL application with a simple vector-addition accelerator. This example uses a precompiled FPGA binary to reduce compilation time and streamline the lab.
-
 #### Overview of the AWS F1 platform and SDAccel flow
 
 The architecture of the AWS F1 platform and the SDAccel development flow are pictured below:
@@ -14,6 +12,8 @@ The architecture of the AWS F1 platform and the SDAccel development flow are pic
 4. The host application is written in C or C++ and uses the OpenCL API to interact with the accelerated functions. The accelerated functions (also referred to as kernels) can be written in C, C++, OpenCL or even RTL.
 
 #### Running the "Hello World" Example
+
+The "hello world" example is an OpenCL application with a simple vector-addition accelerator. This example uses a precompiled FPGA binary to reduce compilation time and streamline the lab.
 
 1. Open a new terminal by right-clicking anywhere in the Desktop area and selecting **Open Terminal**.
 
