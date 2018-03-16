@@ -112,6 +112,7 @@ These steps would take too long to complete during this lab, therefore a precomp
     source /opt/Xilinx/SDx/2017.1.rte/setup.sh
     # Execute the host application with the .awsxclbin FPGA binary
     ./IDCT-NS1.exe ./xclbin/krnl_idct.hw.xilinx_aws-vu9p-f1_4ddr-xpr-2pr_4_0.awsxclbin
+    exit
     ```
 
     Note the performance difference between the IDCT running on the CPU and the IDCT running in the FPGA.
@@ -185,6 +186,8 @@ For optimal performance both the hardware and software components of the applica
 ### Executing on F1 
 
 The next step is to confirm these results by running on the FPGA attached to the F1 instance. Since only the host application was modified, the same precompiled FPGA binary can used.
+
+1. Bring-up the terminal from which you ran the first IDCT executable.
 
 1. Copy the host application executable built by SDAccel to the local directory.
 

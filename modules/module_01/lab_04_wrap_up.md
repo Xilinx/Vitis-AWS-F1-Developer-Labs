@@ -20,7 +20,7 @@ You have successfully completed the first module of SDAccel AWS F1 Developer Lab
 
 ### Next steps
 
-More modules will be added to the SDAccel AWS F1 Developer Labs over time. In the meantime, you can take your AWS F1 and SDAccel experience further by exploring the following resources:
+More modules will be added to the SDAccel AWS F1 Developer Labs over time. In the meantime, you can continue learning about AWS F1 and SDAccel by exploring the following resources:
 
 | Resource | Title                       | Description  |
 | -------- |---------------------------- | ----- |

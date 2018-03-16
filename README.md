@@ -97,7 +97,7 @@ You should now be connected to the remote F1 instance running Centos 7 and the S
 1. Continue following the lab instructions from within the remote instance and the Chromium browser.
     - We suggest you perform all your copy-paste from the instructions to the shell within the RDP session to avoid issues.
 
-You instance is now configured to run the SDAccel Developer labs on AWS F1 and you are ready to start the first training module.
+You instance is now configured to run the SDAccel Developer labs on AWS F1 and you are ready to start the first module.
 
 ---------------------------------------
 
