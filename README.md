@@ -12,7 +12,6 @@ In order to run the SDAccel AWS F1 Developer Labs, you will need the following:
 
 If you do not already have an Amazon Web Services (AWS) account, create one here: [https://aws.amazon.com/](https://aws.amazon.com)
 <p></details><br>
-
 <details>
 <summary><strong>Access to AWS F1 instances</strong> <i>(expand for details)</i></summary><p>
 
