@@ -1,17 +1,4 @@
-<table style="width:100%">
-  <tr>
-    <th width="100%" colspan="5"><h2>SDAccel AWS F1 Developer Labs</h2></th>
-  </tr>
-  <tr>
-    <td width="20%" align="center"><a href="README.md">Module Overview</a></td>
-    <td width="20%" align="center"><b>1. Running Helloworld</b></td>
-    <td width="20%" align="center"><a href="lab_02_idct.md">2. Developing F1 applications</a></td>
-    <td width="20%" align="center"><a href="lab_03_wrap_up.md">3. Wrapping-up</a></td>
-  </tr>
-</table>
-
----------------------------------------
-### Running the "Hello World" Example
+## Running the "Hello World" Example
 
 The "hello world" example is an OpenCL application with a simple vector-addition accelerator. This example uses a precompiled FPGA binary to reduce compilation time and streamline the lab.
 
