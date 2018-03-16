@@ -1,18 +1,4 @@
-<table style="width:100%">
-  <tr>
-    <th width="100%" colspan="5"><h2>SDAccel AWS F1 Developer Labs</h2></th>
-  </tr>
-  <tr>
-    <td width="20%" align="center"><a href="README.md">Module Overview</a></td>
-    <td width="20%" align="center"><a href="lab_01_helloworld.md">1. Running Helloworld</a></td>
-    <td width="20%" align="center"><b>2. Developing F1 applications</b></td>
-    <td width="20%" align="center"><a href="lab_03_wrap_up.md">3. Wrapping-up</a></td>
-  </tr>
-</table>
-	
----------------------------------------
-	
-### Developing, profiling and optimizing F1 applications with SDAccel
+# Developing, profiling and optimizing F1 applications with SDAccel
 
 This lab is designed to teach the fundamentals of the SDAccel development environment and programming model. This includes: familiarizing with OpenCL, understanding software and hardware emulation flows, profiling performance and identifying how to optimize host and kernel code. 
 
