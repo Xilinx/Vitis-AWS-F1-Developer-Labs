@@ -31,13 +31,13 @@ Please also note that although the entire tutorial is performed on an F1 instanc
     ```bash
     cd ~/aws-fpga
     source sdaccel_setup.sh
-    cd ~
+    cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_01/idct
     ```
 	*Note: the sdaccel_setup.sh script might generate warning messages, but these can be safely ignored.*
 
 1. Launch the SDAccel and open the predefined workspace containing the IDCT project: 
     ```bash
-    sdx -workspace ~/SDAccel-AWS-F1-Developer-Labs/idct/workspace
+    sdx -workspace ./workspace
     ```
 	*Note: a warning message may appear if loading Eclipse takes longer than expected. Click **Wait** to dismiss it.*
 
