@@ -4,11 +4,11 @@
 
 This module is divided in 3 labs. It is recommended to complete each lab before proceeding to the next.
 
-1. **Running "Hello World"** \
+1. **Running the "Hello World" example** \
 You will get familiar with the steps involved in running a simple application on the F1 instance. \
 [Start this lab.](lab_01_helloworld.md)
 
-1. **Developing and optimizing F1 applications with SDAccel** \
+1. **Developing, profiling and optimizing F1 applications with SDAccel** \
 You will use the SDAccel development environment to create, profile and optimize an F1 accelerator. The lab focuses on the Inverse Discrete Cosine Transform (IDCT), a compute intensive function used at the heart of all video codecs. \
 [Start this lab.](lab_02_idct.md)
 
@@ -21,5 +21,5 @@ Since building FPGA binaries is not instantaneous, all the modules of this Devel
 ---------------------------------------
 
 <p align="center"><b>
-Start the next lab: <a href="lab_01_helloworld.md">1. Running Helloworld</a>
+Start the next lab: <a href="lab_01_helloworld.md">1. Running the "Hello World" example</a>
 </b></p>
