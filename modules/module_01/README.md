@@ -3,10 +3,10 @@
     <th width="100%" colspan="5"><h2>SDAccel AWS F1 Developer Labs</h2></th>
   </tr>
   <tr>
-    <td width="20%" align="center"><a href="module_01/README.md">Module Overview</a></td>
-    <td width="20%" align="center"><a href="module_01/lab_01_helloworld.md">1. Running Helloworld</a></td>
-    <td width="20%" align="center"><a href="module_01/lab_02_idct.md">2. Developing F1 applications</a></td>
-    <td width="20%" align="center"><a href="module_01/lab_03_wrap_up.md">3. Wrapping-up</a></td>
+    <td width="20%" align="center"><b>Module Overview</b></td>
+    <td width="20%" align="center"><a href="./modules/module_01/lab_01_helloworld.md">1. Running Helloworld</a></td>
+    <td width="20%" align="center"><a href="./modules/module_01/lab_02_idct.md">2. Developing F1 applications</a></td>
+    <td width="20%" align="center"><a href="./modules/module_01/lab_03_wrap_up.md">3. Wrapping-up</a></td>
   </tr>
 </table>
 
@@ -38,5 +38,5 @@ Since building FPGA binaries is not instantaneous, all the modules of this Devel
 ---------------------------------------
 
 <p align="center"><b>
-Start the next lab: <a href="module_01/lab_01_helloworld.md">1. Running Helloworld</a>
+Start the next lab: <a href="./modules/module_01/lab_01_helloworld.md">1. Running Helloworld</a>
 </b></p>
