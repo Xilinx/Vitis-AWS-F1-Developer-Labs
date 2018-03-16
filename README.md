@@ -112,5 +112,5 @@ You instance is now configured to run the SDAccel Developer labs on AWS F1. The 
 ---------------------------------------
 
 <p align="center"><b>
-Start the first module: <a href="module_01/README.md">Introduction to the SDAccel Flow</a>
+Start the first module: <a href="module_01/modules/README.md">Introduction to the SDAccel Flow</a>
 </b></p>
