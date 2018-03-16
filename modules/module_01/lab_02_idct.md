@@ -1,5 +1,5 @@
-# Developing, profiling and optimizing F1 applications with SDAccel
-
+## Developing, profiling and optimizing F1 applications with SDAccel
+---------------------------------------
 This lab is designed to teach the fundamentals of the SDAccel development environment and programming model. This includes: familiarizing with OpenCL, understanding software and hardware emulation flows, profiling performance and identifying how to optimize host and kernel code. 
 
 The kernel used in this lab is an Inverse Discrete Cosine Transform (IDCT), a function widely used in audio/image codecs such as HEVC. 
