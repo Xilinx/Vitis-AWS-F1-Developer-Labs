@@ -1,9 +1,4 @@
-<table style="width:100%">
-  <tr>
-    <th width="100%" colspan="5"><h2>SDAccel AWS F1 Developer Labs</h2></th>
-  </tr>
-</table>
-
+# SDAccel AWS F1 Developer Labs
 ---------------------------------------
 ### Introduction
 
@@ -15,11 +10,13 @@ In order to run the SDAccel AWS F1 Developer Labs, you will need the following:
 
 <details>
 <summary><strong>An AWS account</strong> <i>(expand for details)</i></summary><p>
+
 If you do not already have an Amazon Web Services (AWS) account, create one here: [https://aws.amazon.com/](https://aws.amazon.com)
 <p></details><br>
 
 <details>
 <summary><strong>Access to AWS F1 instances</strong> <i>(expand for details)</i></summary><p>
+
 By default, AWS users do not have access to F1 instances. You need to request and be granted access to F1 instances before you can start using these instance. Here are the steps to do so:
 
 * Open the Service Limit Increase form: [http://aws.amazon.com/contact-us/ec2-request](http://aws.amazon.com/contact-us/ec2-request)
@@ -115,3 +112,6 @@ You instance is now configured to run the SDAccel Developer labs on AWS F1. The 
 
 ---------------------------------------
 
+<p align="center"><b>
+Start the first module: <a href="module_01/README.md">Introduction to the SDAccel Flow</a>
+</b></p>
