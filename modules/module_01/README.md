@@ -14,7 +14,7 @@
 
 The architecture of the AWS F1 platform and the SDAccel development flow are pictured below:
 
-![](./images/module_01/overview/f1_platform.png)
+![](~/images/module_01/overview/f1_platform.png)
 
 1. Amazon EC2 F1 is a compute instance combining x86 CPUs with Xilinx FPGAs. The FPGAs are programmed with custom hardware accelerators which can accelerate complex workloads up to 30x when compared with servers that use CPUs alone. 
 2. An F1 application consists of an x86 executable for the host application and an FPGA binary (also referred to as Amazon FPGA Image or AFI) for the custom hardware accelerators. Communication between the host application and the accelerators are automatically managed by the OpenCL runtime.
