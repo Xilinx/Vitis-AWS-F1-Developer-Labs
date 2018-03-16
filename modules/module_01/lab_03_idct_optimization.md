@@ -5,6 +5,7 @@ This lab builds on the previous one ([Introduction to the SDAccel development en
 Please note that although the entire lab is performed on an F1 instance, only the final step of this lab really needs to be run on F1. All the interactive development, profiling and optimization steps would normally be performed on-premise or on a cost-effective AWS EC2 instance such as C4. However, to avoid switching from C4 to F1 instances during this lab, all the steps are performed on the F1 instance.
 
 If you have closed the SDAccel GUI at the end of the previous lab, reopen it and reload the workspace containing the IDCT project:
+
     ```bash
     cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_01/idct
     sdx -workspace ./workspace
