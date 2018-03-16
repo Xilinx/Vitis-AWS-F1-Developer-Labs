@@ -42,5 +42,5 @@ In addition, the examples below are also very good resources to get familiarized
 ---------------------------------------
 
 <p align="center"><b>
-Return to the beginning of this module: <a href="./modules/module_01/README.md">Introduction to the SDAccel Flow</a>
+Return to the beginning of this module: <a href="README.md">Introduction to the SDAccel Flow</a>
 </b></p>
