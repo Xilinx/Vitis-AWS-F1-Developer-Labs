@@ -106,7 +106,7 @@ You should now be connected to the remote F1 instance running Centos 7 and SDAcc
     git clone https://github.com/Xilinx/SDAccel-AWS-F1-Developer-Labs.git
     ```
 
-You instance is now configured to run the SDAccel Developer labs on AWS F1. The next step is to run the "helloworld" example to confirm everything works correctly.
+You instance is now configured to run the SDAccel Developer labs on AWS F1 and you are ready to start the first training module.
 
 ---------------------------------------
 
