@@ -404,5 +404,5 @@ In this lab, you learned:
 ---------------------------------------
 
 <p align="center"><b>
-Start the next lab: <a href="lab_03_wrap_up.md">3. Wrap-up and Next Steps</a>
+Start the next lab: <a href="lab_03_wrap_up.md">Wrap-up and Next Steps</a>
 </b></p>  
