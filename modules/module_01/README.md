@@ -11,7 +11,7 @@ rm -rf SDAccel-AWS-F1-Developer-Labs
 git clone https://github.com/Xilinx/SDAccel-AWS-F1-Developer-Labs.git
 ```
 
-### Starting the module
+### Module overview
 
 This module is divided in 3 labs. Since building FPGA binaries is not instantaneous, all the labs will use precompiled FPGA binaries. It is recommended to complete each lab before proceeding to the next.
 
