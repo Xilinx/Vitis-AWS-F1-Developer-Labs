@@ -185,5 +185,5 @@ In this lab, you learned:
 ---------------------------------------
 
 <p align="center"><b>
-Finish this module: <a href="lab_03_wrap_up.md">Wrap-up and Next Steps</a>
+Finish this module: <a href="lab_04_wrap_up.md">Wrap-up and Next Steps</a>
 </b></p>  
