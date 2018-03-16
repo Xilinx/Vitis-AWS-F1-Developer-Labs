@@ -30,7 +30,7 @@ The "hello world" example is an OpenCL application with a simple vector-addition
 
     ```bash
     # Go to the example directory
-    cd ~/SDAccel-AWS-F1-Developer-Labs/helloworld_ocl
+    cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_01/lab_01_helloworld
 
     # Compile the host application (./helloworld)
     make TARGETS=hw DEVICES=$AWS_PLATFORM exe
