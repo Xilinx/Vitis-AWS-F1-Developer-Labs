@@ -1,6 +1,6 @@
 ## Wrap-Up and Next Steps
 
-It is now time to wrap-up this lab. Please follow these steps to close your RDP session and stop your instance. It is important to always stop or terminate AWS EC2 instances when you are done using them. This is a recommended best practice to avoid unwanted charges.
+It is now time to wrap-up this module. These steps will show you how to close your RDP session and stop your instance. It is important to always stop or terminate AWS EC2 instances when you are done using them. This is a recommended best practice to avoid unwanted charges.
 
 
 ### Stopping your instance
