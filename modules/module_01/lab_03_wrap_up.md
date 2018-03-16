@@ -23,22 +23,18 @@ It is now time to wrap-up this lab. Please follow these steps to close your RDP 
 * On your local machine, return to your browser and to the tab showing the **EC2 Console** and the details of your running instance.
    * If necessary, use the link which was emailed to you to return to the proper web page.
 * In the **EC2 Console**, make sure you instance is selected
-* Click the **Actions** button, select **Instance State** and then click **Stop**.
-
-Note: permission to **Terminate** instances was disabled for all user accounts of this Developer Lab to prevent accidental terminations.
+* Click the **Actions** button, select **Instance State** and then click **Stop** or **Terminate**.
+   * Use **Stop** if you want to rapidly restart this instance later
+   * Use **Terminate** if you want to permanantly delete this instance and its contents
 
 ### Congratulations!
-You have successfully completed all the modules of SDAccel AWS F1 Developer Labs. 
-1. You started a pre-configured EC2 F1 instance and connected to it using a remote desktop client. 
-1. You experienced the acceleration potential of F1 by using ffmpeg and an F1-optimized HEVC encoder. 
-1. You used SDAccel to create, profile and optimize an F1 accelerator. 
-1. You closed your RDP session and properly stopped your F1 instance.
+
+You have successfully completed the first module of SDAccel AWS F1 Developer Labs. 
+
 
 ### Next steps
 
-The preconfigured instance and account provided by Xilinx will deactivated shortly after the Developer Lab. If you do not already have an AWS account, you can create one [here](https://aws.amazon.com/) to continue on AWS F1.
-
-To take your AWS F1 and SDAccel experience further, we recommend the following resources:
+More modules will be added to the SDAccel AWS F1 Developer Labs over time. In the meantime, you can take your AWS F1 and SDAccel experience further by exploring the following resources:
 
 | Resource | Title                       | Description  |
 | -------- |---------------------------- | ----- |
