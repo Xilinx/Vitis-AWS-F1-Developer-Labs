@@ -1,5 +1,6 @@
-## SDAccel AWS F1 Developer Labs | Module 1: Introduction to the SDAccel Flow
+## Module 1: Introduction to the SDAccel Flow
 
+<br>
 
 This module is divided in 3 labs. It is recommended to complete each lab before proceeding to the next.
 
