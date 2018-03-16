@@ -3,10 +3,10 @@
     <th width="100%" colspan="5"><h2>SDAccel AWS F1 Developer Labs</h2></th>
   </tr>
   <tr>
-    <td width="20%" align="center"><a href="module_01/README.md">Module Overview</a></td>
-    <td width="20%" align="center"><a href="module_01/lab_01_helloworld.md">1. Running Helloworld</a></td>
+    <td width="20%" align="center"><a href="README.md">Module Overview</a></td>
+    <td width="20%" align="center"><a href="lab_01_helloworld.md">1. Running Helloworld</a></td>
     <td width="20%" align="center"><b>2. Developing F1 applications</b></td>
-    <td width="20%" align="center"><a href="module_01/lab_03_wrap_up.md">3. Wrapping-up</a></td>
+    <td width="20%" align="center"><a href="lab_03_wrap_up.md">3. Wrapping-up</a></td>
   </tr>
 </table>
 	
@@ -418,7 +418,7 @@ In this lab, you learned:
 ---------------------------------------
 
 <p align="center"><b>
-Start the next lab: <a href="4_WRAP_UP.md">4. Wrap-up and Next Steps</a>
+Start the next lab: <a href="lab_03_wrap_up.md">3. Wrap-up and Next Steps</a>
 </b></p>  
 
 
