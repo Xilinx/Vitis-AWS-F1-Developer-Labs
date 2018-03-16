@@ -13,7 +13,7 @@ You will use the SDAccel development environment to create, profile and optimize
 [Start this lab.](lab_02_idct.md)
 
 1. **Wrap-up and next steps** \
-You will to close your RDP session, stop your F1 instance and explore next steps to continue your F1 experience after the Xilinx Developer Lab. \
+You will to close your RDP session, stop your F1 instance and explore next steps to continue your experience with SDAccel on AWS. \
 [Start this lab.](lab_03_wrap_up.md)
 
 Since building FPGA binaries is not instantaneous, all the modules of this Developer Lab will use precompiled FPGA binaries.
