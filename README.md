@@ -97,15 +97,6 @@ You should now be connected to the remote F1 instance running Centos 7 and the S
 1. Continue following the lab instructions from within the remote instance and the Chromium browser.
     - We suggest you perform all your copy-paste from the instructions to the shell within the RDP session to avoid issues.
 
-#### Download the Developer Labs contents
-
-1. Open a new terminal by right-clicking anywhere in the Desktop area and selecting **Open Terminal**.
-1. In the terminal, 'git clone' the SDAccel-AWS-F1-Developer repository to download the files for the Developer Labs.
-    ```bash  
-    cd ~
-    git clone https://github.com/Xilinx/SDAccel-AWS-F1-Developer-Labs.git
-    ```
-
 You instance is now configured to run the SDAccel Developer labs on AWS F1 and you are ready to start the first training module.
 
 ---------------------------------------

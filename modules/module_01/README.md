@@ -2,7 +2,19 @@
 
 <br>
 
-This module is divided in 3 labs. It is recommended to complete each lab before proceeding to the next.
+#### Downloading the lab contents
+
+Before starting this module, make sure that the lab contents are properly installed on your instance: 
+1. Open a new terminal by right-clicking anywhere in the Desktop area and selecting **Open Terminal**, then run the following commands:
+    ```bash  
+    cd ~
+    rm -rf SDAccel-AWS-F1-Developer-Labs
+    git clone https://github.com/Xilinx/SDAccel-AWS-F1-Developer-Labs.git
+    ```
+
+#### Starting the module
+
+This module is divided in 3 labs. Since building FPGA binaries is not instantaneous, all the modules of this Developer Lab will use precompiled FPGA binaries. It is recommended to complete each lab before proceeding to the next.
 
 1. **Running the "Hello World" example** \
 You will get familiar with the steps involved in running a simple application on the F1 instance. \
@@ -17,8 +29,6 @@ You will continue the IDCT project started in the previous lab and learn how you
 [**Start this lab.**](lab_03_idct_optimization.md)
 
 After you complete the last lab, you will be guided to close your RDP session, stop your F1 instance and explore next steps to continue your experience with SDAccel on AWS. 
-
-Since building FPGA binaries is not instantaneous, all the modules of this Developer Lab will use precompiled FPGA binaries.
 
 ---------------------------------------
 
