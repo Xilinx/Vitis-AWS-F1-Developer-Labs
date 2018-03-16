@@ -6,10 +6,10 @@ Please note that although the entire lab is performed on an F1 instance, only th
 
 If you have closed the SDAccel GUI at the end of the previous lab, reopen it and reload the workspace containing the IDCT project:
 
-    ```bash
-    cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_01/idct
-    sdx -workspace ./workspace
-    ```
+```bash
+cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_01/idct
+sdx -workspace ./workspace
+```
 
 ### Optimizating the IDCT kernel
 
