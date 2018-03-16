@@ -1,17 +1,3 @@
-<table style="width:100%">
-  <tr>
-    <th width="100%" colspan="5"><h2>SDAccel AWS F1 Developer Labs</h2></th>
-  </tr>
-  <tr>
-    <td width="20%" align="center"><a href="README.md">Module Overview</a></td>
-    <td width="20%" align="center"><a href="lab_01_helloworld.md">1. Running Helloworld</a></td>
-    <td width="20%" align="center"><a href="lab_02_idct.md">2. Developing F1 applications</a></td>
-    <td width="20%" align="center"><b>3. Wrapping-up</b></td>
-  </tr>
-</table>
-
----------------------------------------
-
 ## Wrap-Up and Next Steps
 
 It is now time to wrap-up this lab. Please follow these steps to close your RDP session and stop your instance. It is important to always stop or terminate AWS EC2 instances when you are done using them. This is a recommended best practice to avoid unwanted charges.
