@@ -51,7 +51,7 @@ These steps explain how start an EC2 F1 instance configured with the SDAccel AWS
 1. At the bottom of the page, open the **Advanced Details** section and add the following user data as text:
     ```bash
     #!/bin/bash
-    echo “centos:sdaccel_labs” | sudo chpasswd
+    echo "centos:sdaccel_labs" | sudo chpasswd
     ```
 1. Click **Review and Launch**
 
