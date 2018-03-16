@@ -21,5 +21,5 @@ Since building FPGA binaries is not instantaneous, all the modules of this Devel
 ---------------------------------------
 
 <p align="center"><b>
-Start the next lab: <a href="lab_01_helloworld.md">1. Running the "Hello World" example</a>
+Start the first lab: <a href="lab_01_helloworld.md">Running the "Hello World" example</a>
 </b></p>
