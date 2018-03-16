@@ -97,5 +97,5 @@ This concludes this first lab.
 ---------------------------------------
 
 <p align="center"><b>
-Start the next lab: <a href="lab_02_idct.md">2. Developing, profiling and optimizing F1 applications with SDAccel</a>
+Start the next lab: <a href="lab_02_idct.md">Developing, profiling and optimizing F1 applications with SDAccel</a>
 </b></p>
