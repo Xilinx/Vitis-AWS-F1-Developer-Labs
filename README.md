@@ -3,7 +3,7 @@
 
 Welcome to the SDAccel AWS F1 Developer Labs. By going through these labs you will gain hands-on experience with AWS F1 and learn how to develop accelerated applications using the Xilinx SDAccel development environment.
 
-#### Prerequisites
+### Prerequisites
 
 In order to run the SDAccel AWS F1 Developer Labs, you will need the following:
 
