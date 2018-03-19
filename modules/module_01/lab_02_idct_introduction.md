@@ -234,7 +234,6 @@ In this lab, you learned:
 
 In the next lab you utilize these analysis capabilities to drive and measure code optimizations. 
 
- 
 ---------------------------------------
 
 <p align="center"><b>
