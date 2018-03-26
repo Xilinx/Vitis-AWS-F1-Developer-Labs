@@ -16,13 +16,13 @@ git clone https://github.com/Xilinx/SDAccel-AWS-F1-Developer-Labs.git
 This module is divided in 3 labs. Since building FPGA binaries is not instantaneous, all the labs will use precompiled FPGA binaries. It is recommended to complete each lab before proceeding to the next.
 
 1. **Running the "Hello World" example** \
-You will get familiar with the steps involved in running a simple application on the F1 instance. \
+You will get familiar with the steps involved in running a simple application on the F1 instance. 
 
 1. **Introduction to the SDAccel development environment** \
-You will use the SDAccel development environment to create and profile an F1 accelerator. The lab focuses on the Inverse Discrete Cosine Transform (IDCT), a compute intensive function used at the heart of all video codecs. \
+You will use the SDAccel development environment to create and profile an F1 accelerator. The lab focuses on the Inverse Discrete Cosine Transform (IDCT), a compute intensive function used at the heart of all video codecs. 
 
 1. **Using the SDAccel GUI to optimize F1 applications** \
-You will continue the IDCT project started in the previous lab and learn how you can use the various reports provided by SDAccel to guide the performance optimization process of your application. \
+You will continue the IDCT project started in the previous lab and learn how you can use the various reports provided by SDAccel to guide the performance optimization process of your application. 
 
 After you complete the last lab, you will be guided to close your RDP session, stop your F1 instance and explore next steps to continue your experience with SDAccel on AWS. 
 
