@@ -91,10 +91,9 @@ You should now be connected to the remote F1 instance running Centos 7 and the S
 
 #### Open the lab instructions on the remote F1 instance
 
-1. In the remote instance, double click on the **Chromium** icon.
-    - It opens the browser and loads the lab instructions.
-    - Note: if a "keyring" popup comes up, click Cancel.
-1. Continue following the lab instructions from within the remote instance and the Chromium browser.
+1. In the remote instance, open **Firefox** from the **Applications** menu (located in top left corner of the desktop)
+    - As it opens, the browser automatically loads this README file.
+1. Continue following the lab instructions from within the remote instance and the web browser.
     - We suggest you perform all your copy-paste from the instructions to the shell within the RDP session to avoid issues.
 
 You instance is now configured to run the SDAccel Developer labs on AWS F1 and you are ready to start the first module.
