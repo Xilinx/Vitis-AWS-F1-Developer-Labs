@@ -30,42 +30,52 @@ Requests are typically processed by AWS in 24 to 48 hours.
 
 ### Usage Instructions
 
-These steps explain how start an EC2 F1 instance configured with the SDAccel AWS F1 Developer Labs AMI and connect to it using a remote desktop client. 
+These steps explain how start an EC2 F1 instance starting from the FPGA Developer AMI and setting it up to connect via a remote desktop client. 
 
 #### Launch an EC2 instance 
 1. Navigate to the AWS EC2 dashboard: [https://console.aws.amazon.com/ec2](https://console.aws.amazon.com/ec2)
 1. In the top right corner, select a region with F1 instances: US East (N.Virginia), US West (Oregon) or EU (Ireland) 
 1. Click **Launch Instance**
 
-#### Choose the SDAccel AWS F1 Developer Labs AMI
-1. Click **AWS Marketplace** (on the left pane, second item under Quick Start)
-1. Search for 'SDAccel'
-1. Select the **SDAccel AWS F1 Developer Labs** AMI
-1. Click **Continue** in the the pop-up screen showing rates for each instance type
+#### Choose the FPGA Developer AMI 1.3.4
+1. Click **AMIs** (on the left pane, under "IMAGES")
+1. Set the pulldown of the search text field to "Public images"
+1. Enter "FPGA" in the text field and press "enter"
+1. Select the **FPGA Developer AMI - 1.3.4...** AMI name
+1. Click **Launch**
 
 #### Choose an F1 instance
-1. Select a **f1.2xlarge** instance
-1. Click **Next: Configure Instance Details**.
+1. In the **All Instance Type** menu select "FPGA Instances"
+1. Select **f1.2xlarge**
 
-#### Configure the instance password
-1. At the bottom of the page, open the **Advanced Details** section and add the following user data as text:
-    ```bash
-    #!/bin/bash
-    echo "centos:sdaccel_labs" | sudo chpasswd
-    ```
-1. Click **Review and Launch**
+#### Enable RDP traffic to enable a remote desktop client to access the F1 instance
+1. At the top of the console, select **Configure Security Groups** 
+1. Click **Add Rule**
+1. Select **RDP** from the pulldown menu
+1. Select **My IP** from the Source pulldown
 
 #### Review and launch
+1. Click **Review and Launch**
 1. Click **Launch**
 1. Select an existing key pair or create a new key pair
-1. Click the check box at the bottom of the dialog
-1. Click **Launch Instances**. A message confirms that your instance is being launched
+1. Monitor the launch, click on the "View Instances" button
 1. Click the instance name to display it in the instance view
 1. Copy or write down the **IPv4 Public IP** address of the instance.
 
 When the status of the newly launched instance switches to green (Running), you are ready to connect to it.
   * Allow about 10 seconds for the instance to get in the 'running' state. 
   * If needed, click the **Refresh** icon (![Refresh](./images/setup/refresh2.png?raw=true)) in the top-right corner of the EC2 Console to update the instance status information.
+
+#### Connect to your instance via a ssh to comple the setup
+1. Click **Review and Launch**
+1. Click **Launch**
+1. Select an existing key pair or create a new key pair
+1. Monitor the launch, click on the "View Instances" button
+1. Click the instance name to display it in the instance view
+1. Copy or write down the **IPv4 Public IP** address of the instance.
+1. Using that IP address, connect to your instance using SSH
+1. Once connected to the shell, make sure the AMI version is 1.3.4
+1. On that screen copy and paste to execute /home/centos/src/scripts/setup_gui.sh
 
 #### Connect to your instance using a remote desktop client
 
