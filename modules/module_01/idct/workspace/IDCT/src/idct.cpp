@@ -210,7 +210,7 @@ class.
 *************************************************************************** */
 class oclDct {
 
-#define NUM_SCHED 1
+#define NUM_SCHED 6
 
 public:
   oclDct();
