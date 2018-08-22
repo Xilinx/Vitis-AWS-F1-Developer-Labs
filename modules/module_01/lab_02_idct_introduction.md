@@ -13,7 +13,7 @@ To simplify this lab, a workspace preloaded with the initial project configurati
 1.  Source the SDAccel environment  
 
     ```bash
-    cd ~/aws-fpga
+    cd ~/src/project_data/aws-fpga
     source sdaccel_setup.sh
     ```
 	*Note: the sdaccel_setup.sh script might generate warning messages, but these can be safely ignored.*
