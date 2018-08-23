@@ -86,7 +86,7 @@ To simplify this lab, a workspace preloaded with the initial project configurati
 	* The **oclDct** class is used to encapsulate the OpenCL runtime calls to interact with the kernel in the FPGA. 
 	* The **aligned_allocator**, **smalloc**, **load_file_to_memory**, and **getBinaryName** functions are small helper functions used during test vector generation and OpenCL setup.
 
-1. Go to line 580 of the **idct.cpp** file by pressing **Ctrl+L** and entering **580**. 
+1. Go to line 580 of the **idct.cpp** file by pressing **Ctrl+L** and entering **544**. 
 
 	This section of code is where the OpenCL environment is setup in the host application. This section is typical of most SDAccel application and will look very familiar to developers with prior OpenCL experience. This body of code can often be reused as-is from project to project. 
 
