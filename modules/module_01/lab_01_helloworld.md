@@ -20,7 +20,7 @@ The "hello world" example is an OpenCL application with a simple vector-addition
 1.  Source the SDAccel environment  
 
     ```bash
-    cd ~/aws-fpga
+    cd ~/src/project_data/aws-fpga
     source sdaccel_setup.sh
     cd ~
     ```
@@ -39,46 +39,46 @@ The "hello world" example is an OpenCL application with a simple vector-addition
 1. Confirm the presence of the precompiled FPGA binary.
 
     ```bash
-    ls -la ./xclbin/vector_addition.hw.xilinx_aws-vu9p-f1_4ddr-xpr-2pr_4_0.awsxclbin
+    ls -la ./xclbin/vector_addition.hw.xilinx_aws-vu9p-f1-04261818_dynamic_5_0.awsxclbin
     ```
 
 1. Execute the host application with the precompiled FPGA binary on the F1 instance.
 
     ```bash
     sudo sh
-    source /opt/Xilinx/SDx/2017.1.rte/setup.sh
+    source /opt/Xilinx/SDx/2017.4.rte.dyn/setup.sh
     ./helloworld
     ```
 
 1. The host application executes using the vector_addition kernel running in the FPGA and produces the following results:
 
     ```shell
-    Device/Slot[0] (/dev/xdma0, 0:0:1d.0)
-    xclProbe found 1 FPGA slots with XDMA driver running
-    platform Name: Xilinx
-    Vendor Name : Xilinx
+    [0]user:0xf010:0x1d51:[xocl:2017.4.5:128]
+    xclProbe found 1 FPGA slots with xocl driver running
     Found Platform
-    Found Device=xilinx:aws-vu9p-f1:4ddr-xpr-2pr:4.0
+    Platform Name: Xilinx
+    Found Device=xilinx_aws-vu9p-f1-04261818_dynamic_5_0
     XCLBIN File Name: vector_addition
-    INFO: Importing ./vector_addition.hw.xilinx_aws-vu9p-f1_4ddr-xpr-2pr_4_0.awsxclbin
-    Loading: './vector_addition.hw.xilinx_aws-vu9p-f1_4ddr-xpr-2pr_4_0.awsxclbin'
-    Result =
-    Hello World !!!
-    Hello World !!!
-    Hello World !!!
-    Hello World !!!
-    Hello World !!!
-    Hello World !!!
-    Hello World !!!
-    Hello World !!!
-    Hello World !!!
-    Hello World !!!
-    Hello World !!!
-    Hello World !!!
-    Hello World !!!
-    Hello World !!!
-    Hello World !!!
-    Hello World !!!
+    INFO: Importing xclbin/vector_addition.hw.xilinx_aws-vu9p-f1-04261818_dynamic_5_0.awsxclbin
+    Loading: 'xclbin/vector_addition.hw.xilinx_aws-vu9p-f1-04261818_dynamic_5_0.awsxclbin'
+    AFI load complete.
+    Result = 
+    Hello World !!! 
+    Hello World !!! 
+    Hello World !!! 
+    Hello World !!! 
+    Hello World !!! 
+    Hello World !!! 
+    Hello World !!! 
+    Hello World !!! 
+    Hello World !!! 
+    Hello World !!! 
+    Hello World !!! 
+    Hello World !!! 
+    Hello World !!! 
+    Hello World !!! 
+    Hello World !!! 
+    Hello World !!! 
     TEST PASSED
     sh-4.2#
     ```

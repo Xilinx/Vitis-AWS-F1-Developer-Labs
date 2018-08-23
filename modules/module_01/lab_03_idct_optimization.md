@@ -76,13 +76,13 @@ These steps would take too long to complete during this lab, therefore a precomp
 1. Retrieve the AFI Id from the \<timestamp\>_afi_id.txt file.
 
 	```bash
-	more ./xclbin/18_03_08-054838_afi_id.txt
+	more ./xclbin/18_08_21-024405_afi_id.txt
 	```	
 
 1. Confirm that the AFI is ready and available using the retrieved AFI Id.
 
 	``` bash
-	aws ec2 describe-fpga-images --fpga-image-ids afi-019771ed57a751918
+	aws ec2 describe-fpga-images --fpga-image-ids afi-06ae3f1cdff964c52
 	```
    
    The output of this command should contain:
@@ -109,9 +109,9 @@ These steps would take too long to complete during this lab, therefore a precomp
 	```bash
     sudo sh
     # Source the SDAccel runtime environment
-    source /opt/Xilinx/SDx/2017.1.rte/setup.sh
+    source /opt/Xilinx/SDx/2017.4.rte.dyn/setup.sh
     # Execute the host application with the .awsxclbin FPGA binary
-    ./IDCT-NS1.exe ./xclbin/krnl_idct.hw.xilinx_aws-vu9p-f1_4ddr-xpr-2pr_4_0.awsxclbin
+    ./IDCT-NS1.exe ./xclbin/krnl_idct.hw.xilinx_aws-vu9p-f1-04261818_dynamic_5_0.awsxclbin
     exit
     ```
 
@@ -201,9 +201,9 @@ The next step is to confirm these results by running on the FPGA attached to the
 	```bash
     sudo sh
     # Source the SDAccel runtime environment
-    source /opt/Xilinx/SDx/2017.1.rte/setup.sh
+    source /opt/Xilinx/SDx/2017.4.rte.dyn/setup.sh
     # Execute the host application with the .awsxclbin FPGA binary
-    ./IDCT-NS6.exe ./xclbin/krnl_idct.hw.xilinx_aws-vu9p-f1_4ddr-xpr-2pr_4_0.awsxclbin
+    ./IDCT-NS6.exe ./xclbin/krnl_idct.hw.xilinx_aws-vu9p-f1-04261818_dynamic_5_0.awsxclbin 
     ```
 
     Note the performance difference between the IDCT running on the CPU and the IDCT running in the FPGA. Note as well the performance difference with the previous run on F1. Using exactly the same FPGA binary but an optimized host application, the overall performance is significantly improved.
