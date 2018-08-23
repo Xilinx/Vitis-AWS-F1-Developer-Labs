@@ -30,18 +30,16 @@ Requests are typically processed in 24 to 48 hours.
 
 ### Usage Instructions
 
-These steps explain how start an EC2 F1 instance starting from the FPGA Developer AMI and setting it up to connect via a remote desktop client. 
+These steps explain how to launch an EC2 F1 instance starting from the FPGA Developer AMI and setting it up to connect via a remote desktop client. 
 
-#### Launch an EC2 instance 
+#### Launch an EC2 F1 instance 
 1. Navigate to the AWS EC2 dashboard: [https://console.aws.amazon.com/ec2](https://console.aws.amazon.com/ec2)
 1. In the top right corner, select a region with F1 instances: US East (N.Virginia), US West (Oregon) or EU (Ireland) 
 1. Click **Launch Instance**
 
-#### Choose the FPGA Developer AMI 1.3.4
+#### Choose the FPGA Developer AMI 1.4
 1. Click **AMIs** (on the left pane, under "IMAGES")
-1. Set the pulldown of the search text field to "Public images"
-1. Enter "FPGA" in the text field and press "enter"
-1. Select the **FPGA Developer AMI - 1.3.4...** AMI name
+1. Select the **FPGA Developer AMI - 1.4...**
 1. Click **Launch**
 
 #### Choose an F1 instance
