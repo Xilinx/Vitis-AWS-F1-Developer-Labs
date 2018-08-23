@@ -25,7 +25,7 @@ AWS users need to request access to use F1 instances. Here are the steps to do s
 * Set the 'New limit value' to 1 or more
 * Fill the rest of the form as appropriate and click 'Submit'
 
-Requests are typically processed by AWS in 24 to 48 hours.
+Requests are typically processed in 24 to 48 hours.
 <p></details><br>
 
 ### Usage Instructions
