@@ -134,66 +134,6 @@ static int load_file_to_memory(const char *filename, char **result) {
 
 /* *************************************************************************** 
 
-getBinaryName 
-
-The example makefile is designed to support many platforms and
-different modes of execution. This results in different naming of the
-final kernel executable code. 
-
-This function generates the name based on the environment setup and
-the provided platform name. The name is returned in the binaryName
-argument.
-
-*************************************************************************** */
-void getBinaryName(std::string &binaryName, char* device_name) {
-  char *xcl_mode = getenv("XCL_EMULATION_MODE");
-  bool isHwFlow = false;
-  bool isAwsFlow = !strcmp(device_name, "xilinx:aws-vu9p-f1:4ddr-xpr-2pr:4.0");
-  binaryName = "xclbin/krnl_idct";
-  
-  if(xcl_mode && !(strcmp(xcl_mode, "sw_emu"))) {
-    std::cout << "Running Software Emulation" << std::endl;
-    binaryName += ".sw_emu";
-  } else if(xcl_mode && !(strcmp(xcl_mode, "hw_emu"))) {
-    std::cout << "Running Hardware Emulation" << std::endl;
-    binaryName += ".hw_emu";
-  } else {
-    isHwFlow = true;
-    std::cout << "Running Hardware" << std::endl;
-    binaryName += ".hw";
-  }
-
-  std::string target = device_name;
-  std::replace(target.begin(), target.end(), ':', '_');
-  std::replace(target.begin(), target.end(), '.', '_');
-  if(!isAwsFlow) {
-    // remove platform version
-    int _count = 0;
-    int count = 0;
-    for (char & c : target) {
-      if(c == '_') {
-	_count++;
-      }
-      if(_count == 3) {
-	break;
-      }
-      count++;
-    }
-    target = target.substr(0,count);
-  }
-  binaryName += "." + target;
-
-  if((isHwFlow==true) && (isAwsFlow==true)) {
-    binaryName += ".awsxclbin";
-  } else {
-    binaryName += ".xclbin";
-  }
-}
-
-
-
-/* *************************************************************************** 
-
 oclDct
 
 This class encapsulates all runtime kernel interaction through openCL.
@@ -254,10 +194,8 @@ private:
   cl_mem_ext_ptr_t  mQExt;
   cl_mem_ext_ptr_t  mOutExt;
 
-  cl_event          inEvVec[NUM_SCHED];
-  cl_event          runEvVec[NUM_SCHED];
   cl_event          outEvVec[NUM_SCHED];
-
+  cl_event          inRunEvVec[NUM_SCHED][2];
 };
 
 
@@ -343,8 +281,11 @@ void oclDct::write(
 		   std::vector<int16_t,aligned_allocator<int16_t>> *out,
 		   bool ignore_dc
 		   ) {
-
+  bool releaseOne = false;
   if(mCount == NUM_SCHED) {
+	if(mHasRun == false) {
+		releaseOne = true;
+	}
     mHasRun = true;
     mCount = 0;
   }
@@ -357,9 +298,12 @@ void oclDct::write(
     clReleaseMemObject(mInBufferVec[mCount][1]);
 
     clReleaseEvent(outEvVec[mCount]);
-    clReleaseEvent(inEvVec[mCount]);
-    clReleaseEvent(runEvVec[mCount]);
-
+    if(releaseOne == true) {
+      clReleaseEvent(inRunEvVec[mCount][0]);
+    } else {
+      clReleaseEvent(inRunEvVec[mCount][0]);
+      clReleaseEvent(inRunEvVec[mCount][1]);
+    }
   }
 
   mInBuffer = &(mInBufferVec[mCount][0]);
@@ -393,8 +337,7 @@ void oclDct::write(
   m_dev_ignore_dc = ignore_dc ? 1 : 0;
 
   // Schedule actual writing of data
-  clEnqueueMigrateMemObjects(mQ, 2, mInBuffer, 0, 0, nullptr, &inEvVec[mCount]);
-  
+  clEnqueueMigrateMemObjects(mQ, 2, mInBuffer, 0, 0, nullptr, &inRunEvVec[mCount][0]);
 }
 
 
@@ -414,7 +357,17 @@ void oclDct::run() {
   clSetKernelArg(mKernel, 3, sizeof(int), &m_dev_ignore_dc);
   clSetKernelArg(mKernel, 4, sizeof(unsigned int), &mNumBlocks64);
 
-  clEnqueueTask(mQ, mKernel, 1, &inEvVec[mCount], &runEvVec[mCount]);
+  unsigned int      mCountNext = mCount + 1;
+  if (mCountNext == NUM_SCHED){
+	  mCountNext = 0;
+  }
+
+  int eventDep = 2;
+  if ((mCount == 0) && (mHasRun == false)) {
+	  eventDep = 1;
+  }
+
+  clEnqueueTask(mQ, mKernel, eventDep, &inRunEvVec[mCount][0], &inRunEvVec[mCountNext][1]);
 }
 
 
@@ -426,7 +379,11 @@ This function enqueues the read back operation of the results of the idct.
 
 *************************************************************************** */
 void oclDct::read() {
-  clEnqueueMigrateMemObjects(mQ, 1, mOutBuffer, CL_MIGRATE_MEM_OBJECT_HOST, 1, &runEvVec[mCount], &outEvVec[mCount]);
+  unsigned int      mCountNext = mCount + 1;
+  if (mCountNext == NUM_SCHED){
+	  mCountNext = 0;
+  }
+  clEnqueueMigrateMemObjects(mQ, 1, mOutBuffer, CL_MIGRATE_MEM_OBJECT_HOST, 1, &inRunEvVec[mCountNext][1], &outEvVec[mCount]);
   mCount++;
 }
 
@@ -441,18 +398,25 @@ transactions and it releases the allocated opencl objects.
 *************************************************************************** */
 void oclDct::finish() {
   clFinish(mQ);
-  unsigned int delCount = mCount-1;
-  if(mHasRun) {
-    delCount = NUM_SCHED;
+  unsigned int delCount = NUM_SCHED;
+  if(mHasRun == false) {
+    delCount = mCount;
   }
   for(unsigned int i = 0; i< delCount; i++) {
     clReleaseMemObject(mOutBufferVec[i][0]);
     clReleaseMemObject(mInBufferVec[i][0]);
     clReleaseMemObject(mInBufferVec[i][1]);
 
-    clReleaseEvent(inEvVec[i]);
-    clReleaseEvent(runEvVec[i]);
+    if((mHasRun == false) && (i == 0)) {
+    	clReleaseEvent(inRunEvVec[i][0]);
+    } else {
+    	clReleaseEvent(inRunEvVec[i][0]);
+    	clReleaseEvent(inRunEvVec[i][1]);
+    }
     clReleaseEvent(outEvVec[i]);
+  }
+  if((mHasRun == false) && (mCount < NUM_SCHED)) {
+	  clReleaseEvent(inRunEvVec[mCount][1]);
   }
 }
 
@@ -521,16 +485,16 @@ int main(int argc, char* argv[]) {
 
   char *xcl_mode = getenv("XCL_EMULATION_MODE");
 
-  int xclbin_argc = -1;
-  for(int i=0; i<argc; i++) {
-    std::string arg = argv[i];
-    std::string xclbinStr = "xclbin";
-    if(arg.find(xclbinStr) != std::string::npos) {
-      xclbin_argc = i;
-    }
+  if (argc != 2) {
+    printf("Usage: %s "
+ 	   "./xclbin/<awsxclbin>\n",
+ 	   argv[0]);
+    return EXIT_FAILURE;
   }
-
-
+  
+  char* binaryName = argv[1];
+  
+  
   // *********** Allocate and initialize test vectors **********
 
   // Blocks of 64 of int16_t
@@ -628,24 +592,18 @@ int main(int argc, char* argv[]) {
 
   std::cout << "DEVICE: " << cl_device_name << std::endl;
 
-  std::string binaryName;
-  if(xclbin_argc != -1) {
-    binaryName = argv[xclbin_argc];
-  } else {
-    getBinaryName(binaryName, cl_device_name);
-  }
-
   std::cout << "Loading Bitstream: " << binaryName << std::endl; 
   char *krnl_bin;
   size_t krnl_size;
-  krnl_size = load_file_to_memory(binaryName.c_str(), &krnl_bin);
+  krnl_size = load_file_to_memory(binaryName, &krnl_bin);
 
   printf("INFO: Loaded file\n");
 
-  cl_program program = clCreateProgramWithBinary(context, 1,
-						 (const cl_device_id* ) &device_id, &krnl_size,
-						 (const unsigned char**) &krnl_bin,
-						 NULL, &err);
+  cl_program program =
+    clCreateProgramWithBinary(context, 1,
+			      (const cl_device_id* ) &device_id, &krnl_size,
+			      (const unsigned char**) &krnl_bin,
+			      NULL, &err);
 
 
   // Create Kernel
