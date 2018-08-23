@@ -15,7 +15,7 @@ If you do not already have an Amazon Web Services (AWS) account, create one here
 <details>
 <summary><strong>Access to AWS F1 instances</strong> <i>(expand for details)</i></summary><p>
 
-By default, AWS users do not have access to F1 instances. You need to request and be granted access to F1 instances before you can start using these instance. Here are the steps to do so:
+AWS users need to request access to use F1 instances. Here are the steps to do so:
 
 * Open the Service Limit Increase form: [http://aws.amazon.com/contact-us/ec2-request](http://aws.amazon.com/contact-us/ec2-request)
 * Make sure your account name is correct
