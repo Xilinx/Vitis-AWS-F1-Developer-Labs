@@ -76,13 +76,13 @@ These steps would take too long to complete during this lab, therefore a precomp
 1. Retrieve the AFI Id from the \<timestamp\>_afi_id.txt file.
 
 	```bash
-	more ./xclbin/18_08_21-024405_afi_id.txt
+	more ./xclbin/18_08_24-150508_afi_id.txt
 	```	
 
 1. Confirm that the AFI is ready and available using the retrieved AFI Id.
 
 	``` bash
-	aws ec2 describe-fpga-images --fpga-image-ids afi-06ae3f1cdff964c52
+	aws ec2 describe-fpga-images --fpga-image-ids afi-046758cae9e15cdc7
 	```
    
    The output of this command should contain:
