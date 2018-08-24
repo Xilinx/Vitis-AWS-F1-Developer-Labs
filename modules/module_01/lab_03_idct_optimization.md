@@ -73,16 +73,16 @@ These steps would take too long to complete during this lab, therefore a precomp
 	ls -la ./xclbin
 	```
 
-1. Retrieve the AFI Id from the \<timestamp\>_afi_id.txt file.
+1. Retrieve the Fpga Image Global Id (agfi) from the \<timestamp\>_afi_id.txt file.
 
 	```bash
-	more ./xclbin/18_08_24-150508_afi_id.txt
+	more ./xclbin/18_08_24-150600_afi_id.txt
 	```	
 
-1. Confirm that the AFI is ready and available using the retrieved AFI Id.
+1. Confirm that the AFI is ready and available using the retrieved global AFI Id.
 
 	``` bash
-	aws ec2 describe-fpga-images --fpga-image-ids afi-046758cae9e15cdc7
+	aws ec2 describe-fpga-images --filters Name=fpga-image-global-id,Values=agfi-007640d8fca34316e
 	```
    
    The output of this command should contain:
