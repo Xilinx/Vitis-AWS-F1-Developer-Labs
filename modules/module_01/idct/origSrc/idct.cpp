@@ -283,9 +283,9 @@ void oclDct::write(
 		   ) {
   bool releaseOne = false;
   if(mCount == NUM_SCHED) {
-	if(mHasRun == false) {
-		releaseOne = true;
-	}
+    if((mHasRun == false) && (NUM_SCHED != 1)) {
+      releaseOne = true;
+    }
     mHasRun = true;
     mCount = 0;
   }
@@ -363,7 +363,7 @@ void oclDct::run() {
   }
 
   int eventDep = 2;
-  if ((mCount == 0) && (mHasRun == false)) {
+  if (((mCount == 0) && (mHasRun == false)) || (NUM_SCHED==1)) {
 	  eventDep = 1;
   }
 
@@ -407,7 +407,7 @@ void oclDct::finish() {
     clReleaseMemObject(mInBufferVec[i][0]);
     clReleaseMemObject(mInBufferVec[i][1]);
 
-    if((mHasRun == false) && (i == 0)) {
+    if((mHasRun == false) && (i == 0) && (NUM_SCHED != 1)) {
     	clReleaseEvent(inRunEvVec[i][0]);
     } else {
     	clReleaseEvent(inRunEvVec[i][0]);
@@ -415,7 +415,7 @@ void oclDct::finish() {
     }
     clReleaseEvent(outEvVec[i]);
   }
-  if((mHasRun == false) && (mCount < NUM_SCHED)) {
+  if((mHasRun == false) && (mCount < NUM_SCHED) && (NUM_SCHED != 1)) {
 	  clReleaseEvent(inRunEvVec[mCount][1]);
   }
 }
