@@ -194,8 +194,10 @@ private:
   cl_mem_ext_ptr_t  mQExt;
   cl_mem_ext_ptr_t  mOutExt;
 
+  cl_event          inEvVec[NUM_SCHED];
+  cl_event          runEvVec[NUM_SCHED];
   cl_event          outEvVec[NUM_SCHED];
-  cl_event          inRunEvVec[NUM_SCHED][2];
+
 };
 
 
@@ -281,11 +283,8 @@ void oclDct::write(
 		   std::vector<int16_t,aligned_allocator<int16_t>> *out,
 		   bool ignore_dc
 		   ) {
-  bool releaseOne = false;
+
   if(mCount == NUM_SCHED) {
-    if((mHasRun == false) && (NUM_SCHED != 1)) {
-      releaseOne = true;
-    }
     mHasRun = true;
     mCount = 0;
   }
@@ -298,12 +297,9 @@ void oclDct::write(
     clReleaseMemObject(mInBufferVec[mCount][1]);
 
     clReleaseEvent(outEvVec[mCount]);
-    if(releaseOne == true) {
-      clReleaseEvent(inRunEvVec[mCount][0]);
-    } else {
-      clReleaseEvent(inRunEvVec[mCount][0]);
-      clReleaseEvent(inRunEvVec[mCount][1]);
-    }
+    clReleaseEvent(inEvVec[mCount]);
+    clReleaseEvent(runEvVec[mCount]);
+
   }
 
   mInBuffer = &(mInBufferVec[mCount][0]);
@@ -337,7 +333,8 @@ void oclDct::write(
   m_dev_ignore_dc = ignore_dc ? 1 : 0;
 
   // Schedule actual writing of data
-  clEnqueueMigrateMemObjects(mQ, 2, mInBuffer, 0, 0, nullptr, &inRunEvVec[mCount][0]);
+  clEnqueueMigrateMemObjects(mQ, 2, mInBuffer, 0, 0, nullptr, &inEvVec[mCount]);
+  
 }
 
 
@@ -357,17 +354,7 @@ void oclDct::run() {
   clSetKernelArg(mKernel, 3, sizeof(int), &m_dev_ignore_dc);
   clSetKernelArg(mKernel, 4, sizeof(unsigned int), &mNumBlocks64);
 
-  unsigned int      mCountNext = mCount + 1;
-  if (mCountNext == NUM_SCHED){
-	  mCountNext = 0;
-  }
-
-  int eventDep = 2;
-  if (((mCount == 0) && (mHasRun == false)) || (NUM_SCHED==1)) {
-	  eventDep = 1;
-  }
-
-  clEnqueueTask(mQ, mKernel, eventDep, &inRunEvVec[mCount][0], &inRunEvVec[mCountNext][1]);
+  clEnqueueTask(mQ, mKernel, 1, &inEvVec[mCount], &runEvVec[mCount]);
 }
 
 
@@ -379,11 +366,7 @@ This function enqueues the read back operation of the results of the idct.
 
 *************************************************************************** */
 void oclDct::read() {
-  unsigned int      mCountNext = mCount + 1;
-  if (mCountNext == NUM_SCHED){
-	  mCountNext = 0;
-  }
-  clEnqueueMigrateMemObjects(mQ, 1, mOutBuffer, CL_MIGRATE_MEM_OBJECT_HOST, 1, &inRunEvVec[mCountNext][1], &outEvVec[mCount]);
+  clEnqueueMigrateMemObjects(mQ, 1, mOutBuffer, CL_MIGRATE_MEM_OBJECT_HOST, 1, &runEvVec[mCount], &outEvVec[mCount]);
   mCount++;
 }
 
@@ -398,25 +381,18 @@ transactions and it releases the allocated opencl objects.
 *************************************************************************** */
 void oclDct::finish() {
   clFinish(mQ);
-  unsigned int delCount = NUM_SCHED;
-  if(mHasRun == false) {
-    delCount = mCount;
+  unsigned int delCount = mCount-1;
+  if(mHasRun) {
+    delCount = NUM_SCHED;
   }
   for(unsigned int i = 0; i< delCount; i++) {
     clReleaseMemObject(mOutBufferVec[i][0]);
     clReleaseMemObject(mInBufferVec[i][0]);
     clReleaseMemObject(mInBufferVec[i][1]);
 
-    if((mHasRun == false) && (i == 0) && (NUM_SCHED != 1)) {
-    	clReleaseEvent(inRunEvVec[i][0]);
-    } else {
-    	clReleaseEvent(inRunEvVec[i][0]);
-    	clReleaseEvent(inRunEvVec[i][1]);
-    }
+    clReleaseEvent(inEvVec[i]);
+    clReleaseEvent(runEvVec[i]);
     clReleaseEvent(outEvVec[i]);
-  }
-  if((mHasRun == false) && (mCount < NUM_SCHED) && (NUM_SCHED != 1)) {
-	  clReleaseEvent(inRunEvVec[mCount][1]);
   }
 }
 
@@ -493,7 +469,7 @@ int main(int argc, char* argv[]) {
   }
   
   char* binaryName = argv[1];
-  
+
   
   // *********** Allocate and initialize test vectors **********
 
