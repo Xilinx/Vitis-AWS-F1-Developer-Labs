@@ -1,46 +1,46 @@
-!SESSION 2018-08-23 16:31:36.892 -----------------------------------------------
+!SESSION 2018-08-31 16:12:03.701 -----------------------------------------------
 eclipse.buildId=2016.1
 java.version=1.8.0_112
 java.vendor=Oracle Corporation
 BootLoader constants: OS=linux, ARCH=x86_64, WS=gtk, NL=en_US
 Command-line arguments:  -os linux -ws gtk -arch x86_64
 
-!ENTRY org.eclipse.emf.ecore 2 0 2018-08-23 16:32:08.373
+!ENTRY org.eclipse.emf.ecore 2 0 2018-08-31 16:12:24.225
 !MESSAGE Both 'com.autoesl.autopilot.ui.models' and 'com.autoesl.autopilot.ui.models' register a package for 'com.autoesl.autopilot.solution'
 
-!ENTRY org.eclipse.ui 2 0 2018-08-23 16:32:08.652
+!ENTRY org.eclipse.ui 2 0 2018-08-31 16:12:24.509
 !MESSAGE Warnings while parsing the commands from the 'org.eclipse.ui.commands' and 'org.eclipse.ui.actionDefinitions' extension points.
-!SUBENTRY 1 org.eclipse.ui 2 0 2018-08-23 16:32:08.652
+!SUBENTRY 1 org.eclipse.ui 2 0 2018-08-31 16:12:24.509
 !MESSAGE Commands should really have a category: plug-in='com.xilinx.sdk.appwiz', id='com.xilinx.sdk.app.commands.ChangeAtfBuiltReferences', categoryId='com.xilinx.sdk.app.commands.category'
 
-!ENTRY org.eclipse.ui 2 0 2018-08-23 16:32:09.551
+!ENTRY org.eclipse.ui 2 0 2018-08-31 16:12:25.579
 !MESSAGE Warnings while parsing the commands from the 'org.eclipse.ui.commands' and 'org.eclipse.ui.actionDefinitions' extension points.
-!SUBENTRY 1 org.eclipse.ui 2 0 2018-08-23 16:32:09.551
+!SUBENTRY 1 org.eclipse.ui 2 0 2018-08-31 16:12:25.579
 !MESSAGE Commands should really have a category: plug-in='com.xilinx.sdk.appwiz', id='com.xilinx.sdk.app.commands.ChangeAtfBuiltReferences', categoryId='com.xilinx.sdk.app.commands.category'
 
-!ENTRY com.xilinx.sdk.utils 0 0 2018-08-23 16:32:14.777
-!MESSAGE XSCT Command: [::hsi::utils::init_repo], Thread: Worker-0
+!ENTRY com.xilinx.sdk.utils 0 0 2018-08-31 16:12:31.744
+!MESSAGE XSCT Command: [::hsi::utils::init_repo], Thread: Worker-1
 
-!ENTRY com.xilinx.sdk.utils 0 0 2018-08-23 16:32:14.792
+!ENTRY com.xilinx.sdk.utils 0 0 2018-08-31 16:12:31.774
 !MESSAGE XSCT Command: [plnx-install-path  ; ::scw::scw_mode gui ], Thread: Thread-13
 
-!ENTRY com.xilinx.sdk.utils 0 0 2018-08-23 16:32:14.807
+!ENTRY com.xilinx.sdk.utils 0 0 2018-08-31 16:12:31.791
 !MESSAGE XSCT Command: [set sdk::sdk_chan tcfchan#0], Thread: Thread-17
 
-!ENTRY com.xilinx.sdk.utils 0 0 2018-08-23 16:32:14.943
-!MESSAGE XSCT command with result: [::hsi::utils::init_repo], Result: [null, ]. Thread: Worker-0
+!ENTRY com.xilinx.sdk.utils 0 0 2018-08-31 16:12:31.945
+!MESSAGE XSCT command with result: [::hsi::utils::init_repo], Result: [null, ]. Thread: Worker-1
 
-!ENTRY com.xilinx.sdk.utils 0 0 2018-08-23 16:32:14.958
+!ENTRY com.xilinx.sdk.utils 0 0 2018-08-31 16:12:31.970
 !MESSAGE XSCT command with result: [plnx-install-path  ; ::scw::scw_mode gui ], Result: [null, ]. Thread: Thread-13
 
-!ENTRY com.xilinx.sdk.utils 0 0 2018-08-23 16:32:14.973
+!ENTRY com.xilinx.sdk.utils 0 0 2018-08-31 16:12:31.986
 !MESSAGE XSCT command with result: [set sdk::sdk_chan tcfchan#0], Result: [null, tcfchan#0]. Thread: Thread-17
 
-!ENTRY com.xilinx.sdk.utils 0 0 2018-08-23 16:32:14.988
+!ENTRY com.xilinx.sdk.utils 0 0 2018-08-31 16:12:32.009
 !MESSAGE XSCT Command: [setws /home/centos/src/shared_project_data/users/pfrey/SDAccel-AWS-F1-Developer-Labs/modules/module_01/idct/workspace], Thread: Thread-17
 
-!ENTRY com.xilinx.sdk.utils 0 0 2018-08-23 16:32:15.003
+!ENTRY com.xilinx.sdk.utils 0 0 2018-08-31 16:12:32.027
 !MESSAGE XSCT command with result: [setws /home/centos/src/shared_project_data/users/pfrey/SDAccel-AWS-F1-Developer-Labs/modules/module_01/idct/workspace], Result: [null, ]. Thread: Thread-17
 
-!ENTRY org.eclipse.cdt.core 1 0 2018-08-23 16:33:19.260
+!ENTRY org.eclipse.cdt.core 1 0 2018-08-31 16:13:20.065
 !MESSAGE Indexed 'IDCT' (0 sources, 0 headers) in 0.002 sec: 0 declarations; 0 references; 0 unresolved inclusions; 0 syntax errors; 0 unresolved names (0%)
