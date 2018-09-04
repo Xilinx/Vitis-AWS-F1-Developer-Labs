@@ -1,4 +1,0 @@
-{
-    "FpgaImageId": "afi-019771ed57a751918", 
-    "FpgaImageGlobalId": "agfi-0eb9488a0bac319f9"
-}

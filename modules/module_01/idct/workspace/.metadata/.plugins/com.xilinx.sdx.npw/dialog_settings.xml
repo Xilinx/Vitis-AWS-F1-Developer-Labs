@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section name="Workbench">
+	<item value="/home/centos/src/project_data/aws-fpga/SDAccel/aws_platform/xilinx_aws-vu9p-f1-04261818_dynamic_5_0/xilinx_aws-vu9p-f1-04261818_dynamic_5_0.xpfm" key="sdx.platform"/>
+	<item value="/home/centos/src/shared_project_data/users/pfrey/SDAccel-AWS-F1-Developer-Labs/modules/module_01/idct/workspace" key="sdx.project.location"/>
+	<item value="1" key="sdx.device.count"/>
+	<item value="false" key="sdx.is.shared.library"/>
+	<item value="false" key="sdx.is.system.root"/>
+	<item value="OpenCL" key="sdx.runtime"/>
+	<item value="/home/centos/src/project_data/aws-fpga/SDAccel/aws_platform" key="sdx.custom.platform.repository.locations"/>
+	<item value="IDCT" key="sdx.project.name"/>
+	<item value="linux" key="sdx.os"/>
+	<item value="linux_x86" key="sdx.system.configuration"/>
+</section>
