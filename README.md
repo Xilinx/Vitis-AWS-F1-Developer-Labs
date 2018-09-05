@@ -27,10 +27,9 @@ AWS users need to request access to use F1 instances. Here are the steps to do s
 
 Requests are typically processed in 24 to 48 hours.
 <p></details><br>
-
 ### Usage Instructions
 
-These steps explain how to launch an EC2 F1 instance starting from the FPGA Developer AMI and setting it up to connect via a remote desktop client. 
+The following steps explain how to launch an EC2 F1 instance starting from the FPGA Developer AMI and setting it up to connect via a remote desktop client. 
 
 #### Launch an EC2 F1 instance 
 1. Navigate to the AWS EC2 dashboard: [https://console.aws.amazon.com/ec2](https://console.aws.amazon.com/ec2)
