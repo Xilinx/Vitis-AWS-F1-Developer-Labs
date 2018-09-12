@@ -25,13 +25,14 @@ More modules will be added to the SDAccel AWS F1 Developer Labs over time. In th
 | Resource | Title                       | Description  |
 | -------- |---------------------------- | ----- |
 | Video  | **Learn more about the SDAccel OpenCL application structure** | This video introduces the host code and kernel elements of an OpenCL application and explains how they map to Xilinx FPGAs. [**Click here**](https://www.xilinx.com/video/hardware/opencl-application-structure.html). |
-| Tutorial | **Create, configure and test an AWS F1 instance** | Learn how to launch and configure an F1 instance to work with the SDAccel development environment. [**Click here**](https://github.com/Xilinx/SDAccel_Examples/wiki/Create,-configure-and-test-an-AWS-F1-instance). |
 | Tutorial | **Get started on F1 with the SDAccel C/OpenCL flow** | This guide takes new users through all the steps required to build a first working application on F1. [**Click here**](https://github.com/Xilinx/SDAccel_Examples/wiki/Getting-Started-on-AWS-F1-with-SDAccel-and-C-OpenCL-Kernels). |
 | Tutorial | **Get started on F1 with the SDAccel RTL flow** | This guide is targeted to developers with prior hardware design experience and legacy RTL designs. [**Click here**](https://github.com/Xilinx/SDAccel_Examples/wiki/Getting-Started-on-AWS-F1-with-SDAccel-and-RTL-Kernels). |
+| Documentation | **SDAccel Development Environment HTML Documentation** | Learn how to get the most out of the SDAccel development environment. [**Click here**](https://www.xilinx.com/html_docs/xilinx2018_2/sdaccel_doc/). |
+| F1 App | **SDAccel Apps and Libraries** | Check-out the growing list of accelerated application and libraries available today. [**Click here**](https://www.xilinx.com/products/design-tools/acceleration-zone.html#libraries). |
 | F1 App | **Test-drive Xilinx GoogLeNet / ResNet on AWS F1** | See for yourself how Xilinx can accelerate machine learning image classification on AWS F1. [**Click here**](https://aws.amazon.com/marketplace/pp/B077FM2JNS). |
 
 ---------------------------------------
 
 <p align="center"><b>
-Return to the beginning of this module: <a href="README.md">Introduction to the SDAccel Flow</a>
+Return to the beginning: <a href="../../README.md">SDAccel AWS F1 Developer Labs</a>
 </b></p>

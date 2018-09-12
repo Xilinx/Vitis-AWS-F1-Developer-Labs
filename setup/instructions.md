@@ -36,7 +36,7 @@ The following steps explain how to launch an EC2 F1 instance starting from the F
 1. Click **Launch Instance**. This takes you to the AMI selection step.
 1. Click **AWS Markeplace** (in the left pane)
 1. Enter **FPGA** in the search box 
-1. **Select** the **FPGA Developer AMI**. This brings up a pop-up screen showing pricing details. 
+1. **Select** the "FPGA Developer AMI". This brings up a pop-up screen showing pricing details. 
 1. Click **Continue** to proceed to the instance type selection step.
 1. Scroll down to select a **f1.2xlarge** instance
 1. At the top of the console, click on **6. Configure Security Groups** 
@@ -46,13 +46,13 @@ The following steps explain how to launch an EC2 F1 instance starting from the F
 1. Click **Review and Launch**. This brings up the instance launch review page.
 1. Click **Launch** to launch your instance.
 1. Select a valid key pair and **check** the acknowledge box at the bottom of the dialog
-1. Select **Launch Instaces**. This brings up the launch status page
+1. Select **Launch Instances**. This brings up the launch status page
 1. When ready, select **View Instances** at the bottom of the page
 
 #### Connect to your EC2 F1 instance
 1. When the status of the newly launched instance switches to green (Running), you are ready to connect to it.
     - Allow about 10 seconds for the instance to get in the 'running' state. 
-    - If needed, click the **Refresh** icon (![Refresh](./images/setup/refresh2.png?raw=true)) in the top-right corner of the EC2 Console to update the instance status information.
+    - If needed, click the **Refresh** icon (![Refresh](../images/setup/refresh2.png?raw=true)) in the top-right corner of the EC2 Console to update the instance status information.
 1. In the AWS EC2 dashboard, select your instance to display its information in the bottom pane
 1. Copy or write down the **IPv4 Public IP** address of the instance.
 1. Using that IP address, connect to your instance using SSH (Linux) or PuTTY (Windows)
@@ -80,7 +80,7 @@ The FPGA Developer AMI doesn't include a GUI Desktop. These steps install the Gn
 #### Connect using a remote desktop client
 1. From your local machine, start a remote desktop protocol (RDP) client
     - On Windows: press the Windows key and type "mstsc.exe" in the Windows run prompt
-    - On Linux: RDP clients such a Remmina or Vinagre are suitable
+    - On Linux: use an RDP client such a Remmina or Vinagre
     - On macOS: use the Microsoft Remote Desktop v8.0.43 (that version offers color depth settings) from the Mac App Store
 1. **IMPORTANT**: Set your RDP client to use **24-bit for color depth**
     - On Windows: In the bottom-left corner of connection prompt, click Options, then select the Display tab and set Colors to True Colors (24 bit)
@@ -97,5 +97,5 @@ You are now connected via RDP to your F1 instance running Centos 7 and the FPGA 
 ---------------------------------------
 
 <p align="center"><b>
-<a href="../README.md">Start the SDAccel Developer Labs</a>
+<a href="../README.md#module-1---introduction-to-the-sdaccel-flow">Start the SDAccel Developer Labs</a>
 </b></p>

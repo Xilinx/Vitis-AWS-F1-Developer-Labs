@@ -1,11 +1,19 @@
 ## Module 1: Introduction to the SDAccel Flow
 
 
-### Downloading the lab contents
+### Prepating to run the labs
 
-Before starting this module, perform a fresh reinstall of the lab contents on your instance. Open a new terminal by right-clicking anywhere in the Desktop area and selecting **Open Terminal**, then run the following commands:
+Before starting this module, perform a fresh reinstall of the AWS EC2 FPGA Development Kit and download the lab contents on your instance. Open a new terminal by right-clicking anywhere in the Desktop area and selecting **Open Terminal**, then run the following commands:
 
 ```bash  
+# Install the AWS EC2 FPGA Development Kit
+cd ~
+rm -rf $AWS_FPGA_REPO_DIR
+git clone https://github.com/aws/aws-fpga.git $AWS_FPGA_REPO_DIR  
+cd $AWS_FPGA_REPO_DIR                                         
+source sdaccel_setup.sh
+
+# Download the SDAccel F1 Developer Labs
 cd ~
 rm -rf SDAccel-AWS-F1-Developer-Labs
 git clone https://github.com/Xilinx/SDAccel-AWS-F1-Developer-Labs.git

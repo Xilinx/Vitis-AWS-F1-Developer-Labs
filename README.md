@@ -10,7 +10,7 @@ In order to run the SDAccel AWS F1 Developer Labs, you need the following:
 * Access to AWS F1 instances
 * Familiarity with launching an AWS EC2 F1 instance with RDP services enabled
 
-If you need help with any of the above, follow the [setup instructions](./setup/instructions.md)
+If you need help with any of the above, follow the [**setup instructions**](./setup/instructions.md)
 
 ### Developer Lab Modules
 
@@ -19,7 +19,7 @@ If you need help with any of the above, follow the [setup instructions](./setup/
 * Introduction to the SDAccel development environment 
 * Using the SDAccel GUI to optimize applications 
 
-[FOLLOW THE INSTRUCTIONS](./modules/module_01/README.md)
+[**FOLLOW THE INSTRUCTIONS**](./modules/module_01/README.md)
 
 #### Module 2
 _Coming Soon..._
