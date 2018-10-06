@@ -12,6 +12,10 @@ In order to run the SDAccel AWS F1 Developer Labs, you need the following:
 
 If you need help with any of the above, follow the [**setup instructions**](./setup/instructions.md)
 
+### Supported Versions
+
+These labs are based on SDAccel 2017.4.op available with the FPGA Developer AMI v1.4.0. Please make sure to select this version when you launch your instance. To find this AMI, search for "FPGA Developer AMI - 1.4.0" in the Community AMIs.
+
 ### Developer Lab Modules
 
 #### Module 1 - Introduction to the SDAccel Flow
