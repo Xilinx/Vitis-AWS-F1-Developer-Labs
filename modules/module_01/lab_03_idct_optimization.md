@@ -21,11 +21,11 @@ Looking at the **HLS Report**, we identified that the read, execute and write fu
 
 1. Observe that the three functions are communicating using `hls::streams` objects. These objects model a FIFO-based communication scheme. This is the recommended coding style which should be used whenever possible to exhibit streaming behavior and allow DATAFLOW optimization.
 
-1. Enable the DATAFLOW optimization by uncommenting the **#pragma DATAFLOW** present in the **krnl_idct_dataflow** function (line 322). 
-	
-    - The DATAFLOW optimization allows each of the subsequent functions to execute as independent processes. 
+1. Enable the DATAFLOW optimization by uncommenting the **#pragma DATAFLOW** present in the **krnl_idct_dataflow** function (line 322).
+
+    - The DATAFLOW optimization allows each of the subsequent functions to execute as independent processes.
     - This results in overlapping and pipelined execution of the read, execute and write functions instead of sequential execution.
-    - The FIFO channels between the different processes do not need to buffer the complete dataset anymore but can directly stream the data to the next block. 
+    - The FIFO channels between the different processes do not need to buffer the complete dataset anymore but can directly stream the data to the next block.
 
 1. Comment out the three **#pragma HLS stream** statements on lines 327, 328 and 329.
 
@@ -40,15 +40,15 @@ Looking at the **HLS Report**, we identified that the read, execute and write fu
     - Latency (min/max):
     - Interval (min/max):
 
-1. Run the **Emulation-HW** flow by clicking the run button, ![](../../images/module_01/lab_02_idct/RunButton.PNG). 
+1. Run the **Emulation-HW** flow by clicking the run button, ![](../../images/module_01/lab_02_idct/RunButton.PNG).
 
 1. After the run finishes with the `RUN COMPLETE` message, open the new **Profile Summary** for the **Emulation-HW** run and select the **Kernels & Compute Units** tab.  
 
 1. Compare the **Kernel Total Time (ms)** with the results from the unoptimized run.
 
-### Building the FPGA binary to execute on F1 
+### Building the FPGA binary to execute on F1
 
-The next step is to create an FPGA binary to test the optimized kernel on the FPGA attached to the F1 instance. 
+The next step is to create an FPGA binary to test the optimized kernel on the FPGA attached to the F1 instance.
 
 Creating the FPGA binary is a two-step process:
 * First SDAccel is used to build the Xilinx FPGA binary (.xclbin file).
@@ -68,7 +68,7 @@ These steps would take too long to complete during this lab, therefore a precomp
 	```bash
 	# Go the lab folder
 	cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_01/idct
-	
+
 	# List contents of the ./xclbin directory to look for the .awsxclbin FPGA binary
 	ls -la ./xclbin
 	```
@@ -77,14 +77,14 @@ These steps would take too long to complete during this lab, therefore a precomp
 
 	```bash
 	more ./xclbin/18_08_24-150600_afi_id.txt
-	```	
+	```
 
 1. Confirm that the AFI is ready and available using the retrieved global AFI Id.
 
 	``` bash
 	aws ec2 describe-fpga-images --filters Name=fpga-image-global-id,Values=agfi-007640d8fca34316e
 	```
-   
+
    The output of this command should contain:
 
     ```json
@@ -95,7 +95,7 @@ These steps would take too long to complete during this lab, therefore a precomp
     ...
     ```
 
-### Executing on F1 
+### Executing on F1
 
 1. Copy the host application executable built by SDAccel to the local directory.
 
@@ -109,7 +109,7 @@ These steps would take too long to complete during this lab, therefore a precomp
 	```bash
     sudo sh
     # Source the SDAccel runtime environment
-    source /opt/Xilinx/SDx/2017.4.rte.dyn/setup.sh
+    source /opt/xilinx/xrt/setup.sh
     # Execute the host application with the .awsxclbin FPGA binary
     ./IDCT-NS1.exe ./xclbin/krnl_idct.hw.xilinx_aws-vu9p-f1-04261818_dynamic_5_0.awsxclbin
     exit
@@ -128,14 +128,14 @@ For optimal performance both the hardware and software components of the applica
 
 1. Using the **Outline** viewer, navigate to the **runFPGA** function.
 
-	For each block of 8x8 values, the **runFPGA** function writes data to the FPGA, runs the kernel, and reads results back. 
-	
+	For each block of 8x8 values, the **runFPGA** function writes data to the FPGA, runs the kernel, and reads results back.
+
 	Communication with the FPGA is handled by OpenCL API calls made within the cu.write, cu.run and cu.read functions.
 	- **clEnqueueMigrateMemObjects** schedules the transfer of data to or from the FPGA.
 	- **clEnqueueTask** schedules the executing of the kernel.
 
 	These OpenCL functions use events to signal their completion and synchronize execution.
-	
+
 1. Open the **Application Timeline** of the **Emulation-HW** run.  
 
 	The green segments at the bottom indicate when the IDCT kernel is running.
@@ -146,44 +146,44 @@ For optimal performance both the hardware and software components of the applica
 
     ![](../../images/module_01/lab_02_idct/ZoomApplicationTimeline.PNG)
 
-    - The two green segments correspond to two consecutive invocations of the IDCT kernel. 
-    - The gap between the two segments is indicative of idle time between these two invocations. 
-    - The **Data Transfer** section of the timeline shows that **Read** and **Write** operations are happening when the kernel is idle. 
-    - The **Read** operation is to retrieve the results from the execution which just finished and the **Write** operation is to send inputs for the next execution. 
+    - The two green segments correspond to two consecutive invocations of the IDCT kernel.
+    - The gap between the two segments is indicative of idle time between these two invocations.
+    - The **Data Transfer** section of the timeline shows that **Read** and **Write** operations are happening when the kernel is idle.
+    - The **Read** operation is to retrieve the results from the execution which just finished and the **Write** operation is to send inputs for the next execution.
     - This represents a sequential execution flow of each iteration.  
-    
+
 1. Close the **Application Timeline**.    
-	
+
 1. In the **idct.cpp** file, go to the **oclDct::write** function.
 
-	- Observe that on line 293, the function synchronizes on the **outEvVec** event through a call to **clWaitForEvents**. 
+	- Observe that on line 293, the function synchronizes on the **outEvVec** event through a call to **clWaitForEvents**.
 	- This event is generated by the completion of the **clEnqueueMigrateMemObjects** call in the **oclDct::read** function (line 369).
-	- Effectively the next execution of the **oclDct::write** function is gated by the completion of the previous **oclDct::read** function, resulting in the sequential behavior observed in the **Application Timeline**. 
-	
-	
+	- Effectively the next execution of the **oclDct::write** function is gated by the completion of the previous **oclDct::read** function, resulting in the sequential behavior observed in the **Application Timeline**.
+
+
 1. Use the **Outline** viewer to locate the definition of the **NUM_SCHED** macro in the **idct.cpp** file.
-	
+
 	- This macro defines the depth of the event queue.
-	- The value of **1** explains the observed behavior: new tasks (write, run, read) are only enqueued when the previous has completed effectively synchronizing each loop iteration. 
-	- By increasing the value of the **NUM_SCHED** macro, we increase the depth of the event queue and enable more blocks to be enqueued for processing. This will result in the write, run and read tasks to overlap and allow the kernel to execute continuously. 
-	- This technique is called **software pipelining**. 
-	
+	- The value of **1** explains the observed behavior: new tasks (write, run, read) are only enqueued when the previous has completed effectively synchronizing each loop iteration.
+	- By increasing the value of the **NUM_SCHED** macro, we increase the depth of the event queue and enable more blocks to be enqueued for processing. This will result in the write, run and read tasks to overlap and allow the kernel to execute continuously.
+	- This technique is called **software pipelining**.
+
 1. Modify line 153 to increase the value of **NUM_SCHED** to 6 as follows:
 	```C
 	#define NUM_SCHED 6
 	```
-1. Save the file (**Ctrl-S**) and rerun hardware emulation by clicking the run button ![](../../images/module_01/lab_02_idct/RunButton.PNG). 
+1. Save the file (**Ctrl-S**) and rerun hardware emulation by clicking the run button ![](../../images/module_01/lab_02_idct/RunButton.PNG).
 
     - Since only the **idct.cpp** file was change, the incremental makefile rebuilds only the host code before running emulation.
     - This results in a much faster iteration loop since it is usually the compilation of the kernel to hardware which takes the most time.
-    
+
 1. Once completed, reopen the **Application Timeline** and observe how **software pipelining** enables overlapping of data transfers and kernel exectution.
 
     ![](../../images/module_01/lab_02_idct/ZoomApplicationTimelineEnd.PNG)
-	
-	Note: system tasks might slow down communication between the application and the hardware simulation, impacting on the measured performance results. The effect of software pipelining is considerably higher when running on the actual hardware. 
 
-### Executing on F1 
+	Note: system tasks might slow down communication between the application and the hardware simulation, impacting on the measured performance results. The effect of software pipelining is considerably higher when running on the actual hardware.
+
+### Executing on F1
 
 The next step is to confirm these results by running on the FPGA attached to the F1 instance. Since only the host application was modified, the same precompiled FPGA binary can used.
 
@@ -201,7 +201,7 @@ The next step is to confirm these results by running on the FPGA attached to the
 	```bash
     sudo sh
     # Source the SDAccel runtime environment
-    source /opt/Xilinx/SDx/2017.4.rte.dyn/setup.sh
+    source /opt/xilinx/xrt/setup.sh
     # Execute the host application with the .awsxclbin FPGA binary
     ./IDCT-NS6.exe ./xclbin/krnl_idct.hw.xilinx_aws-vu9p-f1-04261818_dynamic_5_0.awsxclbin 
     ```
