@@ -1,23 +1,22 @@
-## Using the SDAccel GUI to optimize F1 applications
+## Optimize F1 applications
 
 This lab builds on the previous one ([Introduction to the SDAccel development environment](lab_02_idct.md)) which gave an overview of the SDAccel development environment and explained the various performance analysis capabilities provided by the tool. In this lab you will utilize these analysis capabilities to drive and measure code optimizations. This lab illustrates the DATAFLOW optimization for the kernel and software pipelining for the host application.
 
 Please note that although the entire lab is performed on an F1 instance, only the final step of this lab really needs to be run on F1. All the interactive development, profiling and optimization steps would normally be performed on-premise or on a cost-effective AWS EC2 instance such as C4. However, to avoid switching from C4 to F1 instances during this lab, all the steps are performed on the F1 instance.
 
-If you have closed the SDAccel GUI at the end of the previous lab, reopen it and reload the workspace containing the IDCT project:
+If you have closed the terminal window at the end of the previous lab, open a new one and go back to the project folder:
 
 ```bash
 cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_01/idct
-sdx -workspace ./workspace
 ```
 
 ### Optimizing the IDCT kernel
 
-Looking at the **HLS Report**, we identified that the read, execute and write functions of the **krnl_idct_dataflow** function have roughly the same latency and are executing sequentially. We still start by focusing on this performance aspect.
+Remember when we Looked at the **HLS Report**, we identified that the read, execute and write functions of the **krnl_idct_dataflow** function have roughly the same latency and are executing sequentially. We still start by focusing on this performance aspect.
 
-1. Open **krnl_idct.cpp** file (from the **Project Explorer** window).  
+1. Open **krnl_idct.cpp** file.  
 
-1. Using the **Outline** viewer, navigate to the **krnl_idct_dataflow** function.
+1. Navigate to the **krnl_idct_dataflow** function.
 
 1. Observe that the three functions are communicating using `hls::streams` objects. These objects model a FIFO-based communication scheme. This is the recommended coding style which should be used whenever possible to exhibit streaming behavior and allow DATAFLOW optimization.
 
@@ -29,20 +28,23 @@ Looking at the **HLS Report**, we identified that the read, execute and write fu
 
 1. Comment out the three **#pragma HLS stream** statements on lines 327, 328 and 329.
 
-1. Save the file (**Ctrl-S**).
+1. Save the file.
 
-1. Rebuild the **Emulation-HW** configuration of the project by clicking the ![](../../images/module_01/lab_02_idct/BuildButton.PNG) button.
-	- The build process for hardware emulation takes a couple of minutes to run.
+1. Clean the generated files before launching hardware emulation with updated source file.
+```
+make clean
+```
 
-1. Open the new **HLS Report** (in the **Reports** view, open the**Emulation-HW** folder and expand the **binary_container_1** folder).
+1. Rerun hardware emulation.
+```
+make run TARGET=hw_emu
+```
 
-1. Compare the new latency numbers reported in the **Performance Estimates** section with the previous numbers and you will note considerable improvement based on the DATAFLOW optimization.  
+1. Open the new **krnl_idct_dataflow_csynth.rpt** and compare the new latency numbers reported in the **Performance Estimates** section with the previous numbers and you will note considerable improvement based on the DATAFLOW optimization.  
     - Latency (min/max):
     - Interval (min/max):
 
-1. Run the **Emulation-HW** flow by clicking the run button, ![](../../images/module_01/lab_02_idct/RunButton.PNG).
-
-1. After the run finishes with the `RUN COMPLETE` message, open the new **Profile Summary** for the **Emulation-HW** run and select the **Kernels & Compute Units** tab.  
+1. Open the new profile summary report for the hardware emulation and select the **Kernels & Compute Units** tab. If you forget how to view the report, you can go back to previous section for detailed steps.
 
 1. Compare the **Kernel Total Time (ms)** with the results from the unoptimized run.
 
@@ -52,7 +54,7 @@ The next step is to create an FPGA binary to test the optimized kernel on the FP
 
 Creating the FPGA binary is a two-step process:
 * First SDAccel is used to build the Xilinx FPGA binary (.xclbin file).
-* Then the AWS **create_sdaccel_afi.sh** script is used to create the AWS FPGA binary (.awsxclbin file) and regiser a secured and encrypted Amazon FPGA Image (AFI).
+* Then the AWS **create_sdaccel_afi.sh** script is used to create the AWS FPGA binary (.awsxclbin file) and register a secured and encrypted Amazon FPGA Image (AFI).
 
 The **create_sdaccel_afi.sh** script does the following:
 * Starts a background process to create the AFI
@@ -122,11 +124,11 @@ These steps would take too long to complete during this lab, therefore a precomp
 
 For optimal performance both the hardware and software components of the application need to be optimized. This next sections shows how the **software pipelining** technique can be used to overlap transactions from the host to the kernels and thereby improve overall system throughput.
 
-1. Return to the SDAccel development environment.
+1. Return to the project folder in terminal window.
 
-1. Open **idct.cpp** file (from the **Project Explorer** window).  
+1. Open **idct.cpp** file.  
 
-1. Using the **Outline** viewer, navigate to the **runFPGA** function.
+1. Navigate to the **runFPGA** function.
 
 	For each block of 8x8 values, the **runFPGA** function writes data to the FPGA, runs the kernel, and reads results back.
 
@@ -136,7 +138,7 @@ For optimal performance both the hardware and software components of the applica
 
 	These OpenCL functions use events to signal their completion and synchronize execution.
 
-1. Open the **Application Timeline** of the **Emulation-HW** run.  
+1. Open the application timeline report of the hardware emulation run. If you forget how to view the report, you can go back to previous section for detailed steps.  
 
 	The green segments at the bottom indicate when the IDCT kernel is running.
 
@@ -152,7 +154,7 @@ For optimal performance both the hardware and software components of the applica
     - The **Read** operation is to retrieve the results from the execution which just finished and the **Write** operation is to send inputs for the next execution.
     - This represents a sequential execution flow of each iteration.  
 
-1. Close the **Application Timeline**.    
+1. Close the application timeline report.    
 
 1. In the **idct.cpp** file, go to the **oclDct::write** function.
 
@@ -161,7 +163,7 @@ For optimal performance both the hardware and software components of the applica
 	- Effectively the next execution of the **oclDct::write** function is gated by the completion of the previous **oclDct::read** function, resulting in the sequential behavior observed in the **Application Timeline**.
 
 
-1. Use the **Outline** viewer to locate the definition of the **NUM_SCHED** macro in the **idct.cpp** file.
+1. Navigate to the definition of the **NUM_SCHED** macro in the **idct.cpp** file.
 
 	- This macro defines the depth of the event queue.
 	- The value of **1** explains the observed behavior: new tasks (write, run, read) are only enqueued when the previous has completed effectively synchronizing each loop iteration.
@@ -172,12 +174,14 @@ For optimal performance both the hardware and software components of the applica
 	```C
 	#define NUM_SCHED 6
 	```
-1. Save the file (**Ctrl-S**) and rerun hardware emulation by clicking the run button ![](../../images/module_01/lab_02_idct/RunButton.PNG).
+1. Save the file.
+
+1. Rerun hardware emulation.
 
     - Since only the **idct.cpp** file was change, the incremental makefile rebuilds only the host code before running emulation.
     - This results in a much faster iteration loop since it is usually the compilation of the kernel to hardware which takes the most time.
 
-1. Once completed, reopen the **Application Timeline** and observe how **software pipelining** enables overlapping of data transfers and kernel exectution.
+1. Once completed, reopen the application timeline report and observe how **software pipelining** enables overlapping of data transfers and kernel execution.
 
     ![](../../images/module_01/lab_02_idct/ZoomApplicationTimelineEnd.PNG)
 
@@ -203,7 +207,7 @@ The next step is to confirm these results by running on the FPGA attached to the
     # Source the SDAccel runtime environment
     source /opt/xilinx/xrt/setup.sh
     # Execute the host application with the .awsxclbin FPGA binary
-    ./IDCT-NS6.exe ./xclbin/krnl_idct.hw.xilinx_aws-vu9p-f1-04261818_dynamic_5_0.awsxclbin 
+    ./IDCT-NS6.exe ./xclbin/krnl_idct.hw.xilinx_aws-vu9p-f1-04261818_dynamic_5_0.awsxclbin
     ```
 
     Note the performance difference between the IDCT running on the CPU and the IDCT running in the FPGA. Note as well the performance difference with the previous run on F1. Using exactly the same FPGA binary but an optimized host application, the overall performance is significantly improved.
