@@ -1,4 +1,4 @@
-## Introduction to the SDAccel development environment
+## Using XOCC command line flow to develop and compile F1 accelerator
 
 This lab is designed to teach the fundamentals of the SDAccel development environment and programming model. This includes: familiarizing with OpenCL, understanding software and hardware emulation flows, profiling performance and identifying how to optimize host and kernel code.
 
@@ -9,7 +9,7 @@ The kernel used in this lab is an Inverse Discrete Cosine Transform (IDCT), a fu
 
 1.  Open a new terminal by right-clicking anywhere in the Desktop area and selecting **Open Terminal**.
 
-1.  Source the SDAccel environment  
+1.  Set up the SDAccel environment.  
 
     ```bash
     cd ~/src/project_data/aws-fpga
@@ -17,18 +17,20 @@ The kernel used in this lab is an Inverse Discrete Cosine Transform (IDCT), a fu
     ```
 	*Note: the sdaccel_setup.sh script might generate warning messages, but these can be safely ignored.*
 
-1.  Go to design folder and investigate the files
+1.  Go to design folder and investigate the files.
     ```bash
     # Go to the lab directory
     cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_01/idct/design
     ls
     ```
-	  This command listed the files and directory under `design`. The `src` folder contains the source files for kernel and host code. The `Makefile` is provided for design compilation and execution.
-    Let's open up the make file and take a look at its contents.
+	  This command listed the files and directory under `design`. The `src` folder contains the kernel source file and host code. The `Makefile` is provided for design compilation and execution. Let's open up the make file and take a look at its contents.
+    ```
+    vi Makefile
+    ```
 
-    In 'platform selection' part, the default target platform is set as `xilinx_aws-vu9p-f1-04261818_dynamic_5_0` which is the AWS F1 platform.
+    In 'platform selection' section, the default target platform is set as `xilinx_aws-vu9p-f1-04261818_dynamic_5_0` which is the AWS F1 platform.
 
-    The next couple of lines define the design files location and filenames. Following that is the host compiler settings and kernel compiler and linker settings. Notice that in the last line of kernel linker setting, DDR banks are assigned to each port. You don't need to modify any of the options here but you are welcome to play with them after finishing this tutorial.
+    The next couple of lines define the design files location and filenames. Following that is the host compiler settings and kernel compiler and linker settings. Notice that in the last line of kernel linker setting, DDR banks are assigned to each port. You don't need to modify any of the options here but you may want to play with them after finishing this tutorial.
 
     Exit Makefile view window and let's take a look at the design files.
 
@@ -77,10 +79,10 @@ The kernel used in this lab is an Inverse Discrete Cosine Transform (IDCT), a fu
 ### Running the Emulation Flows
 
 SDAccel provides two emulation flows which allow testing the application before deploying it on the F1 instance. The flows are referred to as software emulation and hardware emulation, respectively.
-* Software emulation is used to identify syntax issues and verify the behavior of application.
-* Hardware emulation is used to get performance estimates for the accelerated application.
+  * Software emulation is used to identify syntax issues and verify the behavior of application.
+  * Hardware emulation is used to get performance estimates for the accelerated application.
 
-1.  Make sure current directory is idct/design. Run below commands in the terminal window.
+1.  Make sure current directory is `design`. Run below commands in the terminal window.
     ```
     make run TARGET=sw_emu
     ```
@@ -92,12 +94,12 @@ SDAccel provides two emulation flows which allow testing the application before 
 	  ```
     The generated files are put into `build` folder under `design` directory. You can use `ls` command to investigate the generated files.
 
-    If software emulation finishes successfully, we can move forward to run the design in hardware emulation. The corresponding commands are:
+    If software emulation finishes successfully, we can move forward to run the design in hardware emulation. The corresponding command is:
     ```
     make run TARGET=hw_emu
     ```
 
-	* In hardware emulation, the host code is compiled to run on the x86 processor and the kernel code is compiled into a hardware model (known as RTL or Register Transfer Level) which is run in a special simulator.
+	* In hardware emulation, the host code is compiled to run on the x86 processor and the kernel code is compiled into a hardware model (known as RTL or Register Transfer Level) which is run in RTL simulator.
 	* The build and run cycle takes longer because the kernel code is compiled into a detailed hardware model which is slower to simulate.
 	* The more detailed hardware simulation allow more accurate reporting of kernel and system performance.
 	* This flow is also useful for testing the functionality of the logic that will go in the FPGA.
@@ -116,9 +118,9 @@ SDAccel provides two emulation flows which allow testing the application before 
 
 This section covers how to locate and read the various reports generated by the emulation runs. The goal of the section is to understand the analysis reports of SDAccel before utilizing them in the next section.  
 
-* Profile Summary report
+#### Profile Summary report
 
-After emulations complete, an sdaccel_profile_summary.csv file is generated under `build` folder. Before view it in SDAccel GUI, we need to use below command to convert it into xprf format.
+After emulations complete, an sdaccel_profile_summary.csv file is generated under `build` folder. Before viewing it in SDAccel GUI, we need to use below command to convert it into .xprf format.
 
 ```
 sdx_analyze profile -i sdaccel_profile_summary.csv -f protobuf
@@ -145,13 +147,13 @@ Use the same way to open a profile summary report for hardware emulation.
 
 ![](../../images/module_01/lab_02_idct/HWProfile.PNG)
 
-    Click on the **Kernels & Compute Units** tab of the **Profile Summary** report, locate and note the following numbers:
+Click on the **Kernels & Compute Units** tab of the **Profile Summary** report, locate and note the following numbers:
 
-    - Kernel Total Time (ms):
+  - Kernel Total Time (ms):
 
-    This number will serve as reference point to compare against after optimization.    
+This number will serve as reference point to compare against after optimization.    
 
-* HLS reports
+#### HLS reports
 
 HLS reports for each kernel are also generated during the flow. You can use below command to search for it:
 ```
@@ -171,15 +173,15 @@ In the **Performance Estimates** section, locate the **Latency (clock cycles) > 
 ![](../../images/module_01/lab_02_idct/LatencyKrnlIdctDataflow.PNG)
 
 
-	* Note that the 3 sub-functions read, execute and write have roughly the same latency and that their sum total is equivalent to the total Interval reported in the **Summary** table.
-	* This indicates that the three sub-functions are executing sequentially, hinting to an optimization opportunity.
+  * Note that the 3 sub-functions read, execute and write have roughly the same latency and that their sum total is equivalent to the total Interval reported in the **Summary** table.
+  * This indicates that the three sub-functions are executing sequentially, hinting to an optimization opportunity.
 
 
 
 
-* Application Timeline report
+#### Application Timeline report
 
-After emulations complete, an sdaccel_timeline_trace.csv file is generated under `build` folder. Before view it in SDAccel GUI, we need to use below command to convert it into wdb format.
+After emulations complete, an sdaccel_timeline_trace.csv file is generated under `build` folder. Before viewing it in SDAccel GUI, we need to use below command to convert it into .wdb format.
 
 ```
 sdx_analyze profile -i sdaccel_timeline_trace.csv
@@ -189,7 +191,7 @@ Then we can launch a SDAccel GUI and select **File → Open File** and browse to
 
 Below is an example of timeline trace report for software emulation.
 
-    ![](../../images/module_01/lab_02_idct/SWTimeline.PNG)
+![](../../images/module_01/lab_02_idct/SWTimeline.PNG)
 
 The **Application Timeline** collects and displays host and device events on a common timeline to help you understand and visualize the overall health and performance of your systems. These events include OpenCL API calls from the host code: when they happen and how long each of them takes.
 
@@ -207,5 +209,5 @@ In the next lab you utilize these analysis capabilities to drive and measure cod
 ---------------------------------------
 
 <p align="center"><b>
-Start the next lab: <a href="lab_03_idct_optimization.md">Using the SDAccel GUI to optimize F1 applications</a>
+Start the next lab: <a href="lab_03_idct_optimization.md">Optimizing F1 applications</a>
 </b></p>  

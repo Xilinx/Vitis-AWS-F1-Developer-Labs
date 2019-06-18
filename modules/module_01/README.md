@@ -26,10 +26,10 @@ This module is divided in 3 labs. Since building FPGA binaries is not instantane
 1. **Running the "Hello World" example** \
 You will get familiar with the steps involved in running a simple application on the F1 instance.
 
-1. **Introduction to the SDAccel development environment** \
-You will use the SDAccel development environment to create and profile an F1 accelerator. The lab focuses on the Inverse Discrete Cosine Transform (IDCT), a compute intensive function used at the heart of all video codecs.
+1. **Using XOCC command line flow to develop and compile F1 accelerator ** \
+You will use the XOCC command line flow to create and profile an F1 accelerator. The lab focuses on the Inverse Discrete Cosine Transform (IDCT), a compute intensive function used at the heart of all video codecs.
 
-1. **Using the SDAccel GUI to optimize F1 applications** \
+1. **Optimizing F1 applications** \
 You will continue the IDCT project started in the previous lab and learn how you can use the various reports provided by SDAccel to guide the performance optimization process of your application.
 
 After you complete the last lab, you will be guided to close your RDP session, stop your F1 instance and explore next steps to continue your experience with SDAccel on AWS.
