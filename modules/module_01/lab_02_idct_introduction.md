@@ -1,4 +1,4 @@
-## Using XOCC command line flow to develop and compile F1 accelerator
+## Using the SDAccel xocc compiler to develop F1 accelerated applications
 
 This lab is designed to teach the fundamentals of the SDAccel development environment and programming model. This includes: familiarizing with OpenCL, understanding software and hardware emulation flows, profiling performance and identifying how to optimize host and kernel code.
 
