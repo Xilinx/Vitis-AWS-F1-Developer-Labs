@@ -134,6 +134,66 @@ static int load_file_to_memory(const char *filename, char **result) {
 
 /* *************************************************************************** 
 
+getBinaryName 
+
+The example makefile is designed to support many platforms and
+different modes of execution. This results in different naming of the
+final kernel executable code. 
+
+This function generates the name based on the environment setup and
+the provided platform name. The name is returned in the binaryName
+argument.
+
+*************************************************************************** */
+void getBinaryName(std::string &binaryName, char* device_name) {
+  char *xcl_mode = getenv("XCL_EMULATION_MODE");
+  bool isHwFlow = false;
+  bool isAwsFlow = !strcmp(device_name, "xilinx:aws-vu9p-f1:4ddr-xpr-2pr:4.0");
+  binaryName = "xclbin/krnl_idct";
+  
+  if(xcl_mode && !(strcmp(xcl_mode, "sw_emu"))) {
+    std::cout << "Running Software Emulation" << std::endl;
+    binaryName += ".sw_emu";
+  } else if(xcl_mode && !(strcmp(xcl_mode, "hw_emu"))) {
+    std::cout << "Running Hardware Emulation" << std::endl;
+    binaryName += ".hw_emu";
+  } else {
+    isHwFlow = true;
+    std::cout << "Running Hardware" << std::endl;
+    binaryName += ".hw";
+  }
+
+  std::string target = device_name;
+  std::replace(target.begin(), target.end(), ':', '_');
+  std::replace(target.begin(), target.end(), '.', '_');
+  if(!isAwsFlow) {
+    // remove platform version
+    int _count = 0;
+    int count = 0;
+    for (char & c : target) {
+      if(c == '_') {
+	_count++;
+      }
+      if(_count == 3) {
+	break;
+      }
+      count++;
+    }
+    target = target.substr(0,count);
+  }
+  binaryName += "." + target;
+
+  if((isHwFlow==true) && (isAwsFlow==true)) {
+    binaryName += ".awsxclbin";
+  } else {
+    binaryName += ".xclbin";
+  }
+}
+
+
+
+/* *************************************************************************** 
+
 oclDct
 
 This class encapsulates all runtime kernel interaction through openCL.
@@ -150,7 +210,7 @@ class.
 *************************************************************************** */
 class oclDct {
 
-#define NUM_SCHED 6
+#define NUM_SCHED 1
 
 public:
   oclDct();
@@ -461,16 +521,16 @@ int main(int argc, char* argv[]) {
 
   char *xcl_mode = getenv("XCL_EMULATION_MODE");
 
-  if (argc != 2) {
-    printf("Usage: %s "
- 	   "./xclbin/<awsxclbin>\n",
- 	   argv[0]);
-    return EXIT_FAILURE;
+  int xclbin_argc = -1;
+  for(int i=0; i<argc; i++) {
+    std::string arg = argv[i];
+    std::string xclbinStr = "xclbin";
+    if(arg.find(xclbinStr) != std::string::npos) {
+      xclbin_argc = i;
+    }
   }
-  
-  char* binaryName = argv[1];
 
-  
+
   // *********** Allocate and initialize test vectors **********
 
   // Blocks of 64 of int16_t
@@ -568,18 +628,24 @@ int main(int argc, char* argv[]) {
 
   std::cout << "DEVICE: " << cl_device_name << std::endl;
 
+  std::string binaryName;
+  if(xclbin_argc != -1) {
+    binaryName = argv[xclbin_argc];
+  } else {
+    getBinaryName(binaryName, cl_device_name);
+  }
+
   std::cout << "Loading Bitstream: " << binaryName << std::endl; 
   char *krnl_bin;
   size_t krnl_size;
-  krnl_size = load_file_to_memory(binaryName, &krnl_bin);
+  krnl_size = load_file_to_memory(binaryName.c_str(), &krnl_bin);
 
   printf("INFO: Loaded file\n");
 
-  cl_program program =
-    clCreateProgramWithBinary(context, 1,
-			      (const cl_device_id* ) &device_id, &krnl_size,
-			      (const unsigned char**) &krnl_bin,
-			      NULL, &err);
+  cl_program program = clCreateProgramWithBinary(context, 1,
+						 (const cl_device_id* ) &device_id, &krnl_size,
+						 (const unsigned char**) &krnl_bin,
+						 NULL, &err);
 
 
   // Create Kernel
@@ -660,6 +726,9 @@ int main(int argc, char* argv[]) {
     std::cout << "FPGA Time:       " << fpga_duration.count() << " s" << std::endl;
     std::cout << "FPGA Throughput: " 
 	      << (double) blocks*128 / fpga_duration.count() / (1024.0*1024.0)
+	      << " MB/s" << std::endl;
+    std::cout << "FPGA PCIe Throughput: " 
+	      << (2*(double) blocks*128 + 128) / fpga_duration.count() / (1024.0*1024.0)
 	      << " MB/s" << std::endl;
   } else {
     std::cout << "RUN COMPLETE" << std::endl;
