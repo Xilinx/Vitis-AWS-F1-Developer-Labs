@@ -82,20 +82,21 @@ SDAccel provides two emulation flows which allow testing the application before 
   * Software emulation is used to identify syntax issues and verify the behavior of application.
   * Hardware emulation is used to get performance estimates for the accelerated application.
 
-1.  Make sure current directory is `design`. Run below commands in the terminal window.
-    ```
+1. Make sure current directory is `design`. Run below commands in the terminal window.
+    ```bash
     make run TARGET=sw_emu
     ```
     This will run through software emulation and print out messages as shown in below to indicate the process finishes successfully.
 
-	  ```
-	  TEST PASSED
-	  RUN COMPLETE
-	  ```
+    ```bash
+    TEST PASSED
+    RUN COMPLETE
+    ```
+
     The generated files are put into `build` folder under `design` directory. You can use `ls` command to investigate the generated files.
 
-    If software emulation finishes successfully, we can move forward to run the design in hardware emulation. The corresponding command is:
-    ```
+1. After software emulation finishes successfully, you can move forward to run the design in hardware emulation. The corresponding command is:
+    ```bash
     make run TARGET=hw_emu
     ```
 
@@ -105,14 +106,14 @@ SDAccel provides two emulation flows which allow testing the application before 
 	* This flow is also useful for testing the functionality of the logic that will go in the FPGA.
 	* The hardware emulation is complete when the following messages are displayed:
 
-	```
-	TEST PASSED
-	RUN COMPLETE
-  INFO: [SDx-EM 22] [Wall clock time: 02:43, Emulation time: 0.0298064 ms] Data transfer between kernel(s) and global memory(s)
-  krnl_idct_1:m_axi_gmem0-DDR          RD = 128.000 KB             WR = 0.000 KB        
-  krnl_idct_1:m_axi_gmem1-DDR          RD = 0.500 KB               WR = 0.000 KB        
-  krnl_idct_1:m_axi_gmem2-DDR          RD = 0.000 KB               WR = 128.000 KB    
-	```
+    ```bash
+    TEST PASSED
+    RUN COMPLETE
+    INFO: [SDx-EM 22] [Wall clock time: 02:43, Emulation time: 0.0298064 ms] Data transfer between kernel(s) and global memory(s)
+    krnl_idct_1:m_axi_gmem0-DDR          RD = 128.000 KB             WR = 0.000 KB        
+    krnl_idct_1:m_axi_gmem1-DDR          RD = 0.500 KB               WR = 0.000 KB        
+    krnl_idct_1:m_axi_gmem2-DDR          RD = 0.000 KB               WR = 128.000 KB    
+    ```
 
 ### Analyzing the Reports  
 
