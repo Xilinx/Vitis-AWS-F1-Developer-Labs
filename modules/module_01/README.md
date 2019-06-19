@@ -26,7 +26,7 @@ This module is divided in 3 labs. Since building FPGA binaries is not instantane
 1. **Running the "Hello World" example** \
 You will get familiar with the steps involved in running a simple application on the F1 instance.
 
-1. **Using XOCC command line flow to develop and compile F1 accelerator ** \
+1. **Using the SDAccel xocc compiler to develop F1 accelerated applications** \
 You will use the XOCC command line flow to create and profile an F1 accelerator. The lab focuses on the Inverse Discrete Cosine Transform (IDCT), a compute intensive function used at the heart of all video codecs.
 
 1. **Optimizing F1 applications** \
