@@ -177,19 +177,16 @@ In the **Performance Estimates** section, locate the **Latency (clock cycles) > 
   * This indicates that the three sub-functions are executing sequentially, hinting to an optimization opportunity.
 
 
-
-
 #### Application Timeline report
 
-After emulations complete, an sdaccel_timeline_trace.csv file is generated under `build` folder. Before viewing it in SDAccel GUI, we need to use below command to convert it into .wdb format.
+In addition to the sdacccel_profile_summary.csv file, the emulation run also generates an sdaccel_timeline_trace.csv file in yhe `build` folder. Before viewing it in SDAccel GUI, it must be converted into an appropriate format.
 
-```
-sdx_analyze profile -i sdaccel_timeline_trace.csv
-```
+1. Convert the .csv file to the .wdb format
+    ```
+    sdx_analyze profile -i sdaccel_timeline_trace.csv
+    ```
 
-Then we can launch a SDAccel GUI and select **File → Open File** and browse to the .wdb file.
-
-Below is an example of timeline trace report for software emulation.
+1. In the SDAccel GUI, select **File → Open File** , browse to the sdaccel_timeline_trace.wdb file and click **Open**.
 
 ![](../../images/module_01/lab_02_idct/SWTimeline.PNG)
 
