@@ -155,28 +155,23 @@ This number will serve as reference point to compare against after optimization.
 
 #### HLS reports
 
-HLS reports for each kernel are also generated during the flow. You can use below command to search for it:
+The SDAccel xocc compiler also generates **HLS Reports** for each kernel. **HLS Reports** explain the results of compiling the kernel into hardware. It contains many details (including clocking, resources or device utilization) about the performance and logic usage of the custom-generated hardware logic. These details provide many insights to guide the kernel optimization process.    
+
+1. Locate the HLS reports:
 ```
 find . -name "*_csynth.rpt"
 ```
-  - The **HLS Report** explains the results of compiling the kernel into hardware. It contains many details (including clocking, resources or device utilization) about the performance and logic usage of the custom-generated hardware logic. These details provide many insights to guide the kernel optimization process.    
 
-  - For the needs of this lab, we will focus on the **Performance Estimates** section located in the middle of the main **Synthesis** tab. This section provides information on the latency of the kernel, as well as loop implementation details.  
+2. Open the **krnl_idct_dataflow_csynth.rpt** file, scroll to the **Performance Estimates** section, locate the **Latency (clock cycles)**  summary table and note the following performance numbers:
 
-Let's open up the **krnl_idct_dataflow_csynth.rpt** and take a note on the performance data:
-
-In the **Performance Estimates** section, locate the **Latency (clock cycles) > Summary** table and note the following numbers:
-
-    - Latency (min/max):
-    - Interval (min/max):
+  - Latency (min/max):
+  - Interval (min/max):
 
 ![](../../images/module_01/lab_02_idct/LatencyKrnlIdctDataflow.PNG)
 
 
   * Note that the 3 sub-functions read, execute and write have roughly the same latency and that their sum total is equivalent to the total Interval reported in the **Summary** table.
   * This indicates that the three sub-functions are executing sequentially, hinting to an optimization opportunity.
-
-
 
 
 #### Application Timeline report
