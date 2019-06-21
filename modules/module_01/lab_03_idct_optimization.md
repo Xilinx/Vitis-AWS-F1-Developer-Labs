@@ -137,21 +137,18 @@ For optimal performance both the hardware and software components of the applica
 
 	These OpenCL functions use events to signal their completion and synchronize execution.
 
-1. Open the application timeline report of the hardware emulation run. If you forget how to view the report, you can go back to previous lab for detailed steps.  
+1. Return to the SDAccel GUI look at the application timeline report. If you closed the view, simply re-open it by selecting **File → Open File** and browsing to the sdaccel_time_trace.wdb file. 
 
-	The green segments at the bottom indicate when the IDCT kernel is running.
-
-1. Notice that there are gaps between each of the green segments.
-
-1. Zoom in by performing a **Left mouse drag** across one of these gaps to get a more detailed view.  
-
-    ![](../../images/module_01/lab_02_idct/ZoomApplicationTimeline.PNG)
+1. Zoom in by performing a **Left mouse drag** to get a more detailed view.  
 
     - The two green segments correspond to two consecutive invocations of the IDCT kernel.
     - The gap between the two segments is indicative of idle time between these two invocations.
     - The **Data Transfer** section of the timeline shows that **Read** and **Write** operations are happening when the kernel is idle.
     - The **Read** operation is to retrieve the results from the execution which just finished and the **Write** operation is to send inputs for the next execution.
     - This represents a sequential execution flow of each iteration.  
+
+    ![](../../images/module_01/lab_02_idct/ZoomApplicationTimeline.PNG)
+
 
 1. Close the application timeline report.    
 
