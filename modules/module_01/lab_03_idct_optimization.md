@@ -177,14 +177,20 @@ For optimal performance both the hardware and software components of the applica
 
 1. Rerun hardware emulation.
 
-    - Since only the **idct.cpp** file was change, the incremental makefile rebuilds only the host code before running emulation.
+    - Since only the **idct.cpp** file was changed, the incremental makefile rebuilds only the host code before running emulation.
     - This results in a much faster iteration loop since it is usually the compilation of the kernel to hardware which takes the most time.
 
-1. Once completed, reopen the application timeline report and observe how **software pipelining** enables overlapping of data transfers and kernel execution.
+1. Convert the newly generated application timeline report 
+
+    ```bash
+    sdx_analyze profile -i sdaccel_timeline_trace.csv
+    ```
+
+1. Open the sdaccel_timeline_trace.wdb file in the GUI. Observe how **software pipelining** enables overlapping of data transfers and kernel execution.
 
     ![](../../images/module_01/lab_02_idct/ZoomApplicationTimelineEnd.PNG)
 
-	Note: system tasks might slow down communication between the application and the hardware simulation, impacting on the measured performance results. The effect of software pipelining is considerably higher when running on the actual hardware.
+    Note: system tasks might slow down communication between the application and the hardware simulation, impacting on the measured performance results. The effect of software pipelining is considerably higher when running on the actual hardware.
 
 ### Executing on F1
 
