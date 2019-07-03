@@ -97,5 +97,5 @@ This concludes this first lab.
 ---------------------------------------
 
 <p align="center"><b>
-Start the next lab: <a href="lab_02_idct_introduction.md">Using XOCC command line flow to develop and compile F1 accelerator</a>
+Start the next lab: <a href="lab_02_idct_introduction.md">Using the SDAccel xocc compiler to develop F1 accelerated applications</a>
 </b></p>
