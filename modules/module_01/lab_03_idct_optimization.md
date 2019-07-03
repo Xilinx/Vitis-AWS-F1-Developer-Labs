@@ -31,13 +31,14 @@ Remember when we Looked at the **HLS Report**, we identified that the read, exec
 1. Save the file.
 
 1. Clean the generated files before launching hardware emulation with updated source file.
-```
-make clean
-```
+    ```
+    make clean
+    ```
+
 1. Rerun hardware emulation.
-```
-make run TARGET=hw_emu
-```
+    ```
+    make run TARGET=hw_emu
+    ```
 
 1. Open the new **krnl_idct_dataflow_csynth.rpt** and compare the new latency numbers reported in the **Performance Estimates** section with the previous numbers and you will note considerable improvement based on the DATAFLOW optimization.  
     - Latency (min/max):
@@ -66,25 +67,25 @@ These steps would take too long to complete during this lab, therefore a precomp
 
 1. Confirm that the precompiled FPGA binary (.awsxclbin file) is indeed present.
 
-	```bash
-	# Go the lab folder
-	cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_01/idct
+    ```bash
+    # Go the lab folder
+    cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_01/idct
 
-	# List contents of the ./xclbin directory to look for the .awsxclbin FPGA binary
-	ls -la ./xclbin
-	```
+    # List contents of the ./xclbin directory to look for the .awsxclbin FPGA binary
+    ls -la ./xclbin
+    ```
 
 1. Retrieve the Fpga Image Global Id (agfi) from the \<timestamp\>_afi_id.txt file.
 
-	```bash
-	more ./xclbin/18_08_24-150600_afi_id.txt
-	```
+    ```bash
+    more ./xclbin/18_08_24-150600_afi_id.txt
+    ```
 
 1. Confirm that the AFI is ready and available using the retrieved global AFI Id.
 
-	``` bash
-	aws ec2 describe-fpga-images --filters Name=fpga-image-global-id,Values=agfi-007640d8fca34316e
-	```
+    ``` bash
+    aws ec2 describe-fpga-images --filters Name=fpga-image-global-id,Values=agfi-007640d8fca34316e
+    ```
 
    The output of this command should contain:
 
@@ -107,7 +108,7 @@ These steps would take too long to complete during this lab, therefore a precomp
 
 1. Execute the accelerated application on F1 using the precompiled FPGA binary.
 
-	```bash
+    ```bash
     sudo sh
     # Source the SDAccel runtime environment
     source /opt/xilinx/xrt/setup.sh
@@ -170,9 +171,10 @@ For optimal performance both the hardware and software components of the applica
 	- This technique is called **software pipelining**.
 
 1. Modify line 153 to increase the value of **NUM_SCHED** to 6 as follows:
-	```C
-	#define NUM_SCHED 6
-	```
+    ```C
+    #define NUM_SCHED 6
+    ```
+    
 1. Save the file.
 
 1. Rerun hardware emulation.
@@ -184,7 +186,7 @@ For optimal performance both the hardware and software components of the applica
 
     ![](../../images/module_01/lab_02_idct/ZoomApplicationTimelineEnd.PNG)
 
-	Note: system tasks might slow down communication between the application and the hardware simulation, impacting on the measured performance results. The effect of software pipelining is considerably higher when running on the actual hardware.
+    Note: system tasks might slow down communication between the application and the hardware simulation, impacting on the measured performance results. The effect of software pipelining is considerably higher when running on the actual hardware.
 
 ### Executing on F1
 
@@ -194,14 +196,14 @@ The next step is to confirm these results by running on the FPGA attached to the
 
 1. Copy the host application executable built by SDAccel to the local directory.
 
-	```bash
+    ```bash
     # Copy the host application executable
     cp ~/SDAccel-AWS-F1-Developer-Labs/modules/module_01/idct/workspace/IDCT/Emulation-HW/IDCT.exe IDCT-NS6.exe
     ```
 
 1. Execute the accelerated application on F1 using the precompiled FPGA binary.
 
-	```bash
+    ```bash
     sudo sh
     # Source the SDAccel runtime environment
     source /opt/xilinx/xrt/setup.sh
