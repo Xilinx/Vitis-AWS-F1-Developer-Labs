@@ -138,7 +138,7 @@ For optimal performance both the hardware and software components of the applica
 
 	These OpenCL functions use events to signal their completion and synchronize execution.
 
-1. Return to the SDAccel GUI look at the application timeline report. If you closed the view, simply re-open it by selecting **File → Open File** and browsing to the sdaccel_time_trace.wdb file. 
+1. Return to the SDAccel GUI look at the application timeline report. If you closed the view, simply re-open it by selecting **File → Open File** and browsing to the sdaccel_time_trace.wdb file.
 
 1. Zoom in by performing a **Left mouse drag** to get a more detailed view.  
 
@@ -171,7 +171,7 @@ For optimal performance both the hardware and software components of the applica
     ```C
     #define NUM_SCHED 6
     ```
-    
+
 1. Save the file.
 
 1. Rerun hardware emulation.
@@ -179,10 +179,10 @@ For optimal performance both the hardware and software components of the applica
     - Since only the **idct.cpp** file was changed, the incremental makefile rebuilds only the host code before running emulation.
     - This results in a much faster iteration loop since it is usually the compilation of the kernel to hardware which takes the most time.
 
-1. Convert the newly generated application timeline report 
+1. Convert the newly generated application timeline report
 
     ```bash
-    sdx_analyze profile -i sdaccel_timeline_trace.csv
+    sdx_analyze trace -i sdaccel_timeline_trace.csv -f wdb
     ```
 
 1. Open the sdaccel_timeline_trace.wdb file in the GUI. Observe how **software pipelining** enables overlapping of data transfers and kernel execution.

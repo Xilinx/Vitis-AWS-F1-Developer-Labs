@@ -78,7 +78,7 @@ The kernel used in this lab is an Inverse Discrete Cosine Transform (IDCT), a fu
 
 ### Running the Emulation Flows
 
-SDAccel provides two emulation flows which allow testing the application before deploying it on the F1 instance. The flows are referred to as software emulation and hardware emulation, respectively.
+  SDAccel provides two emulation flows which allow testing the application before deploying it on the F1 instance. The flows are referred to as software emulation and hardware emulation, respectively.
   * Software emulation is used to identify syntax issues and verify the behavior of application.
   * Hardware emulation is used to get performance estimates for the accelerated application.
 
@@ -180,7 +180,7 @@ In addition to the sdacccel_profile_summary.csv file, the emulation run also gen
 
 1. Convert the .csv file to the .wdb format
     ```
-    sdx_analyze profile -i sdaccel_timeline_trace.csv
+    sdx_analyze trace -i sdaccel_timeline_trace.csv -f wdb
     ```
 
 1. In the SDAccel GUI, select **File → Open File** , browse to the sdaccel_timeline_trace.wdb file and click **Open**.
