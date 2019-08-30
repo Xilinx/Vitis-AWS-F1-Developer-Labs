@@ -25,9 +25,14 @@ These labs are based on SDAccel 2018.3 available with the FPGA Developer AMI v1.
 
 [**FOLLOW THE INSTRUCTIONS**](./modules/module_01/README.md)
 
-#### Module 2
-_Coming Soon..._
+#### Module 2 - Developing, profiling and optimizing F1 applications with SDAccel
+* Running the "Filter2D" Example
 
+#### Module 3 - Methodology for Optimizing Accelerated FPGA Applications
+* Begin with a baseline design of 2D convolution of an RGBA video and a set of filter coefficients using ffmpeg
+* Perform a series of optimization methods to achieve the performance target
+
+[**FOLLOW THE INSTRUCTIONS**](./modules/module_03/README.md)
 ---------------------------------------
 
 Visit the [SDAccel Developer Zone](https://www.xilinx.com/products/design-tools/software-zone/sdaccel.html) for more information about FPGA acceleration
