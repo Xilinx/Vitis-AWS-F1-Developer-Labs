@@ -29,6 +29,7 @@ These labs are based on SDAccel 2018.3 available with the FPGA Developer AMI v1.
 * Running the "Filter2D" Example
 
 #### Module 3 - Methodology for Optimizing Accelerated FPGA Applications
+* Determine the software functions to be accelerated
 * Begin with a baseline design of 2D convolution of an RGBA video and a set of filter coefficients using ffmpeg
 * Perform a series of optimization methods to achieve the performance target
 
