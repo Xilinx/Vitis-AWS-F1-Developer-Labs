@@ -84,6 +84,6 @@ The following labs walk through the best practices for taking an existing applic
 
 </br>
 <hr/>
-<p align= center><b><a href="/README.md">Return to Main Page</a> — <a href="/docs/sdaccel-getting-started/">Return to Getting Started Pathway</a></b></p>
+<p align= center><b><a href="/README.md">Return to Main Page</a></b></p>
 </br>
 <p align="center"><sup>Copyright&copy; 2019 Xilinx</sup></p>

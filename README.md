@@ -18,21 +18,14 @@ These labs are based on SDAccel 2018.3 available with the FPGA Developer AMI v1.
 
 ### Developer Lab Modules
 
-#### Module 1 - Introduction to the SDAccel Flow
+#### Introduction to the SDAccel Flow
 * Running the "Hello World" example
 * Introduction to the SDAccel development environment
 * Using the SDAccel GUI to optimize applications
 
 [**FOLLOW THE INSTRUCTIONS**](./modules/module_01/README.md)
 
-#### Module 2 - Developing, profiling and optimizing F1 applications with SDAccel
-* Get familiar with OpenCL
-* Understand emulation Flows
-* Profiling performance and perform different optimizations
-
-[**FOLLOW THE INSTRUCTIONS**](./modules/module_02/README.md)
-
-#### Module 3 - Methodology for Optimizing Accelerated FPGA Applications
+#### Methodology for Optimizing Accelerated FPGA Applications
 * Determine the software functions to be accelerated
 * Begin with a baseline design of 2D convolution of an RGBA video and a set of filter coefficients using ffmpeg
 * Perform a series of optimization methods to achieve the performance target
