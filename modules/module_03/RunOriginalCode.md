@@ -101,6 +101,6 @@ You will be using Hardware Emulation runs for measuring performance in each step
 
 </br>
 <hr/>
-<p align="center"><b><a href="/docs/sdaccel-getting-started/">Return to Getting Started Pathway</a> — <a href="./README.md">Return to Start of Tutorial</a></b></p>
+<p align="center"><b><a href="./README.md">Return to Start of Tutorial</a></b></p>
 
 <p align="center"><sup>Copyright&copy; 2019 Xilinx</sup></p>

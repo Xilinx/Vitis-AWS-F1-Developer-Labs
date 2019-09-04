@@ -126,6 +126,6 @@ You have created the hardware kernel and run the application in hardware emulati
 
 </br>
 <hr/>
-<p align="center"><b><a href="/docs/sdaccel-getting-started/">Return to Getting Started Pathway</a> — <a href="./README.md">Return to Start of Tutorial</a></b></p>
+<p align="center"><b><a href="./README.md">Return to Start of Tutorial</a></b></p>
 
 <p align="center"><sup>Copyright&copy; 2019 Xilinx</sup></p>

@@ -17,7 +17,7 @@ Note the following data:
 * **Total Time**: Measured in hardware Timeline Trace report. For a fair comparison, this will include the data transfer and kernel execution time.
 * **Throughput**: Calculated by Total Data Processed(MB)/Total Time(s)
 
->**IMPORTANT**: Each of the steps in this lab compiles the hardware kernel and can take significant time to complete. To save your time, pre-built xclbin files are provided under /design/xclbin folder. 
+>**IMPORTANT**: Each of the steps in this lab compiles the hardware kernel and can take significant time to complete. To save your time, pre-built xclbin files are provided under /design/xclbin folder.
 
 To run the labs on F1 hardware, you need to follow the steps listed below. The same steps are applied to all five labs, so we will not repeat it in every section.
 
@@ -178,6 +178,6 @@ Congratulations! You have successfully completed all the modules of this lab to 
 
 </br>
 <hr/>
-<p align="center"><b><a href="/docs/sdaccel-getting-started/">Return to Getting Started Pathway</a> — <a href="./README.md">Return to Start of Tutorial</a></b></p>
+<p align="center"><b><a href="./README.md">Return to Start of Tutorial</a></b></p>
 
 <p align="center"><sup>Copyright&copy; 2019 Xilinx</sup></p>
