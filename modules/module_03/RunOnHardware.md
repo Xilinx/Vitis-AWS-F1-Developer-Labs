@@ -8,9 +8,9 @@
 
 # 7. Running the Accelerator in Hardware
 
-Until now, the results of all the previous labs have been run in hardware emulation mode to give you an idea of how the optimization improves performance, while reducing the compilation time needed to build the system. In this section, you will build and run each of the previous optimizations in hardware on an Alveo accelerator card.
+Until now, the results of all the previous labs have been run in hardware emulation mode to give you an idea of how the optimization improves performance, while reducing the compilation time needed to build the system. In this section, you will build and run each of the previous optimizations in hardware on AWS F1.
 
-After each run is finished, record the performance data from the Timeline Trace report, and fill in the table at the end of the section. Your numbers might vary.  
+After each run is finished, kernel execution time and throughput is printed out. The numbers will be filled in the table at the end of the section. Your numbers might vary.  
 Note the following data:
 
 * **Total Data**: Calculated by (frame number x frame size).
