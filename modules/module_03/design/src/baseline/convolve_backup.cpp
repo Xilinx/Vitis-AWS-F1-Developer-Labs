@@ -8,8 +8,6 @@
 
 #include "xcl2.hpp"
 
-
-
 using std::vector;
 
 bool operator==(const RGBPixel& lhs, const RGBPixel& rhs) {
@@ -54,8 +52,8 @@ void convolve(FILE* streamIn, FILE* streamOut,
 
 
     cl::Context context(device);
-    cl::CommandQueue q(context, device,
-    cl::QueueProperties::Profiling | cl::QueueProperties::OutOfOrder);
+    cl::CommandQueue q(context, device, CL_QUEUE_PROFILING_ENABLE);
+
 
     cl::Program::Binaries bins = xcl::import_binary_file(args.binary_file);
     devices.resize(1);
@@ -76,11 +74,9 @@ void convolve(FILE* streamIn, FILE* streamOut,
     convolve_kernel.setArg(5, args.height);
 
     q.enqueueMigrateMemObjects({buffer_coefficient}, 0);
-	
-    int compute_units = 4;
-    int lines_per_compute_unit = args.height / compute_units;
-	
-	auto fpga_begin = std::chrono::high_resolution_clock::now();
+
+
+
 
     for(int frame_count = 0; frame_count < args.nframes; frame_count++) {
         // Read frame
@@ -96,25 +92,11 @@ void convolve(FILE* streamIn, FILE* streamOut,
                      args.width, args.height);
         */
 
-        cl::Event write_event;
-        q.enqueueWriteBuffer(buffer_input, CL_FALSE, 0, frame_bytes, inFrame.data(), nullptr, &write_event);
-				  
-	vector<cl::Event> iteration_events{write_event};
-	vector<cl::Event> task_events;
-        for(int cu = 0; cu < compute_units; cu++) {
-            cl::Event task_event;
-            convolve_kernel.setArg(6, cu * lines_per_compute_unit);
-            convolve_kernel.setArg(7, lines_per_compute_unit);
-            q.enqueueTask(convolve_kernel, &iteration_events, &task_event);
-            task_events.push_back(task_event);
-        }
-        copy(begin(task_events), end(task_events), std::back_inserter(iteration_events));
-		
-        cl::Event read_event;
-        q.enqueueReadBuffer(buffer_output, CL_FALSE, 0, frame_bytes, outFrame.data(), &iteration_events, &read_event);
-        iteration_events.push_back(read_event);
-	read_event.wait();
-		
+        q.enqueueWriteBuffer(buffer_input, CL_FALSE, 0, frame_bytes, inFrame.data());
+        q.enqueueTask(convolve_kernel);
+        q.enqueueReadBuffer(buffer_output, CL_TRUE, 0, frame_bytes, outFrame.data());
+
+
         if(args.gray) {
           grayscale_cpu(outFrame.data(), grayFrame.data(), args.width, args.height);
           bytes_written = fwrite(outFrame.data(), 1, gray_frame_bytes, streamOut);
@@ -138,16 +120,4 @@ void convolve(FILE* streamIn, FILE* streamOut,
         print_progress(frame_count, args.nframes);
     }
     q.finish();
-
-    auto fpga_end = std::chrono::high_resolution_clock::now();
-
-    // Report performance (if not running in emulation mode)
-    if (getenv("XCL_EMULATION_MODE") == NULL) {
-        std::chrono::duration<double> fpga_duration = fpga_end - fpga_begin;
-        std::cout << "                 " << std::endl;
-        std::cout << "FPGA Time:       " << fpga_duration.count() << " s" << std::endl;
-        std::cout << "FPGA Throughput: "
-                  << (1920*1080*4*132) / fpga_duration.count() / (1024.0*1024.0)
-                  << " MB/s" << std::endl;
-     }
 }

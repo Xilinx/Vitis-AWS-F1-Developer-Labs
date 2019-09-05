@@ -73,75 +73,47 @@ make gen_report TARGET=hw STEP=baseline
 
 ## Run the Baseline Application on Hardware
 
-Use the previously introduced method to run baseline design on F1 hardware. View timeline report after application run is finished.
+Use the previously introduced method to run baseline design on F1 hardware.
 
-```
-make view_timeline_trace TARGET=hw STEP=baseline
-```
+The host code will print out kernel execution time and throughput at the end of execution. These numbers will be filled into the table at the bottom as benchmarking comparison data.
 
-You should see a Timeline Trace report similar to the following figure.
+You should see similar result for baseline run:
 
-![][baseline_hw_timeline]
+FPGA Time:       1087.77 s
+FPGA Throughput: 0.959894 MB/s
 
-The two markers record the start and end point of the execution, so the execution time can be roughly calculated as 1090-3 = 1087s.
-
-The total MBs processed is 1920 x 1080 x 4(Bytes) x 132(frames) = 1095 MBs. Therefore, the throughput can be calculated as 1095(MB)/1087(s)= 1 MB/s. Use this number as the benchmark baseline to measure future optimizations.  
 
 ## Run the Memory Transfer Lab on Hardware
 
-Use the previously introduced method to run baseline design on F1 hardware. View timeline report after application run is finished.
 
-```
-make view_timeline_trace TARGET=hw STEP=localbuf
-```
+You should see similar result for localbuf run:
 
-You should see a Timeline Trace report for the hardware run similar to the following figure.
-
-![][localbuf_hw_timeline]
-
-The two markers record the start and end point of the execution, so execution time can be roughly calculated as 131.09-3.46 = 127.63s.
+FPGA Time:       127.487 s
+FPGA Throughput: 8.1902 MB/s
 
 ## Run Fixed Point Lab on Hardware
 
-Use the previously introduced method to run baseline design on F1 hardware. View timeline report after application run is finished.
+You should see similar result for fixedpoint run:
 
-```
-make view_timeline_trace TARGET=hw STEP=fixedpoint
-```
-
-You should see a Timeline Trace report for the hardware run similar to the following figure.
-
-![][fixedtype_hw_timeline]
-
- The two markers record the start and end point of the execution, so the execution time can be roughly calculated as 34.57-3.35 = 31.22s.
+FPGA Time:       31.2099 s
+FPGA Throughput: 33.4554 MB/s
 
 ## Run Dataflow Lab on Hardware
 
-Use the previously introduced method to run baseline design on F1 hardware. View timeline report after application run is finished.
 
-```
-make view_timeline_trace TARGET=hw STEP=dataflow
-```
+You should see similar result for dataflow run:
 
-You should see a Timeline Trace report for the hardware run, similar to the following figure.
-
-![][dataflow_hw_timeline]
-
-The two markers record the start and end point of the execution, so the execution time can be roughly calculated as 19.09-13.39 = 5.7s.
+FPGA Time:       5.70991 s
+FPGA Throughput: 182.865 MB/s
 
 ### Run Multiple Compute Units Lab on Hardware
 
-Use the previously introduced method to run baseline design on F1 hardware. View timeline report after application run is finished.
+Use the previously introduced method to run baseline design on F1 hardware.
+You should see similar result for multicu run:
 
-```
-make view_timeline_trace TARGET=hw STEP=multicu
-```
+FPGA Time:       3.2669 s
+FPGA Throughput: 319.612 MB/s
 
-You should see a Timeline Trace report for the hardware run, similar to the following figure.
-
-![][hostopt_hw_timeline]
-
- The two markers record the start and end point of the execution, so execution time can be roughly calculated as 17.48-13.86 = 3.62s.
 
 ### Performance Table
 
@@ -149,19 +121,14 @@ The final performance benchmarking table displays as follows.
 
 | Step                            | Image Size   | Number of Frames  | Time (Hardware) (s) | Throughput (MBps) |
 | :-----------------------        | :----------- | ------------: | ------------------: | ----------------: |
-| baseline                        |     1920x1080 |           132 |              1087 | 1              |
-| localbuf                        |     1920x1080 |           132 |                127.63 | 8.58 (8.58x)         |
-| fixed-point data                |     1920x1080 |           132 |                31.22 | 35 (4x)        |
-| dataflow                        |     1920x1080 |           132 |                5.7 | 192.1 (5.5x)        |
-| multi-CU                        |     1920x1080 |           132 |                3.62 | 302 (1.57x)       |
+| baseline                        |     1920x1080 |           132 |              1087 | 0.96              |
+| localbuf                        |     1920x1080 |           132 |                127.487 | 8.19 (8.5x)         |
+| fixed-point data                |     1920x1080 |           132 |                31.21 | 33.45 (4x)        |
+| dataflow                        |     1920x1080 |           132 |                5.71 | 182.86 (5.46x)        |
+| multi-CU                        |     1920x1080 |           132 |                3.27 | 319 (1.74x)       |
 
 ---------------------------------------
 
-[baseline_hw_timeline]:./images/baseline_hw_timeline_aws.JPG "Baseline version hardware Timeline Trace Report"
-[localbuf_hw_timeline]:./images/localbuf_hw_timeline_aws.JPG "Local buffer version hardware Timeline Trace Report"
-[fixedtype_hw_timeline]:./images/fixedtype_hw_timeline_aws.JPG "Fixed-type data version hardware Timeline Trace Report"
-[dataflow_hw_timeline]:./images/dataflow_hw_timeline_aws.JPG "Dataflow version hardware Timeline Trace Report"
-[hostopt_hw_timeline]: ./images/multicu_hw_timeline_aws.JPG "Host code optimization version hardware timeline trace report"
 
 ## Conclusion
 

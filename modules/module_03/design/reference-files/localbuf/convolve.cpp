@@ -76,7 +76,7 @@ void convolve(FILE* streamIn, FILE* streamOut,
     q.enqueueMigrateMemObjects({buffer_coefficient}, 0);
 
 
-
+    auto fpga_begin = std::chrono::high_resolution_clock::now();
 
     for(int frame_count = 0; frame_count < args.nframes; frame_count++) {
         // Read frame
@@ -120,4 +120,16 @@ void convolve(FILE* streamIn, FILE* streamOut,
         print_progress(frame_count, args.nframes);
     }
     q.finish();
+
+    auto fpga_end = std::chrono::high_resolution_clock::now();
+
+    // Report performance (if not running in emulation mode)
+    if (getenv("XCL_EMULATION_MODE") == NULL) {
+        std::chrono::duration<double> fpga_duration = fpga_end - fpga_begin;
+        std::cout << "                 " << std::endl;
+        std::cout << "FPGA Time:       " << fpga_duration.count() << " s" << std::endl;
+        std::cout << "FPGA Throughput: "
+                  << (1920*1080*4*132) / fpga_duration.count() / (1024.0*1024.0)
+                  << " MB/s" << std::endl;
+     }
 }
