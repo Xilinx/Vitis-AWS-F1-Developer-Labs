@@ -79,41 +79,49 @@ The host code will print out kernel execution time and throughput at the end of 
 
 You should see similar result for baseline run:
 
+```
 FPGA Time:       1087.77 s
 FPGA Throughput: 0.959894 MB/s
-
+```
 
 ## Run the Memory Transfer Lab on Hardware
 
 
 You should see similar result for localbuf run:
 
+```
 FPGA Time:       127.487 s
 FPGA Throughput: 8.1902 MB/s
+```
 
 ## Run Fixed Point Lab on Hardware
 
 You should see similar result for fixedpoint run:
 
+```
 FPGA Time:       31.2099 s
 FPGA Throughput: 33.4554 MB/s
+```
 
 ## Run Dataflow Lab on Hardware
 
 
 You should see similar result for dataflow run:
 
+```
 FPGA Time:       5.70991 s
 FPGA Throughput: 182.865 MB/s
+```
 
 ### Run Multiple Compute Units Lab on Hardware
 
 Use the previously introduced method to run baseline design on F1 hardware.
 You should see similar result for multicu run:
 
+```
 FPGA Time:       3.2669 s
 FPGA Throughput: 319.612 MB/s
-
+```
 
 ### Performance Table
 
