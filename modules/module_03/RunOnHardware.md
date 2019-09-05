@@ -86,7 +86,7 @@ FPGA Throughput: 0.959894 MB/s
 
 ## Run the Memory Transfer Lab on Hardware
 
-
+Use the previously introduced method to run baseline design on F1 hardware.
 You should see similar result for localbuf run:
 
 ```
@@ -96,6 +96,7 @@ FPGA Throughput: 8.1902 MB/s
 
 ## Run Fixed Point Lab on Hardware
 
+Use the previously introduced method to run baseline design on F1 hardware.
 You should see similar result for fixedpoint run:
 
 ```
@@ -105,7 +106,7 @@ FPGA Throughput: 33.4554 MB/s
 
 ## Run Dataflow Lab on Hardware
 
-
+Use the previously introduced method to run baseline design on F1 hardware.
 You should see similar result for dataflow run:
 
 ```
