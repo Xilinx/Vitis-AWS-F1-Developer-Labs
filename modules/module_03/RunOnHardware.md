@@ -114,7 +114,7 @@ FPGA Time:       5.70991 s
 FPGA Throughput: 182.865 MB/s
 ```
 
-### Run Multiple Compute Units Lab on Hardware
+## Run Multiple Compute Units Lab on Hardware
 
 Use the previously introduced method to run baseline design on F1 hardware.
 You should see similar result for multicu run:
@@ -124,7 +124,7 @@ FPGA Time:       3.2669 s
 FPGA Throughput: 319.612 MB/s
 ```
 
-### Performance Table
+## Performance Table
 
 The final performance benchmarking table displays as follows.
 
