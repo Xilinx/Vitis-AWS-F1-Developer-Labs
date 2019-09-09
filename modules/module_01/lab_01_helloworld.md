@@ -6,7 +6,7 @@ The architecture of the AWS F1 platform and the SDAccel development flow are pic
 
 ![](../../images/module_01/overview/f1_platform.png)
 
-1. Amazon EC2 F1 is a compute instance combining x86 CPUs with Xilinx FPGAs. The FPGAs are programmed with custom hardware accelerators which can accelerate complex workloads up to 30x when compared with servers that use CPUs alone. 
+1. Amazon EC2 F1 is a compute instance combining x86 CPUs with Xilinx FPGAs. The FPGAs are programmed with custom hardware accelerators which can accelerate complex workloads up to 30x when compared with servers that use CPUs alone.
 2. An F1 application consists of an x86 executable for the host application and an FPGA binary (also referred to as Amazon FPGA Image or AFI) for the custom hardware accelerators. Communication between the host application and the accelerators are automatically managed by the OpenCL runtime.
 3. SDAccel is the development environment used to create F1 applications. It comes with a fully fledged IDE, x86 and FPGA compilers, profiling and debugging tools.
 4. The host application is written in C or C++ and uses the OpenCL API to interact with the accelerated functions. The accelerated functions (also referred to as kernels) can be written in C, C++, OpenCL or even RTL.
@@ -46,14 +46,13 @@ The "hello world" example is an OpenCL application with a simple vector-addition
 
     ```bash
     sudo sh
-    source /opt/Xilinx/SDx/2017.4.rte.dyn/setup.sh
+    source /opt/xilinx/xrt/setup.sh
     ./helloworld
     ```
 
 1. The host application executes using the vector_addition kernel running in the FPGA and produces the following results:
 
     ```shell
-    [0]user:0xf010:0x1d51:[xocl:2017.4.5:128]
     xclProbe found 1 FPGA slots with xocl driver running
     Found Platform
     Platform Name: Xilinx
@@ -61,24 +60,25 @@ The "hello world" example is an OpenCL application with a simple vector-addition
     XCLBIN File Name: vector_addition
     INFO: Importing xclbin/vector_addition.hw.xilinx_aws-vu9p-f1-04261818_dynamic_5_0.awsxclbin
     Loading: 'xclbin/vector_addition.hw.xilinx_aws-vu9p-f1-04261818_dynamic_5_0.awsxclbin'
+    INFO: Could not load AFI for data retention, code: 18 - Loading in classic mode.
     AFI load complete.
-    Result = 
-    Hello World !!! 
-    Hello World !!! 
-    Hello World !!! 
-    Hello World !!! 
-    Hello World !!! 
-    Hello World !!! 
-    Hello World !!! 
-    Hello World !!! 
-    Hello World !!! 
-    Hello World !!! 
-    Hello World !!! 
-    Hello World !!! 
-    Hello World !!! 
-    Hello World !!! 
-    Hello World !!! 
-    Hello World !!! 
+    Result =
+    Hello World !!!
+    Hello World !!!
+    Hello World !!!
+    Hello World !!!
+    Hello World !!!
+    Hello World !!!
+    Hello World !!!
+    Hello World !!!
+    Hello World !!!
+    Hello World !!!
+    Hello World !!!
+    Hello World !!!
+    Hello World !!!
+    Hello World !!!
+    Hello World !!!
+    Hello World !!!
     TEST PASSED
     sh-4.2#
     ```
@@ -97,5 +97,5 @@ This concludes this first lab.
 ---------------------------------------
 
 <p align="center"><b>
-Start the next lab: <a href="lab_02_idct_introduction.md">Introduction to the SDAccel development environment</a>
+Start the next lab: <a href="lab_02_idct_introduction.md">Using the SDAccel xocc compiler to develop F1 accelerated applications</a>
 </b></p>
