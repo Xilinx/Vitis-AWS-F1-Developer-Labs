@@ -87,11 +87,11 @@ In most FPGA-accelerated systems, the maximum achievable throughput is limited b
 
 ### Establish Overall Acceleration Goals
 
-On the CPU, it takes 55.15 ms to process one 1080p frame. This means you are achieving a performance of 1000/55.15 = 18.13 frames per second (fps). You want your application to achieve a minimum real-time performance of 30 fps, so you need to accelerate it by a factor of ~2x compared to the CPU.
+On the CPU, it takes 19.25 seconds to process 132 1920x1080 frames. This means you are achieving a performance of 132/19.25 = <7 frames per second (fps). You want your application to achieve a minimum real-time performance of 30 fps, so you need to accelerate it by a factor of ~5x compared to the CPU.
 
 Given that the size of a frame is 1920 x 1080 x 4bytes = 8.29 MB, this means that, in absolute terms, your accelerated application must deliver a minimum throughput of 8.29 MB x 30 fps = 249 MB/s.
 
-This throughput goal is well within the bounds of maximum achievable throughput of an AWS F1 card. This tutorial will walk you through a predictable process for achieving that goal.
+This throughput goal is well within the bounds of maximum achievable throughput of an Alveo Data Center accelerator card. This tutorial will walk you through a predictable process for achieving that goal.
 
 ## Next Step
 
