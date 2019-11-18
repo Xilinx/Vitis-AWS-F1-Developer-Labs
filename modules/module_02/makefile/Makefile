@@ -36,7 +36,7 @@ build: host
 
 run: build
 	mkdir -p $(BUILDDIR)
-	cp $(SRCDIR)/runOnfpga_hw.awsxclbin $(BUILDDIR)
+	cp runOnfpga_hw.awsxclbin $(BUILDDIR)
 	cp xrt.ini $(BUILDDIR)
 	cd $(BUILDDIR) && ./host 100000 $(ITER) 
 
