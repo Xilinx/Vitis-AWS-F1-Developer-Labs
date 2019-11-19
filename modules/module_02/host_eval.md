@@ -162,15 +162,17 @@ for(unsigned int doc=0, n=0; doc<total_num_docs;doc++)
   }
 ```
 
-* From the above code, you can see that the compute score requires one memory access to `profile_weights`, one accumulation and one multiplication operation.
-* The memory accesses are random in each loop iteration, because you do not know the word ID accessed in each consecutive word of the document.
-* The size of `profile_weights` array is 128 MB and is placed in FPGA DDR. Non-sequential accesses to   DDR are big performance bottlenecks. Since accesses to the `profile_weights` array are random and     since this function takes only about 11% of the total running time, we can run this function           on the CPU. If this function is implemented on the FPGA, the accesses to this array can slow down     the performance while computing the score, so you can keep this function on CPU.
+* From the above code, you can see that the compute score requires one memory access to  `profile_weights`, one accumulation and one multiplication operation.
 
- Based on above code inspection, you will only offload Compute Hash and Output Flags code section on     FPGA.
+* The memory accesses are random in each loop iteration, because you do not know the word ID accessed   in each consecutive word of the document.
+
+* The size of `profile_weights` array is 128 MB and is placed in FPGA DDR. Non-sequential accesses to   DDR are big performance bottlenecks. Since accesses to the `profile_weights` array are random and     since this function takes only about 11% of the total running time, we can run this function on the   CPU. If this function is implemented on the FPGA, the accesses to this array can slow down the         performance while computing the score, so you can keep this function on CPU.
+
+  Based on this analysis of the algorithm, you will only offload Compute Hash and Output Flags code     section on FPGA.
 
 ## Run the Application on the FPGA
 
-When the Compute Hash & Output Flags code section is implemented in the FPGA, the FPGA returns a byte for each input document word received, indicating if the word is present in the search array. In an optimal implementation, you can process 16 32-bit input document words in parallel because the maximum data width read from the FPGA is 512-bits, computing an output for 16 words in every clock cycle. This parallelization factor (reading 16 parallel document words and thus more compute in parallel) can be modified. In this tutorial, a parallelization factor of 8 is used. After offloading the `MumurHash2` function on FPGA, you see the following results.
+When the Compute Hash & Output Flags code section is implemented in the FPGA, the FPGA returns a byte for each input document word received, indicating if the word is present in the search array. In this  implementation, we are processing 8 32-bit input document words in parallel computing hash and output flags for 8 words in every clock cycle. After offloading the compute hash and output flags code section on FPGA, you see the following results.
 
 ```
 --------------------------------------------------------------------
@@ -180,10 +182,14 @@ When the Compute Hash & Output Flags code section is implemented in the FPGA, th
  Verification: PASS
 ```
 
-You can see that the execution time of the application has increased almost by a factor of 7 by offloading the `MurmurHash2` function to the FPGA.  
+You can see that the execution time of the application has increased almost by a factor of 7 by offloading the compute hash and outout flags code section to the FPGA.  
 
 ## Conclusion
 
-From your analysis, you see that the `MurmurHash2` function is a good candidate for FPGA acceleration as it is compute intensive with a lot of arithmetic shift and multiplication operations which can perform faster on the FPGA compared to the CPU.
+In the previous steps, we have seen total execution time on FPGA has improved 7 times compared to CPU. The optimization of 3 key components of an FPGA-accelerated application that helped achieve these results are :
 
-Next, you need to improve the execution time of the `MurmurHash2` function on the FPGA by overlapping data transfers and computes between the host and FPGA, as the kernel is already optimized, and its execution time is close to theoretical number (explained in the next part). Because the kernel is already optimized, the only way to improve the execution time on the FPGA is by [overlapping data transfers and compute](./data_movement.md) between host and FPGA. To further improve the performance of application, you overlap FPGA hash function processing with CPU document score to achieve an optimal execution time.
+* FPGA Kernel 
+* Data Movement
+* Host Application
+
+In the next steps, we explain the techniques used to optimize data movement and the host application by [overlapping data transfers and compute](./data_movement.md) between host and FPGA. To further improve the performance of application, you overlap compute hash processing on FPGA with CPU document score to achieve an optimal execution time.
