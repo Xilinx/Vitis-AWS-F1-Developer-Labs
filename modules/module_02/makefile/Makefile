@@ -1,6 +1,6 @@
 TARGET := hw
 PF     := 8
-ITER   := 16
+ITER   := 
 
 STEP := single_buffer
 STEP := double_buffer
