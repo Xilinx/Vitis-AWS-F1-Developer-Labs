@@ -86,7 +86,7 @@ To improve the performance, you can send the input buffer in multiple iterations
 
 ### Host Code Modifications
   
-1. Change your working directory to `src/double_buffer`.
+1. Change your working directory to `src/split_buffer`.
 
 2. In the `run_fpga.cpp` file, replace lines 64 to 95 with the following.
 
@@ -193,7 +193,7 @@ To improve the performance, you can send the input buffer in multiple iterations
 Go to the `makefile` directory and run the following command.
 
 ```
-make run STEP=double_buffer
+make run STEP=split_buffer
 ```
 
 >**NOTE:** While running the `makefile`, you can add the argument `SOLUTION=1` to run the reference code, which already contains the above optimization.
@@ -210,7 +210,7 @@ The output is as follows.
 
 ### Profile Summary Analysis
 
-1. Change your working directory to `build/double_buffer`.
+1. Change your working directory to `build/split_buffer`.
 
 2. Run the following command to view the Profile Summary report.
 
