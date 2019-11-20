@@ -219,12 +219,9 @@ The output is as follows.
    ```
 
 * The time spent in kernel execution = 175.478 ms as shown in the *Kernel Execution* section.
-   The total time spent on data transfers is total time spent in the FPGA - kernel execution time.
 * The time spent in the FPGA is 564.939 ms as shown the above section. 
 
-* From the Profile Summary, you can see that the kernel execution time is 175.478 ms.
-
-   Therefore, time spent in data transfers =  564.939 - 175.478 = 389.461 ms
+   Therefore, time spent in data transfers from host to kernel =  564.939 - 175.478 = 389.461 ms
 
  ### Timeline Trace Analysis
 
@@ -243,9 +240,9 @@ As you can see from the Timeline Trace, there is an overlap of the read, compute
 
 ### Conclusion
 
-  From the above Profile Summary and Timeline Trace reports, you can see that the total execution time on the FPGA improved, as the time spent on theFPGA improved from the previous step due to the overlap between the data transfer and compute.
+  From the above Profile Summary and Timeline Trace reports, you can see that the total execution time on the FPGA improved, as the time spent on the FPGA improved from the previous step due to the overlap between the data transfer and compute.
 
-## Step 3: Optimized Approach (Overlap of Data Transfer and Compute with Multiple Buffers)
+## Step 3: Overlap of Data Transfer and Compute with Multiple Buffers
 
 In the previous step, you split the input buffer into two sub buffers and overlapped the compute with a data transfer. In this step, you will write a generic code, so the input data is split into multiple iterations to achieve the optimal execution time.
 
@@ -402,9 +399,9 @@ As you can see from the report, the input buffer is split into 16 sub buffers, a
 
 From the above Profile Summary and Timeline Trace reports, you see that the total execution time on the FPGA improved from the previous steps after splitting the input data into multiple buffers, allowing overlap between the data transfer and compute.
 
-## Step 4: Optimized Approach (Overlap Between the CPU and FPGA)
+## Step 4: Overlap Between the CPU and FPGA
 
- In the previous steps, you have looked at optimizing the execution time of the FPGA by overlapping the data transfer and compute. After the FPGA compute is complete, the CPU computes the document scores based on the output from the FPGA. There is serial execution between the FPGA processing and CPU post-processing. In this step, you will overlap the FPGA processing with the CPU post-processing.
+ In the previous steps, you have looked at optimizing the execution time of the FPGA by overlapping the data transfer and compute. After the FPGA compute is complete, the CPU computes the document scores based on the output from the FPGA. There is sequential execution between the FPGA processing and CPU post-processing. In this step, you will overlap the FPGA processing with the CPU post-processing.
 
 Because the total compute is split into multiple iterations, you can start post-processing in the CPU once the corresponding iteration is complete, allowing the overlap between the CPU and FPGA processing. The performance increases because the CPU is also processing in parallel with the FPGA, which reduces the execution time. The following figure illustrates this type of overlap.
 
