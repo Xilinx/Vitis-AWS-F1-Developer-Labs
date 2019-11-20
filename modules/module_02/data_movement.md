@@ -1,8 +1,8 @@
 # Part 2: Data Movement Between the Host and Kernel
 
-## Step 1: Native Approach (Transfer Entire 1.4 GB of Data from Host to FPGA  -> Compute  -> Read Back from FPGA to Host)
+## Step 1: Naive Approach
 
-In this step, you are transferring the entire input buffer from the host to the FPGA in one iteration followed by compute and reading the output from the FPGA to the host. The following figure shows a pictorial representation of the read-compute-write pattern in this step
+The initial version of the accelerated application follows the structure of original software version. We are transferring the entire input buffer from the host to the FPGA in one iteration followed by compute and reading the output from the FPGA to the host. The following figure shows the read-compute-write pattern in this step
 
   ![](./images/overlap_single_buffer.PNG)
 
@@ -17,7 +17,7 @@ The input arguments to the kernel are as follows:
 
 The output of the kernel is as follows:
 
-* `output_inh_flags`: Output array of 8-bit outputs where each bit in the 8-bit output indicates whether a word is present in the bloom filter which is then used for a post-computing score in the CPU.
+* `output_inh_flags`: Output array of 8-bit outputs where each bit in the 8-bit output indicates whether a word is present in the bloom filter which is then used for computing score in the CPU.
 
 ### Run the Application
 
@@ -47,15 +47,17 @@ The output is as follows.
 
    ```
    sdx_analyze  profile  –f html -i ./profile_summary.csv
+   firefox profile_summary.html
    ```
 
-* In the Profile Summary, in the *Kernel Execution* section, the kernel execution time displays as 175.286 ms.
-* The theoretical number expected from the kernel running at 250M HZ clock and processing eight words in parallel is as follows:
+*  In the Profile Summary, in the *Kernel Execution* section, the kernel execution time displays as 175.286 ms.
 
-   Number of words/(Clock freq * (Parallelization factor in Kernel) =    401022976/(250\*1000000\*8) = 174.86 ms
+*  The theoretical number expected from the kernel running at 250M HZ clock and processing eight words in parallel is as follows:
 
-    As you can see, the compute time of kernel closely matches with the theoretical number. The time spent in data transfers can be seen from the *Top Memory Writes* and *Top Memory Reads* sections.
-* The time spent is sum of time spent in writes and reads, that is 410.979 + 29.645 = 440.624 ms.
+   Number of words/(Clock freq * Parallelization factor in Kernel) =    401022976/(250\*1000000\*8) = 174.86 ms
+
+   As you can see, the compute time of kernel closely matches with the theoretical number. 
+    
 
 ### Timeline Trace Analysis
 
@@ -70,23 +72,23 @@ sdx –workspace workspace –report timeline_trace.wdb
 
 ![](./images/single_buffer_timeline_trace.PNG)
 
-As you can see from the Timeline Trace, there is a sequential execution of operations starting from the data transferred from the host to the FPGA, followed by compute in the FPGA and transferring back the results from the FPGA to host.
+As expected, there is a sequential execution of operations starting from the data transferred from the host to the FPGA, followed by compute in the FPGA and transferring back the results from the FPGA to host.
 
 ### Conclusion
 
-  From the above Profile Summary and Timeline Trace reports, you see that the kernel execution time closely matches with the expected theoretical number. There is sequential execution with the data transfers between the FPGA and host and compute in the FPGA. To further improve performance, you can look into overlapping data transfers and compute.
+From the above Profile Summary and Timeline Trace reports, you see that the kernel execution time closely matches with the expected theoretical number. There is sequential execution with the data transfers between the FPGA and host and compute in the FPGA. To further improve performance, you can look into overlapping data transfers and compute.
 
-## Step 2: Optimized Approach (Overlap Data Transfer and Compute)
+## Step 2: Overlapping Data Transfer and Compute
 
 In the previous step, you noticed a sequential execution of the read, compute, and write (that is, the compute does not start until the entire input is read into the FPGA and similarly, the host read from the FPGA does not start until compute is done).
 
-To improve the performance, you can send the input buffer in multiple iterations and start the compute for the corresponding iteration as soon as the data for the iteration is transferred.  Because the compute of each iteration is independent of the other iterations, you can overlap the data transfer of the next iteration and compute of the current iteration. The performance is expected to increase, because instead of the serial execution of the data transfer and compute, you are now overlapping the data transfer and compute. The following figure shows an illustrated representation of sending data as a whole, versus sending it in two buffers.
+To improve the performance, you can send the input buffer in multiple iterations and start the compute for the corresponding iteration as soon as the data for the iteration is transferred.  Because the compute of each iteration is independent of the other iterations, you can overlap the data transfer of the next iteration and compute of the current iteration. The performance is expected to increase, because instead of the sequential execution of the data transfer and compute, you are now overlapping the data transfer and compute. The following figure shows an illustrated representation of sending data as a whole, versus sending it in two buffers.
 
-   ![](./images/overlap_double_buffer.PNG)
+   ![](./images/overlap_split_buffer.PNG)
 
 ### Host Code Modifications
   
-1. Change your working directory to `src/double_buffer`.
+1. Change your working directory to `src/split_buffer`.
 
 2. In the `run_fpga.cpp` file, replace lines 64 to 95 with the following.
 
@@ -193,7 +195,7 @@ To improve the performance, you can send the input buffer in multiple iterations
 Go to the `makefile` directory and run the following command.
 
 ```
-make run STEP=double_buffer
+make run STEP=split_buffer
 ```
 
 >**NOTE:** While running the `makefile`, you can add the argument `SOLUTION=1` to run the reference code, which already contains the above optimization.
@@ -210,21 +212,16 @@ The output is as follows.
 
 ### Profile Summary Analysis
 
-1. Change your working directory to `build/double_buffer`.
+1. Change your working directory to `build/split_buffer`.
 
 2. Run the following command to view the Profile Summary report.
 
    ```
    sdx_analyze  profile  –f html -i ./profile_summary.csv
+   firefox profile_summary.html
    ```
 
 * The time spent in kernel execution = 175.478 ms as shown in the *Kernel Execution* section.
-   The total time spent on data transfers is total time spent in the FPGA - kernel execution time.
-* The time spent in the FPGA is 564.939 ms as shown the above section. 
-
-* From the Profile Summary, you can see that the kernel execution time is 175.478 ms.
-
-   Therefore, time spent in data transfers =  564.939 - 175.478 = 389.461 ms
 
  ### Timeline Trace Analysis
 
@@ -245,7 +242,7 @@ As you can see from the Timeline Trace, there is an overlap of the read, compute
 
   From the above Profile Summary and Timeline Trace reports, you can see that the total execution time on the FPGA improved, as the time spent on theFPGA improved from the previous step due to the overlap between the data transfer and compute.
 
-## Step 3: Optimized Approach (Overlap of Data Transfer and Compute with Multiple Buffers)
+## Step 3: Overlap of Data Trapingnsfer and Compute with Multiple Buffers)
 
 In the previous step, you split the input buffer into two sub buffers and overlapped the compute with a data transfer. In this step, you will write a generic code, so the input data is split into multiple iterations to achieve the optimal execution time.
 
@@ -343,23 +340,27 @@ In the previous step, you split the input buffer into two sub buffers and overla
  The above code is generic enough to split the data into the number of multiple buffers you specified.
 
 ### Run the Application
-
-
-1. Let us try to find the number of iterations that will give the best performance for this application. The below graph shows the        execution time varying with number of iterations
-
-    ![](./images/iter_generic.PNG)
- 
-   As we can see from the above graph that 16 iterations seems to give the best performance.
    
 
-2. Go to the `makefile` directory and run the following command.
+1. Go to the `makefile` directory and run the following command.
  
     ```
      make run STEP=generic_buffer ITER=16
     ```
+   The argument `ITER` represents the number of iterations of data transfer from host to FPGA.
+    
 >**NOTE**: You can add the argument `SOLUTION=1` while running the `makefile` to run the reference code, which already contains the above optimization.
 
- The output is as follows.
+
+2. Run the above `make` command with `ITER` values as 1,2,4,8,16,32. 
+
+3. Plotting a graph with the execution times of different `ITER` values varying with `ITER` is as follows
+
+    ![](./images/iter_generic.PNG)
+ 
+   As we can see from the above graph that 16 iterations seems to give the best performance.
+ 
+ 4. The output with `ITER` 16 is as follows.
 
 ```
  --------------------------------------------------------------------
@@ -377,11 +378,12 @@ In the previous step, you split the input buffer into two sub buffers and overla
 
    ```
    sdx_analyze  profile  –f html -i ./profile_summary.csv
+   firefox profile_summary.html
    ```
 
 * Time spent in kernel execution = 177.378 ms
 
-* Total time spent on data transfers is 515.489 - 177.378 = 338.211 ms.
+
 
 ### Timeline Trace Analysis
 
@@ -402,9 +404,9 @@ As you can see from the report, the input buffer is split into 16 sub buffers, a
 
 From the above Profile Summary and Timeline Trace reports, you see that the total execution time on the FPGA improved from the previous steps after splitting the input data into multiple buffers, allowing overlap between the data transfer and compute.
 
-## Step 4: Optimized Approach (Overlap Between the CPU and FPGA)
+## Step 4: Overlap Between the CPU and FPGA
 
- In the previous steps, you have looked at optimizing the execution time of the FPGA by overlapping the data transfer and compute. After the FPGA compute is complete, the CPU computes the document scores based on the output from the FPGA. There is serial execution between the FPGA processing and CPU post-processing. In this step, you will overlap the FPGA processing with the CPU post-processing.
+In the previous steps, you have looked at optimizing the execution time of the FPGA by overlapping the data transfer and compute. After the FPGA compute is complete, the CPU computes the document scores based on the output from the FPGA. There is sequential execution between the FPGA processing and CPU post-processing. From the previous timeline trace reports, you can find red segments in *OpenCL API Calls* of the *Host* section indicating that the host is blocked during FPGA processing. In this step, you will overlap the FPGA processing with the CPU post-processing.
 
 Because the total compute is split into multiple iterations, you can start post-processing in the CPU once the corresponding iteration is complete, allowing the overlap between the CPU and FPGA processing. The performance increases because the CPU is also processing in parallel with the FPGA, which reduces the execution time. The following figure illustrates this type of overlap.
 
@@ -500,23 +502,10 @@ The output is as follows.
  Verification: PASS
 ```
 
-### Profile Summary Analysis
-
-1. Change working directory to `build/sw_overlap`.
-
-2. Run the following command to view the Profile Summary report.
-
-   ```
-   sdx_analyze  profile  –f html -i ./profile_summary.csv
-   ```
-
-* Time spent in kernel execution = 177.231 ms
-
-* Total time spent on data transfers is 528.744 - 177.231 = 351.513 ms.
-
 ### Timeline Trace Analysis
 
 Run the following commands to view the Timeline Trace report.
+
 ```
 sdx_analyze trace –f wdb -I ./timeline_trace.csv
 sdx –workspace workspace –report timeline_trace.wdb
@@ -526,8 +515,10 @@ The Timeline Trace displays as follows.
 
 ![](./images/sw_overlap_timeline_trace.PNG)
 
-The processing time of the host CPU, located in *OpenCL API Calls* in the *Host* section, is now overlapping with FPGA processing, which improved the overall application execution time. In the previous steps, the host was completely blocked until the FPGA processing was complete.
+As seen above in *OpenCL API Calls* of the *Host* section with the yellow marking, the red segments are shorter in width indicating that the processing time of the host CPU is now overlapping with FPGA processing, which improved the overall application execution time. In the previous steps, the host was completely blocked until the FPGA processing was complete.
 
 ### Conclusion
 
-Congratulations. You have successfully completed the lab! You can see that the performance of the application on the FPGA is 7 times faster than the CPU. In this step, the total execution time of the application has improved because the CPU processing is now overlapping with the FPGA processing, achieving the optimal execution time for the application.
+Congratulations. You have successfully completed the lab!
+
+In this lab, you performed host code optimizations by overlapping data transfers and compute and overlapping CPU processing with FPGA processing. You can see that the performance of the application on the FPGA is 7 times faster than the CPU by performing host code optimizations without any kernel optimizations.
