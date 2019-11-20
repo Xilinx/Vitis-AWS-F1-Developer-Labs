@@ -16,7 +16,7 @@ unsigned int profile_size = 1L<<24;
 unsigned size_per_iter_const=512*1024;
 unsigned size_per_iter;
 
-#define HW_SW_OVERLAP
+
 
 void runOnFPGA(	
 	unsigned int*  doc_sizes,
@@ -130,13 +130,13 @@ void runOnFPGA(
 		flagWait.push_back(flagDone);
 	}
 
-#ifndef HW_SW_OVERLAP
+
 	// Wait until all results are copied back to the host before doing the post-processing
 	for (int i=0; i<num_iter; i++) 
 	{
 		flagWait[i].wait();
 	}
-#endif
+
 
 	// Compute the profile score the CPU using the in-hash flags computed on the FPGA
 	unsigned      curr_entry;
@@ -150,7 +150,7 @@ void runOnFPGA(
 		unsigned long ans = 0;
 		unsigned int size = doc_sizes[doc];
 
-#ifdef HW_SW_OVERLAP
+
 		// Check if we have enough flags from the FPGA device to process the next doc
 		// If not, wait until the next sub-buffer is read back to the host
 		// Update the number of available words and sub-buffer count (iter)
@@ -160,7 +160,7 @@ void runOnFPGA(
 			available += subbuf_doc_info[iter].size / sizeof(uint);
 			iter++;
 		}
-#endif
+
 		for (unsigned i = 0; i < size ; i++, n++)
 		{ 
 			curr_entry = input_doc_words[n];
