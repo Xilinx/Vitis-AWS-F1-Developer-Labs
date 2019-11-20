@@ -3,7 +3,7 @@ PF     := 8
 ITER   := 
 
 STEP := single_buffer
-STEP := double_buffer
+STEP := split_buffer
 STEP := generic_buffer
 STEP := sw_overlap
 
