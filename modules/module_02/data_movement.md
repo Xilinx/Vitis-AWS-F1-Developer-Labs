@@ -64,7 +64,7 @@ The output is as follows.
  Run the following commands to view the Timeline Trace report.
 
 ```
-sdx_analyze trace –f wdb -I ./timeline_trace.csv
+sdx_analyze trace –f wdb -i ./timeline_trace.csv
 sdx –workspace workspace –report timeline_trace.wdb
 ```
 
@@ -228,7 +228,7 @@ The output is as follows.
 Run the following commands to view the Timeline Trace report.
 
 ```
-sdx_analyze trace –f wdb -I ./timeline_trace.csv
+sdx_analyze trace –f wdb -i ./timeline_trace.csv
 sdx –workspace workspace –report timeline_trace.wdb
 ```
 
@@ -242,7 +242,7 @@ As you can see from the Timeline Trace, there is an overlap of the read, compute
 
   From the above Profile Summary and Timeline Trace reports, you can see that the total execution time on the FPGA improved, as the time spent on theFPGA improved from the previous step due to the overlap between the data transfer and compute.
 
-## Step 3: Overlap of Data Trapingnsfer and Compute with Multiple Buffers)
+## Step 3: Overlap of Data Transfer and Compute with Multiple Buffers
 
 In the previous step, you split the input buffer into two sub buffers and overlapped the compute with a data transfer. In this step, you will write a generic code, so the input data is split into multiple iterations to achieve the optimal execution time.
 
@@ -352,7 +352,7 @@ In the previous step, you split the input buffer into two sub buffers and overla
 >**NOTE**: You can add the argument `SOLUTION=1` while running the `makefile` to run the reference code, which already contains the above optimization.
 
 
-2. Run the above `make` command with `ITER` values as 1,2,4,8,16,32. 
+2. Run the above `make` command with `ITER` values as 1,2,4,8,16,32,64. 
 
 3. Plotting a graph with the execution times of different `ITER` values varying with `ITER` is as follows
 
@@ -390,7 +390,7 @@ In the previous step, you split the input buffer into two sub buffers and overla
 Run the following commands to look at Timeline Trace report.
 
 ```
-sdx_analyze trace –f wdb -I ./timeline_trace.csv
+sdx_analyze trace –f wdb -i ./timeline_trace.csv
 sdx –workspace workspace –report timeline_trace.wdb
 ```
 
@@ -415,31 +415,25 @@ Because the total compute is split into multiple iterations, you can start post-
 ## Host Code Modifications
 
 1. Navigate to the `src/sw_overlap` directory.
-2. Add a macro at line 19 as follows.
 
-   ```
-   #define HW_SW_OVERLAP
-   ```
-
-3. In the `run_fpga.cpp` file, replace lines 132 to 165 with the following.
+2. In the `run_fpga.cpp` file, replace lines 132 to 165 with the following.
 
 
-   a. Block the host only if the macro `HW_SW_OVERLAP` is not defined
-   
-        #ifndef HW_SW_OVERLAP
+   a. Remove the lines from 132- 137 which are as follows
+      
         // Wait until all results are copied back to the host before doing the post-processing
         for (int i=0; i<num_iter; i++)
         {
                 flagWait[i].wait();
         }
-        q,finish();
-        #endif
+        q.finish();
+      
 
      
      b. Create variables to keep track of number of words for which hash function is computed by FPGA and compute the corresponding             document score.
      
         // Compute the profile score the CPU using the in-hash flags computed on the FPGA
-        unsigned      curr_entry;
+        unsigned int curr_entry;
         unsigned char inh_flags;
         unsigned int  available = 0;
         unsigned int  needed = 0;
@@ -452,7 +446,7 @@ Because the total compute is split into multiple iterations, you can start post-
                 unsigned long ans = 0;
                 unsigned int size = doc_sizes[doc];
 
-         #ifdef HW_SW_OVERLAP
+       
                 // Check if we have enough flags from the FPGA device to process the next doc
                 // If not, wait until the next sub-buffer is read back to the host
                 // Update the number of available words and sub-buffer count (iter)
@@ -462,7 +456,7 @@ Because the total compute is split into multiple iterations, you can start post-
                         available += subbuf_doc_info[iter].size / sizeof(uint);
                         iter++;
                 }
-         #endif
+        
                 for (unsigned i = 0; i < size ; i++, n++)
                 {
                         curr_entry = input_doc_words[n];
@@ -507,7 +501,7 @@ The output is as follows.
 Run the following commands to view the Timeline Trace report.
 
 ```
-sdx_analyze trace –f wdb -I ./timeline_trace.csv
+sdx_analyze trace –f wdb -i ./timeline_trace.csv
 sdx –workspace workspace –report timeline_trace.wdb
 ```
 
