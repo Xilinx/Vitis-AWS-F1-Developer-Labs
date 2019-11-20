@@ -1,8 +1,8 @@
 # Part 2: Data Movement Between the Host and Kernel
 
-## Step 1: Native Approach (Transfer Entire 1.4 GB of Data from Host to FPGA  -> Compute  -> Read Back from FPGA to Host)
+## Step 1: Naive Approach 
 
-In this step, you are transferring the entire input buffer from the host to the FPGA in one iteration followed by compute and reading the output from the FPGA to the host. The following figure shows a pictorial representation of the read-compute-write pattern in this step
+In this step, you are transferring the entire input buffer of 1.4GB from the host to the FPGA in one iteration followed by compute and reading the output from the FPGA to the host. The following figure shows a pictorial representation of the read-compute-write pattern in this step
 
   ![](./images/overlap_single_buffer.PNG)
 
