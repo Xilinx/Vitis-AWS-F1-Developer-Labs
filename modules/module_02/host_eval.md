@@ -137,7 +137,7 @@ II. The code for the compute hash which computes the output flags based on hash 
 
 * The input words read from the DDR are accessed sequentially from DDR enablng FPGA to infer words from DDR in burst mode thereby         improving DDR read bandwidth.
 
-Based on the above code inspection, you can see that hash function has lot of arithmetic shifts which runfaster on FPGA aling with CPU. We can also compute hash for multile words in parallel which further imporves the application's execution time..
+Based on the above code inspection, you can see that hash function has lot of arithmetic shifts which run faster on FPGA compared to CPU. We can also compute hash for multile words in parallel which further imporves the application's execution time..
 
 ### Computing Document Score
 
@@ -166,9 +166,9 @@ for(unsigned int doc=0, n=0; doc<total_num_docs;doc++)
 
 * The memory accesses are random in each loop iteration, because you do not know the word ID accessed   in each consecutive word of the document.
 
-* The size of `profile_weights` array is 128 MB and is placed in FPGA DDR. Non-sequential accesses to   DDR are big performance bottlenecks. Since accesses to the `profile_weights` array are random and     since this function takes only about 11% of the total running time, we can run this function on the   CPU. If this function is implemented on the FPGA, the accesses to this array can slow down the         performance while computing the score, so you can keep this function on CPU.
+* The size of `profile_weights` array is 128 MB and is placed in FPGA DDR. Non-sequential accesses to DDR are big performance bottlenecks. Since accesses to the `profile_weights` array are random and since this function takes only about 11% of the total running time, we can run this function on the   CPU. If this function is implemented on the FPGA, the accesses to this array can slow down the   performance while computing the score, so you can keep this function on CPU.
 
-  Based on this analysis of the algorithm, you will only offload Compute Hash and Output Flags code     section on FPGA.
+Based on this analysis of the algorithm, you will only offload Compute Hash and Output Flags code     section on FPGA.
 
 ## Run the Application on the FPGA
 
