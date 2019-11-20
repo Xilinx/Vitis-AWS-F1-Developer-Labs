@@ -131,13 +131,6 @@ void runOnFPGA(
 	}
 
 
-	// Wait until all results are copied back to the host before doing the post-processing
-	for (int i=0; i<num_iter; i++) 
-	{
-		flagWait[i].wait();
-	}
-
-
 	// Compute the profile score the CPU using the in-hash flags computed on the FPGA
 	unsigned      curr_entry;
 	unsigned char inh_flags;
