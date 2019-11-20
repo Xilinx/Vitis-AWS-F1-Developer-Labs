@@ -81,7 +81,7 @@ void runOnCPU (
     chrono::duration<double> hash_processing   = (t2-t1);
     chrono::duration<double> cpu_post_processing   = (t3-t2);
 
-    printf(" Total execution time of CPU         | %10.4f ms\n", 1000*time_span_cpu.count());
-    printf(" Hash function processing time       | %10.4f ms\n", 1000*hash_processing.count());
-    printf(" CPU post processing time            | %10.4f ms\n", 1000*cpu_post_processing.count());
+    printf(" Total execution time of CPU          | %10.4f ms\n", 1000*time_span_cpu.count());
+    printf(" Compute Hash processing time         | %10.4f ms\n", 1000*hash_processing.count());
+    printf(" Compute Score processing time        | %10.4f ms\n", 1000*cpu_post_processing.count());
 }
