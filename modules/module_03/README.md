@@ -31,9 +31,8 @@ Before starting this lab, perform a fresh reinstall of the AWS EC2 FPGA Developm
 ```bash  
 # Install the AWS EC2 FPGA Development Kit
 cd ~
-rm -rf $AWS_FPGA_REPO_DIR
-git clone https://github.com/aws/aws-fpga.git $AWS_FPGA_REPO_DIR  
-cd $AWS_FPGA_REPO_DIR                                         
+git clone https://github.com/aws/aws-fpga.git
+cd aws-fpga                                   
 source sdaccel_setup.sh
 
 # Download the SDAccel F1 Developer Labs
