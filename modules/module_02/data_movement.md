@@ -24,8 +24,8 @@ The output of the kernel is as follows:
 Go to the `makefile` directory and run the following command.
 
 ```
-cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_02/makefile
-make run STEP=single_buffer
+cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_02/makefile
+sudo -E -- bash -c 'make run STEP=single_buffer SOLUTION=1'
 ```
 
    >**NOTE:** While running the `makefile`, you can add the argument `SOLUTION=1` to run the reference code, which already contains the above optimization.
@@ -196,8 +196,8 @@ To improve the performance, you can send the input buffer in multiple iterations
 Go to the `makefile` directory and run the following command.
 
 ```
-cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_02/makefile
-make run STEP=split_buffer
+cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_02/makefile
+sudo -E -- bash -c 'make run STEP=split_buffer SOLUTION=1'
 ```
 
 >**NOTE:** While running the `makefile`, you can add the argument `SOLUTION=1` to run the reference code, which already contains the above optimization.
@@ -347,8 +347,8 @@ In the previous step, you split the input buffer into two sub buffers and overla
 1. Go to the `makefile` directory and run the following command.
  
     ```
-   cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_02/makefile
-   make run STEP=generic_buffer ITER=16
+   cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_02/makefile
+   sudo -E -- bash -c 'make run STEP=generic_buffer ITER=16 SOLUTION=1'
     ```
    The argument `ITER` represents the number of iterations of data transfer from host to FPGA.
     
@@ -484,9 +484,8 @@ Because the total compute is split into multiple iterations, you can start post-
 Go to the `makefile` directory and run the following command.
 
 ```
-
-cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_02/makefile
-make run STEP=sw_overlap ITER=16
+cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_02/makefile
+sudo -E -- bash -c 'make run STEP=sw_overlap ITER=16 SOLUTION=1'
 ```
 
 >**NOTE**: While running the `makefile`, you can add the argument `SOLUTION=1` to run the reference code, which already contains the above optimization.
