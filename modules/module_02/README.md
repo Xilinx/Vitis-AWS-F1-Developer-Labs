@@ -36,7 +36,6 @@ This module is divided in 2 labs. Since building FPGA binaries is not instantane
 You will evaluate potential candidates in the algorithm for FPGA acceleration. You will also experience the acceleration gain by running application on FPGA and comparing this with application run on CPU
 
 1. **Data Movement Between the Host and Kernel** \
-
 You will learn the techniques how to optimize the data movements between host and FPGA. You will also go through how ovelapping of host and FPGA execution accelerate the application performance. 
 
 After you complete the last lab, you will be guided to close your RDP session, stop your F1 instance and explore next steps to continue your experience with SDAccel on AWS.
