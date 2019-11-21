@@ -20,7 +20,7 @@ In this step, you will build and run this application to create baseline perform
 2. Execute the following `make` command.
 
    ```
-   cd convolution-tutorial/design/cpu_src
+   cd modules/module_03/design/cpu_src
    make
    ```
 
@@ -33,7 +33,7 @@ The command will compile the C source code, and build the `convolve` executable.
 In this step, run the original C application with a specified input video file in different formats, and generate the corresponding golden output files for comparison purposes using the following commands.
 
 ```
-cd convolution-tutorial/design/cpu_src
+cd modules/module_03/design/cpu_src
 make golden
 ```
 
