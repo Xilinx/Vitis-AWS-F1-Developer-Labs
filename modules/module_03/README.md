@@ -39,7 +39,7 @@ source sdaccel_setup.sh
 # Download the SDAccel F1 Developer Labs
 cd ~
 rm -rf SDAccel-AWS-F1-Developer-Labs
-git clone https://github.com/Xilinx/xxxx.git Convolution-labs
+git clone https://github.com/Xilinx/SDAccel-AWS-F1-Developer-Labs
 ```
 
 
@@ -55,18 +55,10 @@ This tutorial requires that the ffmpeg framework is installed on the machine whe
    sudo yum install ffmpeg
    ```
 
-* For Ubuntu:
-
-   ```
-   sudo apt update
-   sudo apt install ffmpeg
-   ffmpeg -version
-  ```
-
 The labs in this tutorial use:
 
 * BASH Linux shell commands.
-* 2018.3 SDx release and the *aws-vu9p-f1-04261818_dynamic_5_0* platform.
+* 2019.1 SDx release and the *aws-vu9p-f1-04261818_dynamic_5_0* platform.
 * A `Makefile` that is detailed and contains many steps and variables. For a discussion of the `Makefile` structure and contents, refer to [Understanding the Makefile](./HowToRunTutorial.md).
 
 
