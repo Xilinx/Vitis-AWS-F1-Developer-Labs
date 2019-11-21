@@ -2,7 +2,8 @@
 
 ## AWS F1 environment setup
 
-Skip this step if the SDAccel environment is already setup
+Skip this step if the SDAccel environment is already setup.
+
 Before starting this module, perform a fresh reinstall of the AWS EC2 FPGA Development Kit and download the lab contents on your instance. Open a new terminal by right-clicking anywhere in the Desktop area and selecting **Open Terminal**, then run the following commands:
 
 ```
