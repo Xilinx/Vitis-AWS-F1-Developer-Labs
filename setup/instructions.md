@@ -35,7 +35,7 @@ The following steps explain how to launch an EC2 F1 instance starting from the F
 1. In the top right corner, select a region with F1 instances: US East (N.Virginia), US West (Oregon) or EU (Ireland) 
 1. Click **Launch Instance**. This takes you to the AMI selection step.
 1. Click **Community AMIs** (in the left pane)
-1. Enter **FPGA Developer AMI - 1.4.0** in the search box 
+1. Enter **FPGA Developer AMI - 1.7.0** in the search box 
 1. **Select** the "FPGA Developer AMI". This brings up a pop-up screen showing pricing details. 
 1. Click **Continue** to proceed to the instance type selection step.
 1. Scroll down to select a **f1.2xlarge** instance
