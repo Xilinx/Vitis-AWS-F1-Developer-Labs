@@ -14,7 +14,7 @@ If you need help with any of the above, follow the [**setup instructions**](./se
 
 ### Supported Versions
 
-These labs are based on SDAccel 2018.3 available with the FPGA Developer AMI v1.6.0. Please make sure to select this version when you launch your instance. To find this AMI, search for "FPGA Developer AMI - 1.6.0" in the Community AMIs.
+These labs are based on SDAccel 2019.1 available with the FPGA Developer AMI v1.7.0. Please make sure to select this version when you launch your instance. To find this AMI, search for "FPGA Developer AMI - 1.7.0" in the Community AMIs.
 
 ### Developer Lab Modules
 
