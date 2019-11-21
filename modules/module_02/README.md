@@ -39,3 +39,9 @@ You will evaluate potential candidates in the algorithm for FPGA acceleration. Y
 You will learn the techniques how to optimize the data movements between host and FPGA. You will also go through how ovelapping of host and FPGA execution accelerate the application performance. 
 
 After you complete the last lab, you will be guided to close your RDP session, stop your F1 instance and explore next steps to continue your experience with SDAccel on AWS.
+
+---------------------------------------
+
+<p align="center"><b>
+Start the first lab: <a href="host_eval.md">Optimize the data movement between CPU and FPGA</a>
+</b></p>
