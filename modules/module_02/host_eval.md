@@ -11,6 +11,7 @@ This algorithm attempts to find the best matching documents for a specific searc
 Navigate to the `cpu_src` directory and run the following command.
 
 ``` 
+cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_02/cpu_src
 make run
 ```
 
