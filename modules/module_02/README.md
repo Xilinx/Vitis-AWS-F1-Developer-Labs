@@ -43,5 +43,5 @@ After you complete the last lab, you will be guided to close your RDP session, s
 ---------------------------------------
 
 <p align="center"><b>
-Start the first lab: <a href="host_eval.md">Optimize the data movement between CPU and FPGA</a>
+Start the first lab: <a href="host_eval.md">Experience FPGA Acceleration</a>
 </b></p>
