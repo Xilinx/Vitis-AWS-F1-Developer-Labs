@@ -40,7 +40,7 @@ sudo -E -- bash -c 'make run STEP=single_buffer SOLUTION=1'
 
 ### Profile Summary Analysis
 
-1. Change your working directory to `/home/centos/src/project_data/SDAccel-AWS-F1-Developer-                m     Labs/modules/module_02/build/single_buffer`.
+1. Change your working directory to `/home/centos/src/project_data/SDAccel-AWS-F1-Developer-  Labs/modules/module_02/build/single_buffer`.
 
    ```
    cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_02/build/single_buffer
