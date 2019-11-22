@@ -372,10 +372,10 @@ In the previous step, you split the input buffer into two sub buffers and overla
 
 1. Run the following commands to look at Timeline Trace report.
 
-```
-sdx_analyze trace -f wdb -i ./timeline_trace.csv
-sdx -workspace workspace -report timeline_trace.wdb
-```
+  ```
+  sdx_analyze trace -f wdb -i ./timeline_trace.csv
+  sdx -workspace workspace -report timeline_trace.wdb
+  ```
 
 2. Zoom in to display the timeline trace report as follows.
 
@@ -405,10 +405,9 @@ Because the total compute is split into multiple iterations, you can start post-
 
 2. Open `run_sw_overlap.cpp` file with a file editor.
 
-3. The lines 67-137 are modified to optimize the host code to send the input buffer in multiple iterations to enable overlapping of        data transfer an compute. It is explained in detail as follows
-
+3. The lines 134-171 are modified to optimize the host code such that CPU processing is overlapped with FPGA processing. It is            explained in detail as follows
      
-     a. Variables to keep track of number of words for which hash function is computed by FPGA and compute the corresponding             document score.
+     a. Following variables are created to keep track of the words processed by FPGA 
      
         // Compute the profile score the CPU using the in-hash flags computed on the FPGA
         unsigned int curr_entry;
@@ -417,7 +416,7 @@ Because the total compute is split into multiple iterations, you can start post-
         unsigned int  needed = 0;
         unsigned int  iter = 0;
 
-     c. Block the host only if the hash function of the words are still not computed by FPGA thereby allowing overlap between host &           FPGA processing.
+     b. Block the host only if the hash function of the words are still not computed by FPGA thereby allowing overlap between CPU &             FPGA processing.
      
         for(unsigned int doc=0, n=0; doc<total_num_docs;doc++)
         {
@@ -456,35 +455,33 @@ Because the total compute is split into multiple iterations, you can start post-
 
 ### Run the Application
 
-Go to the `makefile` directory and run the following command.
+1. Go to the `makefile` directory and run the `make` command.
 
-```
-cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_02/makefile
-sudo -E -- bash -c 'make run STEP=sw_overlap ITER=16 SOLUTION=1'
-```
+  ```
+  cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_02/makefile
+  sudo -E -- bash -c 'make run STEP=sw_overlap ITER=16 SOLUTION=1'
+  ```
 
->**NOTE**: While running the `makefile`, you can add the argument `SOLUTION=1` to run the reference code, which already contains the above optimization.
+2. The output is as follows.
 
-The output is as follows.
-
-```
---------------------------------------------------------------------
- Executed FPGA accelerated version  |   552.5344 ms   ( FPGA 528.744 ms )
- Executed Software-Only version     |   3864.4070 ms
---------------------------------------------------------------------
- Verification: PASS
-```
+  ```
+  --------------------------------------------------------------------
+  Executed FPGA accelerated version  |   552.5344 ms   ( FPGA 528.744 ms )
+  Executed Software-Only version     |   3864.4070 ms
+  --------------------------------------------------------------------
+  Verification: PASS
+  ```
 
 ### Timeline Trace Analysis
 
-Run the following commands to view the Timeline Trace report.
+1. Run the following commands to view the Timeline Trace report.
 
-```
-sdx_analyze trace -f wdb -i ./timeline_trace.csv
-sdx -workspace workspace -report timeline_trace.wdb
-```
+ ```
+ sdx_analyze trace -f wdb -i ./timeline_trace.csv
+ sdx -workspace workspace -report timeline_trace.wdb
+ ```
 
-The Timeline Trace displays as follows.
+2. Zoom in to display the timeline trace report as follows.
 
 ![](./images/sw_overlap_timeline_trace.PNG)
 
