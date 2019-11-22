@@ -8,14 +8,14 @@ This algorithm attempts to find the best matching documents for a specific searc
 
 ## Run the Application on the CPU
 
-Navigate to the `cpu_src` directory and run the following command.
+1. Navigate to the `cpu_src` directory and run the following command.
 
 ``` 
-cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_02/cpu_src
+cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/cpu_src
 make run
 ```
 
-The output is as follows.
+2. The output is as follows.
  ```
  Total execution time of CPU                        |  4112.5895 ms
  Compute Hash & Output Flags processing time        |  3660.4433 ms
@@ -38,16 +38,18 @@ As we can see from the execution times in the previous step, the applications sp
 
 ## Evaluating What Code is a Good Fit for the FPGA
 
-The algorithm can be divided into two sections:  
+We have two files for evaluation:
 
-* Computing the hash function of the words and creating output flags.
+1. compute_score_host.cpp : Computes document score based on the output flags created from hash function of the words. 
 
-* Computing document scores based on output flags from the above step.
+2. MurmurHash2.c : Called by `compute_score_host.cpp` to compute Hash function for a given word.
 
 
-### Compute Hash Function & Output Flags 
+### Evaluating Hash Function 
 
-I. The hash function (`MurmurHash2`) which is called as part of computing output flags is as follows:
+1. Open `MurmurHash2.c` file with a file editor.
+
+2. The `MurmurHash2` hash function code is as follows:
 
 ```
 unsigned int MurmurHash2 ( const void * key, int len, unsigned int seed )
@@ -95,9 +97,25 @@ case 1: h ^= data[0];
 
 * FPGA also has dedicated DSP units, which perform multiplication faster than the CPU. Even though the CPU runs at 8 times higher clock frequency than the FPGA, the arithmetic shift and multiplication operations can perform faster on FPGA because of its custom hardware architecture, enabling it to perform in fewer clock cycles compared to the CPU.
 
+* Therefore this function is a good candidate for implemeting on FPGA.
 
-II. The code for the compute hash which computes the output flags based on hash function (`MurmurHash2`) output for the words in all       documents is shown below. 
+3. Close the file.
 
+### Evaluating Compute Output Flags from Hash Function
+
+
+1. Open `compute_score_host.cpp` file in the file editor. 
+
+
+2. The algorithm can be divided into two sections
+
+   * Computing output flags created from the hash function of every word in all documents. 
+  
+   * Computing document score based on output flags created above.
+   
+   Let us evaluate if these code sections are a good fit for FPGA.
+
+3.  The code at lines 32-58 which computes output flags is shown below.
 
 ```
 // Compute output flags based on hash function output for the words in all documents
@@ -132,15 +150,20 @@ II. The code for the compute hash which computes the output flags based on hash 
 
 ```
 
-* From the above code, we see that we are computing two hash outputs for each word in all the documents and create output flags           accordingly.
 
-* The computation of hash of one word is independent of other words and can be done in parallel thereby improving the execution time.
+* From the above code, we see that we are computing two hash outputs for each word in all the documents and creating output flags         accordingly.
+
+* We already saw that hash function is a good candidate for acceleration on FPGA.
+
+* The computation of hash function of one word is independent of other words and can be done in parallel thereby improving the           execution time.
 
 * The input words read from the DDR are accessed sequentially from DDR enablng FPGA to infer words from DDR in burst mode thereby         improving DDR read bandwidth.
 
-Based on the above code inspection, you can see that hash function has lot of arithmetic shifts which run faster on FPGA compared to CPU. We can also compute hash for multile words in parallel which further imporves the application's execution time..
+ 4. Close the file. 
+ 
+ Looking at above code you can see that this code section is a a good candidate for FPGA as hash function can run faster on FPGA and     we can compute hash function for multiple words in parallel by reading multiple words from DDR in burst mode. 
 
-### Computing Document Score
+### Evaluating Compute Document Score
 
 The code for computing the document score is as follows:
 
@@ -165,17 +188,24 @@ for(unsigned int doc=0, n=0; doc<total_num_docs;doc++)
 
 * From the above code, you can see that the compute score requires one memory access to  `profile_weights`, one accumulation and one multiplication operation.
 
-* The memory accesses are random in each loop iteration, because you do not know the word ID accessed   in each consecutive word of the document.
+* The memory accesses are random in each loop iteration, because you do not know the word ID accessed  in each consecutive word of the document.
 
 * The size of `profile_weights` array is 128 MB and is placed in FPGA DDR. Non-sequential accesses to DDR are big performance bottlenecks. Since accesses to the `profile_weights` array are random and since this function takes only about 11% of the total running time, we can run this function on the   CPU. If this function is implemented on the FPGA, the accesses to this array can slow down the   performance while computing the score, so you can keep this function on CPU.
 
-Based on this analysis of the algorithm, you will only offload Compute Hash and Output Flags code     section on FPGA.
+Based on this analysis of the algorithm, you will not offload Compute Document Score code section and will only offload Compute Hash and Output Flags code section of `compute_score_fpga.cpp` on FPGA.
 
 ## Run the Application on the FPGA
 
 When the Compute Hash & Output Flags code section is implemented in the FPGA, the FPGA returns a byte for each input document word received, indicating if the word is present in the search array. In this  implementation, we are processing 8 32-bit input document words in parallel computing hash and output flags for 8 words in every clock cycle. After offloading the compute hash and output flags code section on FPGA, you see the following results.
 
-```
+1. Run the following make command for running optimized application on FPGA
+
+   `make run_fpga`
+
+
+2  The output is as follows:
+
+ ```
 --------------------------------------------------------------------
  Executed FPGA accelerated version  |   552.5344 ms   ( FPGA 528.744 ms )
  Executed Software-Only version     |   3864.4070 ms
