@@ -187,10 +187,12 @@ You can see that the execution time of the application has increased almost by a
 
 ## Conclusion
 
-In the previous steps, we have seen total execution time on FPGA has improved 7 times compared to CPU. The optimization of 3 key components of an FPGA-accelerated application that helped achieve these results are :
+In this lab, you have seen how to profile an application and determine which parts are best suited for FPGA acceleration. You've also  experienced that once efficiently implemented, FPGA-accelerated applications on AWS F1 instances execute significantly faster than conventional software-only applications.
 
-* FPGA Kernel 
-* Data Movement
-* Host Application
+In the next lab you will dive deeper into the details of the FPGA-acceleration application and learn some of the fundamental optimization techniques leveraged in this example. In particular, you will discover how to optimize data movements between host and FPGA, how to efficiently invoke the FPGA kernel and how to overlap computation on the CPU and the FPGA to maximize application performance.
 
-In the next steps, we explain the techniques used to optimize data movement and the host application by [overlapping data transfers and compute](./data_movement.md) between host and FPGA. To further improve the performance of application, you overlap compute hash processing on FPGA with CPU document score to achieve an optimal execution time.
+---------------------------------------
+
+<p align="center"><b>
+Start the next module: <a href="./data_movement.md">2: Overlapping data transfers and compute</a>
+</b></p>
