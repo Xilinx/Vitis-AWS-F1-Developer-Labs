@@ -189,7 +189,7 @@ You can see that the execution time of the application has increased almost by a
 
 In this lab, you have seen how to profile an application and determine which parts are best suited for FPGA acceleration. You've also  experienced that once efficiently implemented, FPGA-accelerated applications on AWS F1 instances execute significantly faster than conventional software-only applications.
 
-In the next lab you will dive deeper into the details of the FPGA-acceleration application and learn some of the fundamental optimization techniques leveraged in this example. In particular, you will discover how to optimize data movements between host and FPGA, how to efficiently invoke the FPGA kernel and how to overlap computation on the CPU and the FPGA to maximize application performance.
+In the next lab you will dive deeper into the details of the FPGA-accelerated application and learn some of the fundamental optimization techniques leveraged in this example. In particular, you will discover how to optimize data movements between host and FPGA, how to efficiently invoke the FPGA kernel and how to overlap computation on the CPU and the FPGA to maximize application performance.
 
 ---------------------------------------
 
