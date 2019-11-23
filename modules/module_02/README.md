@@ -1,4 +1,4 @@
-## Module 2: Optimize the data movement between CPU and FPGA
+## Module 1: Optimize the data movement between CPU and FPGA
 
 ### Prerequisites
 
