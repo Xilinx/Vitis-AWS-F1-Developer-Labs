@@ -99,32 +99,30 @@ II. The code for the compute hash which computes the output flags based on hash 
 // Compute output flags based on hash function output for the words in all documents
 
  for(unsigned int doc=0;doc<total_num_docs;doc++) 
-    {
-        profile_score[doc] = 0.0;
-        unsigned int size = doc_sizes[doc];
+ {
+   profile_score[doc] = 0.0;
+   unsigned int size = doc_sizes[doc];
 
-        for (unsigned i = 0; i < size ; i++)
-        { 
-            unsigned curr_entry = input_doc_words[size_offset+i];
-            unsigned word_id = curr_entry >> 8;
-            unsigned hash_pu =  MurmurHash2( &word_id , 3,1);
-            unsigned hash_lu =  MurmurHash2( &word_id , 3,5);
-            bool doc_end = (word_id==docTag);
-            unsigned hash1 = hash_pu&hash_bloom;
-            bool inh1 = (!doc_end) && (bloom_filter[ hash1 >> 5 ] & ( 1 << (hash1 & 0x1f)));
-            unsigned hash2 = (hash_pu+hash_lu)&hash_bloom;
-            bool inh2 = (!doc_end) && (bloom_filter[ hash2 >> 5 ] & ( 1 << (hash2 & 0x1f)));
-            
-           
-            if (inh1 && inh2) {
-                inh_flags[size_offset+i]=1;
-            }else {
-                inh_flags[size_offset+i]=0;
-            }
-        }
-      
-        size_offset+=size;
-    }
+   for (unsigned i = 0; i < size ; i++)
+   { 
+     unsigned curr_entry = input_doc_words[size_offset+i];
+     unsigned word_id = curr_entry >> 8;
+     unsigned hash_pu =  MurmurHash2( &word_id , 3,1);
+     unsigned hash_lu =  MurmurHash2( &word_id , 3,5);
+     bool doc_end = (word_id==docTag);
+     unsigned hash1 = hash_pu&hash_bloom;
+     bool inh1 = (!doc_end) && (bloom_filter[ hash1 >> 5 ] & ( 1 << (hash1 & 0x1f)));
+     unsigned hash2 = (hash_pu+hash_lu)&hash_bloom;
+     bool inh2 = (!doc_end) && (bloom_filter[ hash2 >> 5 ] & ( 1 << (hash2 & 0x1f)));
+               
+     if (inh1 && inh2) {
+       inh_flags[size_offset+i]=1;
+     } else {
+       inh_flags[size_offset+i]=0;
+     }
+   }   
+   size_offset+=size;
+ }
 
 ```
 
@@ -141,21 +139,21 @@ Based on the above code inspection, you can see that hash function has lot of ar
 The code for computing the document score is as follows:
 
 ```
-for(unsigned int doc=0, n=0; doc<total_num_docs;doc++)
-   {
-      profile_score[doc] = 0.0;
-      unsigned int size = doc_sizes[doc];
+  for(unsigned int doc=0, n=0; doc<total_num_docs;doc++)
+  {
+    profile_score[doc] = 0.0;
+    unsigned int size = doc_sizes[doc];
 
-      for (unsigned i = 0; i < size ; i++,n++)
+    for (unsigned i = 0; i < size ; i++,n++)
+    {
+      if(inh_flags[n])
       {
-          if(inh_flags[n])
-        {
-          unsigned curr_entry = input_doc_words[n];
-          unsigned frequency = curr_entry & 0x00ff;
-          unsigned word_id = curr_entry >> 8;
-          profile_score[doc]+= profile_weights[word_id] * (unsigned long)frequency;
-        }
+        unsigned curr_entry = input_doc_words[n];
+        unsigned frequency = curr_entry & 0x00ff;
+        unsigned word_id = curr_entry >> 8;
+        profile_score[doc]+= profile_weights[word_id] * (unsigned long)frequency;
       }
+    }
   }
 ```
 
