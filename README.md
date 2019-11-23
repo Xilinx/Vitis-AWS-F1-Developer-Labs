@@ -26,9 +26,9 @@ These labs are based on SDAccel 2019.1 available with the FPGA Developer AMI v1.
 [**FOLLOW THE INSTRUCTIONS**](./modules/module_01/README.md)
 
 #### Optimize the data movement between CPU and FPGA
-* Determine the software functions to be accelerated and experience the acceleration gain on FPGA
-* Start with naive approach of sending the entire data from host to FPGA as a serial execution
-* Experience acceleration gain by spltting entire data over multiple buffers and overlapping FPGA processing with CPU processing
+* Profile the software application and determine which functions to accelerate on FPGA
+* Working with a predefined FPGA accelerator, optimize performance by overlapping data transfers and FPGA execution
+* Further speed-up the application by overlapping FPGA execution and CPU processing
 
 [**FOLLOW THE INSTRUCTIONS**](./modules/module_02/README.md)
 
