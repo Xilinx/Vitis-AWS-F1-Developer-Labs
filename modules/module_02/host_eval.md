@@ -213,7 +213,7 @@ When the Compute Hash & Output Flags code section is implemented in the FPGA, th
  Verification: PASS
 ```
 
-You can see that the execution time of the application has increased almost by a factor of 7 by offloading the compute hash and outout flags code section to the FPGA.  
+You can see that the execution time of the application has decreased almost by a factor of 7 by offloading the compute hash and outout flags code section to the FPGA.  
 
 ## Conclusion
 
