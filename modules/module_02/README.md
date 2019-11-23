@@ -1,5 +1,13 @@
 ## Module 2: Optimize the data movement between CPU and FPGA
 
+### Prerequisites
+
+Run the following command 
+
+```
+source /opt/xilinx/xrt/setup.sh
+```
+
 ### Module overview
 
 This module is divided in 2 labs. Since building FPGA binaries is not instantaneous, both labs will use precompiled FPGA binary. The labs focus on data movement from host to kernel and how this affects the performance. Also, the same FPGA binary is being used for both the labs
