@@ -8,6 +8,10 @@ In practical scenarios, the number and the size of the documents to be searched 
 
 The core of the application is a Bloom filter, a space-efficient probabilistic data structure used to test whether an element is a member of a set. The algorithm attempts to find the best matching documents for a specific search array. The search array is the filter that matches documents against the user’s interest. In this application, each document is reduced to a set of 32-bit words, where each word is a pair of 24-bit word ID and 8-bit frequency representing the occurrence of the word ID in the document. The search array consists of smaller set of word IDs and each word ID has a weight associated with it, which represents the significance of the word. The application computes a score for each document to determine its relevance to the given search array.
 
+The algorithm can be divided in two sections:  
+* Computing the hash function of the words and creating output flags
+* Computing document scores based on the previously computed output flags
+
 ## Run the Application on the CPU
 
 Navigate to the `cpu_src` directory and run the following command.
@@ -27,25 +31,18 @@ The output is as follows.
 
 >**NOTE:** The performance number might vary depending on the CPU machine and workload activity at that time.
 
-The above command computes the score for 100,000 documents (1.39 GB) in this application. The execution time for this application is 4.112 seconds. The throughput is as follows:
+The above command computes the score for 100,000 documents, amounting to 1.39 GBytes of data. The execution time is 4.112 seconds and throughput is computed as follows:
 
 Throughput = Total data/Total time = 1.39 GB/4.112s = 338 MB/s
 
 ## Profiling the Application
 
-To improve the performance of the application, you need to identify bottlenecks in this application where the application is spending majority of the time.
+To improve the performance, you need to identify bottlenecks where the application is spending the majority of the total running time.
 
 As we can see from the execution times in the previous step, the applications spends 89% of time in calculating the hash function and 11 % of the time in computing the document score.
 
 
 ## Evaluating What Code is a Good Fit for the FPGA
-
-The algorithm can be divided into two sections:  
-
-* Computing the hash function of the words and creating output flags.
-
-* Computing document scores based on output flags from the above step.
-
 
 ### Compute Hash Function & Output Flags 
 
@@ -54,36 +51,33 @@ I. The hash function (`MurmurHash2`) which is called as part of computing output
 ```
 unsigned int MurmurHash2 ( const void * key, int len, unsigned int seed )
 {
-// 'm' and 'r' are mixing constants generated offline.
-// They're not really 'magic', they just happen to work well.
+  // 'm' and 'r' are mixing constants generated offline.
+  // They're not really 'magic', they just happen to work well.
 
-const unsigned int m = 0x5bd1e995;
-//	const int r = 24;
+  const unsigned int m = 0x5bd1e995;
+  //	const int r = 24;
 
-// Initialize the hash to a 'random' value
+  // Initialize the hash to a 'random' value
+  unsigned int h = seed ^ len;
 
-unsigned int h = seed ^ len;
+  // Mix 4 bytes at a time into the hash
+  const unsigned char * data = (const unsigned char *)key;
 
-// Mix 4 bytes at a time into the hash
+  switch(len)
+  {
+    case 3: h ^= data[2] << 16;
+    case 2: h ^= data[1] << 8;
+    case 1: h ^= data[0];
+    h *= m;
+  };
 
-const unsigned char * data = (const unsigned char *)key;
-
-switch(len)
-{
-case 3: h ^= data[2] << 16;
-case 2: h ^= data[1] << 8;
-case 1: h ^= data[0];
+  // Do a few final mixes of the hash to ensure the last few
+  // bytes are well-incorporated.
+  h ^= h >> 13;
   h *= m;
-};
-
-// Do a few final mixes of the hash to ensure the last few
-// bytes are well-incorporated.
-
-   h ^= h >> 13;
-   h *= m;
-   h ^= h >> 15;
+  h ^= h >> 15;
  
- return h;
+  return h;
 }   
 ```
 
@@ -169,13 +163,17 @@ for(unsigned int doc=0, n=0; doc<total_num_docs;doc++)
 
 * The memory accesses are random in each loop iteration, because you do not know the word ID accessed   in each consecutive word of the document.
 
-* The size of `profile_weights` array is 128 MB and is placed in FPGA DDR. Non-sequential accesses to DDR are big performance bottlenecks. Since accesses to the `profile_weights` array are random and since this function takes only about 11% of the total running time, we can run this function on the   CPU. If this function is implemented on the FPGA, the accesses to this array can slow down the   performance while computing the score, so you can keep this function on CPU.
+* The size of `profile_weights` array is 128 MB and is placed in FPGA DDR. Non-sequential accesses to DDR are big performance bottlenecks. Since accesses to the `profile_weights` array are random and since this function takes only about 11% of the total running time, we can run this function on the CPU. If this function is implemented on the FPGA, the accesses to this array can slow down the   performance while computing the score, so you can keep this function on CPU.
 
-Based on this analysis of the algorithm, you will only offload Compute Hash and Output Flags code     section on FPGA.
+Based on this analysis of the algorithm, you will only offload the "Compute Hash & Output Flags" code section in the FPGA.
 
 ## Run the Application on the FPGA
 
-When the Compute Hash & Output Flags code section is implemented in the FPGA, the FPGA returns a byte for each input document word received, indicating if the word is present in the search array. In this  implementation, we are processing 8 32-bit input document words in parallel computing hash and output flags for 8 words in every clock cycle. After offloading the compute hash and output flags code section on FPGA, you see the following results.
+For the purposes of this lab, we have implemented the FPGA accelerator with an 8x parallelization factor. It processes 8 input words in parallel, producing 8 output flags in parallel each clock cycle. Each output flag is stored as byte and indicates whether the corresponding word is present in the search array. Since each word requires two calls to the `MurmurHash2` function, this means that the accelerator performs 16 hash computations in parallel. 
+
+In addition, we have optimized the host application to efficiently interact with the parallelized FPGA-accelerator. 
+
+The result is an application which runs significantly faster thanks for FPGAs and AWS F1 instances:
 
 ```
 --------------------------------------------------------------------
