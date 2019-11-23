@@ -12,7 +12,7 @@ This algorithm attempts to find the best matching documents for a specific searc
 
 ``` 
 cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_02/cpu_src
-sudo -E -- bash -c 'make run'
+make run
 ```
 
 2. The output is as follows.
