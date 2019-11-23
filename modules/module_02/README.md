@@ -1,3 +1,9 @@
+<<<<<<< HEAD
+=======
+## Module 1: Optimize the data movement between CPU and FPGA
+
+### Prerequisites
+>>>>>>> 999c526091d4991807bc740214ddac3d3e31409b
 
 <table>
 <tr>

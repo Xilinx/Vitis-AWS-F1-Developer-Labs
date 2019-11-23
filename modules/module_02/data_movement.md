@@ -25,7 +25,7 @@ The output of the kernel is as follows:
 
 ```
 cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_02/makefile
-sudo -E -- bash -c 'make run STEP=single_buffer SOLUTION=1'
+make run STEP=single_buffer SOLUTION=1
 ```
 
 2. The output is as follows.
@@ -40,7 +40,7 @@ sudo -E -- bash -c 'make run STEP=single_buffer SOLUTION=1'
 
 ### Profile Summary Analysis
 
-1. Change your working directory to `/home/centos/src/project_data/SDAccel-AWS-F1-Developer-                m     Labs/modules/module_02/build/single_buffer`.
+1. Change your working directory to `/home/centos/src/project_data/SDAccel-AWS-F1-Developer-  Labs/modules/module_02/build/single_buffer`.
 
    ```
    cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_02/build/single_buffer
@@ -204,7 +204,7 @@ To improve the performance, you can send the input buffer in multiple iterations
 
 ```
 cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_02/makefile
-sudo -E -- bash -c 'make run STEP=split_buffer SOLUTION=1'
+make run STEP=split_buffer SOLUTION=1
 ```
 
 2. The output is as follows.
@@ -346,7 +346,7 @@ In the previous step, you split the input buffer into two sub buffers and overla
  
     ```
    cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_02/makefile
-   sudo -E -- bash -c 'make run STEP=generic_buffer ITER=16 SOLUTION=1'
+   make run STEP=generic_buffer ITER=16 SOLUTION=1
     ```
    The argument `ITER` represents the number of iterations of data transfer from host to FPGA.
 
@@ -459,7 +459,7 @@ Because the total compute is split into multiple iterations, you can start post-
 
   ```
   cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_02/makefile
-  sudo -E -- bash -c 'make run STEP=sw_overlap ITER=16 SOLUTION=1'
+  make run STEP=sw_overlap ITER=16 SOLUTION=1
   ```
 
 2. The output is as follows.

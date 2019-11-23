@@ -38,8 +38,7 @@ run: build
 	mkdir -p $(BUILDDIR)
 	cp runOnfpga_hw.awsxclbin $(BUILDDIR)
 	cp xrt.ini $(BUILDDIR)
-	source /opt/xilinx/xrt/setup.sh
-	cd $(BUILDDIR) && ./host 100000 $(ITER) 
+	sudo -E -- bash -c 'source /opt/xilinx/xrt/setup.sh && cd $(BUILDDIR) && ./host 100000 $(ITER)' 
 
 
 help:

@@ -18,4 +18,4 @@ xclbin: runOnfpga_$(TARGET).xclbin
 xo: runOnfpga_$(TARGET).xo
 
 clean:
-	rm -rf temp_dir log_dir ../build report_dir *log host runOnfpga* *.csv *summary .run .Xil vitis* *jou xilinx*
+	rm -rf temp_dir log_dir ../build report_dir *log host *.csv *summary .run .Xil vitis* *jou xilinx*
