@@ -1,10 +1,12 @@
 # Part 1: Experience FPGA Acceleration
 
-## Algorithm Overview  
+## Application Overview  
 
- In this algorithm, you are monitoring a stream of incoming documents, and computing a score for each document based on the user’s interest, represented by a search array. An example system would be the use of a filtering mechanism, which monitors news feeds and sends relevant articles to a user.
+The application used in this lab reads a stream of incoming documents, and computes a score for each document based on the user’s interest, represented by a search array. It is representative of real-time filtering systems, which monitor news feeds and send relevant articles to end users.
 
-This algorithm attempts to find the best matching documents for a specific search array. The search array is the filter that matches documents against the user’s interest. In this application, each document is reduced to a set of 32-bit words, where each word is a pair of 24-bit word ID and 8-bit frequency representing the occurrence of the word ID in the document. The search array consists of smaller set of word IDs and each word ID has a weight associated with it, which represents the significance of the word. The application computes a score for each document to determine its relevance to the given search array.
+In practical scenarios, the number of documents to be searched for an event can be very large and because the monitoring of events must run in real time, a smaller execution time is required for processing all the documents.
+
+The core of the application is a Bloom filter, a space-efficient probabilistic data structure used to test whether an element is a member of a set. The algorithm attempts to find the best matching documents for a specific search array. The search array is the filter that matches documents against the user’s interest. In this application, each document is reduced to a set of 32-bit words, where each word is a pair of 24-bit word ID and 8-bit frequency representing the occurrence of the word ID in the document. The search array consists of smaller set of word IDs and each word ID has a weight associated with it, which represents the significance of the word. The application computes a score for each document to determine its relevance to the given search array.
 
 ## Run the Application on the CPU
 
