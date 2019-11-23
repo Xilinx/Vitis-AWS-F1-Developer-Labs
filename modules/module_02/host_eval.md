@@ -194,5 +194,5 @@ In the next lab you will dive deeper into the details of the FPGA-acceleration a
 ---------------------------------------
 
 <p align="center"><b>
-Start the next module: <a href="./data_movement.md">2: Overlapping data transfers and compute</a>
+Start the next module: <a href="./data_movement.md">2: Optimizing CPU and FPGA interactions</a>
 </b></p>
