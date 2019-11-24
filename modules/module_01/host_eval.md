@@ -11,7 +11,7 @@ This algorithm attempts to find the best matching documents for a specific searc
 1. Navigate to the `cpu_src` directory and run the following command.
 
 ``` 
-cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/cpu_src
+cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_01/cpu_src
 make run
 ```
 
