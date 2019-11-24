@@ -431,9 +431,6 @@ Because the total compute is split into multiple iterations, you can start post-
         {
            unsigned long ans = 0;
            unsigned int size = doc_sizes[doc];
-       
-           // Non-blocking CPU-FPGA overlap using events 
-           
 	   
            // Calculate size by needed by CPU for processing next document score
              needed += size;
