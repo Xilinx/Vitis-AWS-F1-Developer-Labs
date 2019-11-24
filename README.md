@@ -2,8 +2,10 @@
 Welcome to the SDAccel AWS F1 Workshop. By going through these modules you will gain hands-on experience with AWS F1 and learn how to develop accelerated applications using the Xilinx SDAccel development environment.
 
 ### Setup
-For this workshop, we have provisioned an F1 instance for you to work on.
-Follow the 
+* For this workshop, we have provisioned an F1 instance for you to work on.
+* Please go through the instructions to connect to your instance and get started with the workshop.
+
+[**FOLLOW THE INSTRUCTIONS**](./setup/instructions.md)
 
 ### Module 1 - Optimize the data movement between CPU and FPGA
 * Determine the software functions to be accelerated and experience the acceleration gain on FPGA
