@@ -456,7 +456,7 @@ Because the total compute is split into multiple iterations, you can start post-
                  unsigned word_id = curr_entry >> 8;
                  ans += profile_weights[word_id] * (unsigned long)frequency;
                  }
-               }
+              }
                profile_score[doc] = ans;
         }
 
