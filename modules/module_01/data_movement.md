@@ -497,6 +497,8 @@ As seen above in *OpenCL API Calls* of the *Host* section with the yellow markin
 
 ### Conclusion
 
-Congratulations. You have successfully completed the lab!
+Congratulations. You have successfully completed Module 1!
 
 In this lab, you performed host code optimizations by overlapping data transfers and compute and overlapping CPU processing with FPGA processing. You can see that the performance of the application on the FPGA is 7 times faster than the CPU by performing host code optimizations without any kernel optimizations.
+
+In the next module, you will perform [2D Convolution]((./modules/module_02/README.md)) of an RGBA video to achieve real-time performnce of 30fps
