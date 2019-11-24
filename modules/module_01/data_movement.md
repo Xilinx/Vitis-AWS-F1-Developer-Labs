@@ -78,7 +78,7 @@ make run STEP=single_buffer SOLUTION=1
 
 ![](./images/single_buffer_timeline_trace.PNG)
 
-
+3. Exit the SDAccel application to return to the terminal.
 
 As expected, there is a sequential execution of operations starting from the data transferred from the host to the FPGA, followed by compute in the FPGA and transferring back the results from the FPGA to host.
 
@@ -252,6 +252,8 @@ make run STEP=split_buffer SOLUTION=1
 
 As you can see from the Timeline Trace report, there is an overlap of the read, compute, and write operations between the first and second iterations, which improves the total execution time on the FPGA.
 
+4. Exit the SDAccel application to return to the terminal.
+
 ### Conclusion
 
    From the above Profile Summary and Timeline Trace reports, you can see that the total execution time on the FPGA improved, as the time spent on the FPGA improved from the previous step due to the overlap between the data transfer and compute.
@@ -262,7 +264,9 @@ In the previous step, you split the input buffer into two sub buffers and overla
 
 ### Host Code Modifications
 
-1. Change your working directory to `/home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_01/reference_files`.
+> **NOTE:** If you started sdx to view the profile in the previous step, you may need to exit the application to get back to the terminal.
+
+1. Change your working directory to `modules/module_01/reference_files`.
 
    ```
    cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_01/reference_files
@@ -380,7 +384,7 @@ In the previous step, you split the input buffer into two sub buffers and overla
  
    As we can see from the above graph that 16 iterations seems to give the best performance.
  
- 4. The output with `ITER` 16 is as follows.
+4. The output with `ITER` 16 is as follows.
 
 ```
  --------------------------------------------------------------------
@@ -391,19 +395,26 @@ In the previous step, you split the input buffer into two sub buffers and overla
 ```
 
 ### Timeline Trace Analysis
+1. Change your working directory to `modules/module_01/build/generic_buffer`.
 
-1. Run the following commands to look at Timeline Trace report.
+   ```
+    cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_01/build/generic_buffer
+   ```
+   
+2. Run the following commands to look at Timeline Trace report.
 
   ```
   sdx_analyze trace -f wdb -i ./timeline_trace.csv
   sdx -workspace workspace -report timeline_trace.wdb
   ```
 
-2. Zoom in to display the timeline trace report as follows.
+3. Zoom in to display the timeline trace report as follows.
 
 ![](./images/generic_buffer_timeline_trace.PNG)
 
 As you can see from the report, the input buffer is split into 16 sub buffers, and there are overlaps between read, compute, and write.
+
+4. Exit the SDAccel application to return to the terminal.
 
 ### Conclusion
 
@@ -419,7 +430,7 @@ Because the total compute is split into multiple iterations, you can start post-
 
 ## Host Code Modifications
 
-1. Change your working directory to `/home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_01/reference_files`.
+1. Change your working directory to `modules/module_01/reference_files`.
 
    ```
    cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_01/reference_files
@@ -494,25 +505,34 @@ Because the total compute is split into multiple iterations, you can start post-
   ```
 
 ### Timeline Trace Analysis
+1. Change your working directory to `modules/module_01/build/sw_overlap`.
 
-1. Run the following commands to view the Timeline Trace report.
+   ```
+    cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_01/build/sw_overlap
+   ```
+   
+2. Run the following commands to view the Timeline Trace report.
 
  ```
  sdx_analyze trace -f wdb -i ./timeline_trace.csv
  sdx -workspace workspace -report timeline_trace.wdb
  ```
 
-2. Zoom in to display the timeline trace report as follows.
+3. Zoom in to display the timeline trace report as follows.
 
 ![](./images/sw_overlap_timeline_trace.PNG)
 
 As seen above in *OpenCL API Calls* of the *Host* section with the yellow marking, the red segments are shorter in width indicating that the processing time of the host CPU is now overlapping with FPGA processing, which improved the overall application execution time. In the previous steps, the host was completely blocked until the FPGA processing was complete.
 
+4. Exit the SDAccel application to return to the terminal.
+
 ### Conclusion
 
 Congratulations. You have successfully completed Module 1!
 
-In this lab, you performed host code optimizations by overlapping data transfers and compute and overlapping CPU processing with FPGA processing. You can see that the performance of the application on the FPGA is 7 times faster than the CPU by performing host code optimizations without any kernel optimizations.
+In this lab, you performed host code optimizations by overlapping data transfers and compute and overlapping CPU processing with FPGA processing. You also saw that the performance of the application on the FPGA is 7 times faster than the CPU by performing host code optimizations without any kernel optimizations.
 
 In the next module, you will perform [2D Convolution]((./modules/module_02/README.md)) of an RGBA video to achieve real-time performnce of 30fps.
- >**TIP:** Note that the next module consists of 7 steps and might take longer time to complete the module
+
+>**TIP:** The next module consists of 7 steps and might take longer time to complete the module.
+
