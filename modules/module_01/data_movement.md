@@ -84,7 +84,9 @@ As expected, there is a sequential execution of operations starting from the dat
 
 ### Conclusion
 
-From the above Profile Summary and Timeline Trace reports, you see that the kernel execution time closely matches with the expected theoretical number. There is sequential execution with the data transfers between the FPGA and host and compute in the FPGA. To further improve performance, you can look into overlapping data transfers and compute.
+From the Profile Summary and Timeline Trace reports, you see that the kernel execution time closely matches with the expected theoretical number. There is sequential execution with the data transfers between the FPGA and host and compute in the FPGA. 
+
+To further improve performance, you can look into overlapping data transfers and compute.
 
 ## Step 2: Overlapping Data Transfer and Compute
 
@@ -95,9 +97,13 @@ To improve the performance, you can send the input buffer in multiple iterations
    ![](./images/overlap_split_buffer.PNG)
 
 ### Host Code Modifications
-  
-1. Change your working directory to `/home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_01/reference_files`.
 
+> **NOTE:** If you started sdx to view the profile in the previous step, you may need to exit the application to get back to the terminal.
+
+1. Change your working directory to `modules/module_01/reference_files`.
+    ```
+    cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_01/reference_files
+    ```
 2. Open `run_split_buffer.cpp` file with a file editor.
 
 3. The lines 64-148 are modified to optimize the host code to send the input buffer in two iterations to enable overlapping of data        transfer an compute. It is explained in detail as follows
@@ -226,24 +232,29 @@ make run STEP=split_buffer SOLUTION=1
  Verification: PASS
 ```
 
- ### Timeline Trace Analysis
+### Timeline Trace Analysis
+1. Change your working directory to `modules/module_01/build/split_buffer`.
 
-1. Run the following commands to view the Timeline Trace report.
+   ```
+    cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_01/build/split_buffer
+   ```
+   
+2. Run the following commands to view the Timeline Trace report.
 
-```
-sdx_analyze trace -f wdb -i ./timeline_trace.csv
-sdx -workspace workspace -report timeline_trace.wdb
-```
+    ```
+    sdx_analyze trace -f wdb -i ./timeline_trace.csv
+    sdx -workspace workspace -report timeline_trace.wdb
+    ```
 
-2. Zoom in to display the timeline trace report as follows:
+3. Zoom in to display the timeline trace report as follows:
 
 ![](./images/double_buffer_timeline_trace.PNG)
 
-As you can see from the Timeline Trace report , there is an overlap of the read, compute, and write operations between the first and second iterations, which improves the total execution time on the FPGA.
+As you can see from the Timeline Trace report, there is an overlap of the read, compute, and write operations between the first and second iterations, which improves the total execution time on the FPGA.
 
 ### Conclusion
 
-   From the above Profile Summary and Timeline Trace reports, you can see that the total execution time on the FPGA improved, as the time spent on theFPGA improved from the previous step due to the overlap between the data transfer and compute.
+   From the above Profile Summary and Timeline Trace reports, you can see that the total execution time on the FPGA improved, as the time spent on the FPGA improved from the previous step due to the overlap between the data transfer and compute.
 
 ## Step 3: Overlap of Data Transfer and Compute with Multiple Buffers
 
