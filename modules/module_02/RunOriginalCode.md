@@ -16,11 +16,11 @@ In this step, you will build and run this application to create baseline perform
 
 ## Build the C Application
 
-1. Navigate to the `cpu_src` directory for the original application code.
+1. Navigate to the `modules/module_02/design/cpu_src` directory for the original application code.
 2. Execute the following `make` command.
 
    ```
-   cd modules/module_02/design/cpu_src
+   cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_02/design/cpu_src
    make
    ```
 
@@ -32,10 +32,10 @@ The command will compile the C source code, and build the `convolve` executable.
 
 In this step, run the original C application with a specified input video file in different formats, and generate the corresponding golden output files for comparison purposes using the following commands.
 
-```
-cd modules/module_02/design/cpu_src
-make golden
-```
+   ```
+   cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_02/design/cpu_src
+   make golden
+   ```
 
 The first output file generated, `golden_out_full.mp4` is a full movie with 132 frames. Each frame is 1920x1080 pixels. This golden output file is used for all hardware runs as applications can run very quickly on hardware. However, for emulation, you use smaller files with only one frame for a quicker turnaround.  
 
@@ -50,10 +50,10 @@ Here is the summary of the generated golden output files.
 As stated in the *SDAccel Methodology Guide* ([UG1346](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2019_1/ug1346-sdaccel-methodology-guide.pdf)), you can use the `gprof` tool to profile the application, and identify potential functions for acceleration.
 
 1. Add the `-pg` option in the gcc command line. This is already done in the `Makefile`.
-2. Change directory into the `cpu_src` folder, and run `make` to generate the executable file.
+2. Change directory into the `modules/module_02/design/cpu_src` folder, and run `make` to generate the executable file.
 
    ```
-   cd cpu_src
+   cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_02/design/cpu_src
    ```
 
 3. Run the executable file.

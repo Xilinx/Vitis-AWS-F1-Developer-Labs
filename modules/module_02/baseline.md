@@ -17,7 +17,7 @@ To measure the performance, you will use the Profile Summary and Timeline Trace 
 
 Use the following instructions to convert the C code into kernel code, and convert the `convolve_cpu` function into a hardware accelerated kernel to run on the FPGA.
 
->**TIP:** The completed kernel source file is provided in the `reference-files/baseline` folder. You can use it as a reference if needed.
+>**TIP:** The completed kernel source file is provided in the `modules/module_02/reference-files/baseline` folder. You can use it as a reference if needed.
 
 1. Select the `convolve_kernel.cpp` file from `cpu_src` folder, and make a copy called `convolve_fpga.cpp`.
 
@@ -54,10 +54,10 @@ Use the following instructions to convert the C code into kernel code, and conve
 
 ## Run Hardware Emulation
 
-1. Go to the `makefile` directory, and use the following command to run hardware emulation.
+1. Go to the `modules/module_02/design/makefile` directory, and use the following command to run hardware emulation.
 
     ```
-    cd design/makefile
+    cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_02/design/makefile
     make run TARGET=hw_emu STEP=baseline SOLUTION=1 NUM_FRAMES=1
     ```
 
