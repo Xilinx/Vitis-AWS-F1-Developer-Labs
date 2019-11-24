@@ -442,7 +442,7 @@ Because the total compute is split into multiple iterations, you can start post-
            // Update the number of available words and sub-buffer count(iter)
            
              if (needed > available)
-	      {
+              {
                flagWait[iter].wait();
                available += subbuf_doc_info[iter].size / sizeof(uint);
                iter++;
@@ -457,7 +457,7 @@ Because the total compute is split into multiple iterations, you can start post-
                 {
                  unsigned frequency = curr_entry & 0x00ff;
                  unsigned word_id = curr_entry >> 8;
-		 ans += profile_weights[word_id] * (unsigned long)frequency;
+                 ans += profile_weights[word_id] * (unsigned long)frequency;
                  }
                }
                profile_score[doc] = ans;
