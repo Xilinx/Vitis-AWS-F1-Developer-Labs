@@ -173,12 +173,12 @@ To improve the performance, you can send the input buffer in multiple iterations
         kernel.setArg(3, total_size);
         kernel.setArg(4, load_filter);
         kernel.setArg(0, subbuf_inh_flags[0]);
-	kernel.setArg(1, subbuf_doc_words[0]);
-	q.enqueueMigrateMemObjects({subbuf_doc_words[0]}, 0, &wordWait, &buffDone); 
-	wordWait.push_back(buffDone);
-	q.enqueueTask(kernel, &wordWait, &krnlDone);
-	krnlWait.push_back(krnlDone);
-	q.enqueueMigrateMemObjects({subbuf_inh_flags[0]}, CL_MIGRATE_MEM_OBJECT_HOST, &krnlWait, &flagDone);
+        kernel.setArg(1, subbuf_doc_words[0]);
+        q.enqueueMigrateMemObjects({subbuf_doc_words[0]}, 0, &wordWait, &buffDone); 
+        wordWait.push_back(buffDone);
+        q.enqueueTask(kernel, &wordWait, &krnlDone);
+        krnlWait.push_back(krnlDone);
+        q.enqueueMigrateMemObjects({subbuf_inh_flags[0]}, CL_MIGRATE_MEM_OBJECT_HOST, &krnlWait, &flagDone);
 	flagWait.push_back(flagDone);
          
    e.  Kernel arguments are set , input buffer is transferred from host to FPGA , kernel is enqueued and the output is read from FPGA          to host for processing the second iteration  
@@ -189,19 +189,19 @@ To improve the performance, you can send the input buffer in multiple iterations
         kernel.setArg(3, total_size);
         kernel.setArg(4, load_filter);
         kernel.setArg(0, subbuf_inh_flags[1]);
-	kernel.setArg(1, subbuf_doc_words[1]);
-	q.enqueueMigrateMemObjects({subbuf_doc_words[1]}, 0, &wordWait, &buffDone); 
-	wordWait.push_back(buffDone);
-	q.enqueueTask(kernel, &wordWait, &krnlDone);
-	krnlWait.push_back(krnlDone);
-	q.enqueueMigrateMemObjects({subbuf_inh_flags[1]}, CL_MIGRATE_MEM_OBJECT_HOST, &krnlWait, &flagDone);
+        kernel.setArg(1, subbuf_doc_words[1]);
+        q.enqueueMigrateMemObjects({subbuf_doc_words[1]}, 0, &wordWait, &buffDone); 
+        wordWait.push_back(buffDone);
+        q.enqueueTask(kernel, &wordWait, &krnlDone);
+        krnlWait.push_back(krnlDone);
+        q.enqueueMigrateMemObjects({subbuf_inh_flags[1]}, CL_MIGRATE_MEM_OBJECT_HOST, &krnlWait, &flagDone);
 	flagWait.push_back(flagDone);
  
    f. The host is blocked until the output is read from FPGA to host.
    
         // Wait until all results are copied back to the host before doing the post-processing
-         flagWait[0].wait();
-         flagWait[1].wait();
+        flagWait[0].wait();
+        flagWait[1].wait();
   
 
 
