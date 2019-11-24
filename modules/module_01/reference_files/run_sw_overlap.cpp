@@ -146,19 +146,19 @@ void runOnFPGA(
 		unsigned int size = doc_sizes[doc];
 
 
-		// Non-blocking CPU-FPGA overlap using events 
-		// Check if we have enough flags from the FPGA device to process the next doc
-		// If not, wait until the next sub-buffer is read back to the host
-		// Update the number of available words and sub-buffer count (iter)
+		
+                // Calculate size by needed by CPU for processing next document score
 		needed += size;
 		if (needed > available) {
 			flagWait[iter].wait();
 			available += subbuf_doc_info[iter].size / sizeof(uint);
 			iter++;
 		}
-
+ 
+	        // Check if flgas processed by FPGA is greater than needed by CPU. Else, block CPU
+                // Update the number of available words and sub-buffer count(iter)
 		for (unsigned i = 0; i < size ; i++, n++)
-		{ 
+		  { 
 			curr_entry = input_doc_words[n];
 			inh_flags  = output_inh_flags[n];
 
@@ -169,7 +169,7 @@ void runOnFPGA(
 
 				ans += profile_weights[word_id] * (unsigned long)frequency;
 			}
-		}
+		 }
 		profile_score[doc] = ans;
 	}
 
