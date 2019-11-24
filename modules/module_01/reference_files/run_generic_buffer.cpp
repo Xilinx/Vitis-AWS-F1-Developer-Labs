@@ -102,7 +102,7 @@ void runOnFPGA(
 	chrono::high_resolution_clock::time_point t1, t2;
 	t1 = chrono::high_resolution_clock::now();
 
-	// Set Kernel arguments and load the bloom filter coeffecients in the kernel
+	// Set Kernel arguments and load the bloom filter coefficients in the kernel
 	cl::Event buffDone, krnlDone;
 	total_size = 0;
 	load_filter = true;
