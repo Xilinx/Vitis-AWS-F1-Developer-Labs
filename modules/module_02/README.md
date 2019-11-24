@@ -25,34 +25,14 @@ This tutorial follows the *SDAccel Methodology Guide* ([UG1346](https://www.xili
 
 # Before You Begin
 
-## AWS F1 environment setup
-
-Before starting this lab, perform a fresh reinstall of the AWS EC2 FPGA Development Kit and download the lab contents on your instance. Open a new terminal by right-clicking anywhere in the Desktop area and selecting **Open Terminal**, then run the following commands:
-
-```bash  
-# Install the AWS EC2 FPGA Development Kit
-cd ~
-git clone https://github.com/aws/aws-fpga.git
-cd aws-fpga                                   
-source sdaccel_setup.sh
-
-# Download the SDAccel F1 Developer Labs
-cd ~
-rm -rf SDAccel-AWS-F1-Developer-Labs
-git clone https://github.com/Xilinx/SDAccel-AWS-F1-Developer-Labs
-```
-
-
-
 ## ffmpeg plugin setup
 
-This tutorial requires that the ffmpeg framework is installed on the machine where the steps will be executed. These dependencies can be downloaded by running the following commands.
-
-* For CentOS:
+This tutorial requires that the ffmpeg framework is installed on the machine where the steps will be executed. 
+These dependencies can be downloaded by running the following commands.
 
    ```
-   sudo yum localinstall --nogpgcheck https://download1.rpmfusion.org/free/el/rpmfusion-free-release-7.noarch.rpm
-   sudo yum install ffmpeg
+   sudo yum localinstall -y --nogpgcheck https://download1.rpmfusion.org/free/el/rpmfusion-free-release-7.noarch.rpm
+   sudo yum install ffmpeg -y
    ```
 
 The labs in this tutorial use:
