@@ -103,40 +103,40 @@ To improve the performance, you can send the input buffer in multiple iterations
   
   a.   The two sub buffers for "input_doc_words" & "output_inh_flags" are created as follows:
 
-     	// Make buffers resident in the device
-      q.enqueueMigrateMemObjects({buffer_bloom_filter, buffer_input_doc_words, buffer_output_inh_flags}, CL_MIGRATE_MEM_OBJECT_CONTENT_UNDEFINED);
+     // Make buffers resident in the device
+       q.enqueueMigrateMemObjects({buffer_bloom_filter, buffer_input_doc_words, buffer_output_inh_flags}, CL_MIGRATE_MEM_OBJECT_CONTENT_UNDEFINED);
 
-	  // Specify size of sub-buffers, one for each transaction 
-	   unsigned subbuf_doc_sz = total_doc_size/2;
-	   unsigned subbuf_inh_sz = total_doc_size/2;
+     // Specify size of sub-buffers, one for each transaction 
+       unsigned subbuf_doc_sz = total_doc_size/2;
+       unsigned subbuf_inh_sz = total_doc_size/2;
   
     // Declare sub-buffer regions to specify offset and size of sub-buffer   
-	   cl_buffer_region subbuf_inh_info[2];
-	   cl_buffer_region subbuf_doc_info[2];
+	cl_buffer_region subbuf_inh_info[2];
+	cl_buffer_region subbuf_doc_info[2];
 
     // Declare sub-buffers
-	   cl::Buffer subbuf_inh_flags[2];
-	   cl::Buffer subbuf_doc_words[2];
+	cl::Buffer subbuf_inh_flags[2];
+	cl::Buffer subbuf_doc_words[2];
 
         
     // Specify offset and size of sub-buffers 
-      subbuf_inh_info[0]={0, subbuf_inh_sz*sizeof(char)};
-      subbuf_inh_info[1]={subbuf_inh_sz*sizeof(char), subbuf_inh_sz*sizeof(char)};
-      subbuf_doc_info[0]={0, subbuf_doc_sz*sizeof(uint)};
-      subbuf_doc_info[1]={subbuf_doc_sz*sizeof(uint), subbuf_doc_sz*sizeof(uint)};
+        subbuf_inh_info[0]={0, subbuf_inh_sz*sizeof(char)};
+        subbuf_inh_info[1]={subbuf_inh_sz*sizeof(char), subbuf_inh_sz*sizeof(char)};
+        subbuf_doc_info[0]={0, subbuf_doc_sz*sizeof(uint)};
+        subbuf_doc_info[1]={subbuf_doc_sz*sizeof(uint), subbuf_doc_sz*sizeof(uint)};
 
     // Create sub-buffers from buffers based on sub-buffer regions
-	     subbuf_inh_flags[0] = buffer_output_inh_flags.createSubBuffer(CL_MEM_WRITE_ONLY, CL_BUFFER_CREATE_TYPE_REGION, &subbuf_inh_info[0]);
-	     subbuf_inh_flags[1] = buffer_output_inh_flags.createSubBuffer(CL_MEM_WRITE_ONLY, CL_BUFFER_CREATE_TYPE_REGION, &subbuf_inh_info[1]);
-	     subbuf_doc_words[0] = buffer_input_doc_words.createSubBuffer (CL_MEM_READ_ONLY,  CL_BUFFER_CREATE_TYPE_REGION, &subbuf_doc_info[0]);
-	     subbuf_doc_words[1] = buffer_input_doc_words.createSubBuffer (CL_MEM_READ_ONLY,  CL_BUFFER_CREATE_TYPE_REGION, &subbuf_doc_info[1]);
+	subbuf_inh_flags[0] = buffer_output_inh_flags.createSubBuffer(CL_MEM_WRITE_ONLY, CL_BUFFER_CREATE_TYPE_REGION, &subbuf_inh_info[0]);
+	subbuf_inh_flags[1] = buffer_output_inh_flags.createSubBuffer(CL_MEM_WRITE_ONLY, CL_BUFFER_CREATE_TYPE_REGION, &subbuf_inh_info[1]);
+	subbuf_doc_words[0] = buffer_input_doc_words.createSubBuffer (CL_MEM_READ_ONLY,  CL_BUFFER_CREATE_TYPE_REGION, &subbuf_doc_info[0]);
+	subbuf_doc_words[1] = buffer_input_doc_words.createSubBuffer (CL_MEM_READ_ONLY,  CL_BUFFER_CREATE_TYPE_REGION, &subbuf_doc_info[1]);
 
           
 	printf("\n");
-    double mbytes_total  = (double)(total_doc_size * sizeof(int)) / (double)(1000*1000);
-    double mbytes_block  = mbytes_total / 2;
-    printf(" Processing %.3f MBytes of data\n", mbytes_total);
-    printf(" Splitting data in 2 sub-buffers of %.3f MBytes for FPGA processing\n", mbytes_block);
+        double mbytes_total  = (double)(total_doc_size * sizeof(int)) / (double)(1000*1000);
+        double mbytes_block  = mbytes_total / 2;
+        printf(" Processing %.3f MBytes of data\n", mbytes_total);
+        printf(" Splitting data in 2 sub-buffers of %.3f MBytes for FPGA processing\n", mbytes_block);
  
   b. Vector of events are created to coordinate the read, compute, and write operations such that each iteration is independent of          other iteration, which allows for overlap between the data transfer and compute.
   
@@ -168,40 +168,40 @@ To improve the performance, you can send the input buffer in multiple iterations
 
 
         //  Set Kernel Arguments, Read, Enqueue Kernel and Write for first iteration
-         total_size = total_doc_size/2;
-         load_filter=false;
-		     kernel.setArg(3, total_size);
-		     kernel.setArg(4, load_filter);
-		     kernel.setArg(0, subbuf_inh_flags[0]);
-		     kernel.setArg(1, subbuf_doc_words[0]);
-		     q.enqueueMigrateMemObjects({subbuf_doc_words[0]}, 0, &wordWait, &buffDone); 
-		     wordWait.push_back(buffDone);
-		     q.enqueueTask(kernel, &wordWait, &krnlDone);
-		     krnlWait.push_back(krnlDone);
-		     q.enqueueMigrateMemObjects({subbuf_inh_flags[0]}, CL_MIGRATE_MEM_OBJECT_HOST, &krnlWait, &flagDone);
-		     flagWait.push_back(flagDone);
+        total_size = total_doc_size/2;
+        load_filter=false;
+        kernel.setArg(3, total_size);
+        kernel.setArg(4, load_filter);
+        kernel.setArg(0, subbuf_inh_flags[0]);
+	kernel.setArg(1, subbuf_doc_words[0]);
+	q.enqueueMigrateMemObjects({subbuf_doc_words[0]}, 0, &wordWait, &buffDone); 
+	wordWait.push_back(buffDone);
+	q.enqueueTask(kernel, &wordWait, &krnlDone);
+	krnlWait.push_back(krnlDone);
+	q.enqueueMigrateMemObjects({subbuf_inh_flags[0]}, CL_MIGRATE_MEM_OBJECT_HOST, &krnlWait, &flagDone);
+	flagWait.push_back(flagDone);
          
    e.  Kernel arguments are set , input buffer is transferred from host to FPGA , kernel is enqueued and the output is read from FPGA          to host for processing the second iteration  
        
-        //  Set Kernel Arguments, Read, Enqueue Kernel and Write for first iteration
-         total_size = total_doc_size/2;
-         load_filter=false;
-		     kernel.setArg(3, total_size);
-		     kernel.setArg(4, load_filter);
-		     kernel.setArg(0, subbuf_inh_flags[0]);
-		     kernel.setArg(1, subbuf_doc_words[0]);
-		     q.enqueueMigrateMemObjects({subbuf_doc_words[0]}, 0, &wordWait, &buffDone); 
-		     wordWait.push_back(buffDone);
-		     q.enqueueTask(kernel, &wordWait, &krnlDone);
-		     krnlWait.push_back(krnlDone);
-		     q.enqueueMigrateMemObjects({subbuf_inh_flags[0]}, CL_MIGRATE_MEM_OBJECT_HOST, &krnlWait, &flagDone);
-		     flagWait.push_back(flagDone);
+        //  Set Kernel Arguments, Read, Enqueue Kernel and Write for second iteration
+        total_size = total_doc_size/2;
+        load_filter=false;
+        kernel.setArg(3, total_size);
+        kernel.setArg(4, load_filter);
+        kernel.setArg(0, subbuf_inh_flags[1]);
+	kernel.setArg(1, subbuf_doc_words[1]);
+	q.enqueueMigrateMemObjects({subbuf_doc_words[1]}, 0, &wordWait, &buffDone); 
+	wordWait.push_back(buffDone);
+	q.enqueueTask(kernel, &wordWait, &krnlDone);
+	krnlWait.push_back(krnlDone);
+	q.enqueueMigrateMemObjects({subbuf_inh_flags[1]}, CL_MIGRATE_MEM_OBJECT_HOST, &krnlWait, &flagDone);
+	flagWait.push_back(flagDone);
  
    f. The host is blocked until the output is read from FPGA to host.
    
         // Wait until all results are copied back to the host before doing the post-processing
-                flagWait[0].wait();
-                flagWait[1].wait();
+         flagWait[0].wait();
+         flagWait[1].wait();
   
 
 
@@ -262,89 +262,89 @@ In the previous step, you split the input buffer into two sub buffers and overla
   
     a. Multiple sub buffers are created for "input_doc_words" & "output_inh_flags" as follows
     
-    	 // Specify size of sub buffers for each iteration
-	      unsigned subbuf_doc_sz = total_doc_size/num_iter;
-	      unsigned subbuf_inh_sz = total_doc_size/num_iter;
+        // Specify size of sub buffers for each iteration
+	   unsigned subbuf_doc_sz = total_doc_size/num_iter;
+	   unsigned subbuf_inh_sz = total_doc_size/num_iter;
 
        // Declare sub buffer regions to specify offset and size for each iteration
-	      cl_buffer_region subbuf_inh_info[num_iter];
-	      cl_buffer_region subbuf_doc_info[num_iter];
+	   cl_buffer_region subbuf_inh_info[num_iter];
+	   cl_buffer_region subbuf_doc_info[num_iter];
 
        // Declare sub buffers
-	      cl::Buffer subbuf_inh_flags[num_iter];
-	      cl::Buffer subbuf_doc_words[num_iter];
+	   cl::Buffer subbuf_inh_flags[num_iter];
+	   cl::Buffer subbuf_doc_words[num_iter];
 
        // Define sub buffers from buffers based on sub-buffer regions
-	      for (int i=0; i<num_iter; i++) {
-		     subbuf_inh_info[i]={i*subbuf_inh_sz*sizeof(char), subbuf_inh_sz*sizeof(char)};
-		     subbuf_doc_info[i]={i*subbuf_doc_sz*sizeof(uint), subbuf_doc_sz*sizeof(uint)};
-		     subbuf_inh_flags[i] = buffer_output_inh_flags.createSubBuffer(CL_MEM_WRITE_ONLY, CL_BUFFER_CREATE_TYPE_REGION, &subbuf_inh_info[i]);
-		     subbuf_doc_words[i] = buffer_input_doc_words.createSubBuffer (CL_MEM_READ_ONLY,  CL_BUFFER_CREATE_TYPE_REGION, &subbuf_doc_info[i]);
-	}
+	   for (int i=0; i<num_iter; i++) {
+             subbuf_inh_info[i]={i*subbuf_inh_sz*sizeof(char), subbuf_inh_sz*sizeof(char)};
+	     subbuf_doc_info[i]={i*subbuf_doc_sz*sizeof(uint), subbuf_doc_sz*sizeof(uint)};
+	     subbuf_inh_flags[i] = buffer_output_inh_flags.createSubBuffer(CL_MEM_WRITE_ONLY, CL_BUFFER_CREATE_TYPE_REGION, &subbuf_inh_info[i]);
+	     subbuf_doc_words[i] = buffer_input_doc_words.createSubBuffer (CL_MEM_READ_ONLY,  CL_BUFFER_CREATE_TYPE_REGION, &subbuf_doc_info[i]);
+	   }
 
-	     printf("\n");
-       double mbytes_total  = (double)(total_doc_size * sizeof(int)) / (double)(1000*1000);
-       double mbytes_block  = mbytes_total / num_iter;
-       printf(" Processing %.3f MBytes of data\n", mbytes_total);
-       if (num_iter>1) {
-        printf(" Splitting data in %d sub-buffers of %.3f MBytes for FPGA processing\n", num_iter, mbytes_block);
-       }
+	   printf("\n");
+           double mbytes_total  = (double)(total_doc_size * sizeof(int)) / (double)(1000*1000);
+           double mbytes_block  = mbytes_total / num_iter;
+           printf(" Processing %.3f MBytes of data\n", mbytes_total);
+           if (num_iter>1) {
+            printf(" Splitting data in %d sub-buffers of %.3f MBytes for FPGA processing\n", num_iter, mbytes_block);
+           }
  
      b. Vector of events are created to coordinate the read, compute, and write operations such that every iteration is independent of         other iterations, which allows for overlap between the data transfer and compute.
      
        // Create Events for co-ordinating read,compute and write for each iteration
-        vector<cl::Event> wordWait;
-        vector<cl::Event> krnlWait;
-        vector<cl::Event> flagWait;
+           vector<cl::Event> wordWait;
+           vector<cl::Event> krnlWait;
+           vector<cl::Event> flagWait;
  
-        printf("--------------------------------------------------------------------\n");
+           printf("--------------------------------------------------------------------\n");
  
-        chrono::high_resolution_clock::time_point t1, t2;
-        t1 = chrono::high_resolution_clock::now();
+           chrono::high_resolution_clock::time_point t1, t2;
+           t1 = chrono::high_resolution_clock::now();
         
       c. Kernel arguments are set and the kernel is enqueued to load the bloom filter coeffecients
  
         // Set Kernel arguments and load the bloom filter coefficients in the kernel
-        cl::Event buffDone, krnlDone;
-        total_size = 0;
-        load_filter = true;
-        kernel.setArg(3, total_size);
-        kernel.setArg(4, load_filter);
-        q.enqueueMigrateMemObjects({buffer_bloom_filter}, 0, NULL, &buffDone);
-        wordWait.push_back(buffDone);
-        q.enqueueTask(kernel, &wordWait, &krnlDone);
-        krnlWait.push_back(krnlDone);
+           cl::Event buffDone, krnlDone;
+           total_size = 0;
+           load_filter = true;
+           kernel.setArg(3, total_size);
+           kernel.setArg(4, load_filter);
+           q.enqueueMigrateMemObjects({buffer_bloom_filter}, 0, NULL, &buffDone);
+           wordWait.push_back(buffDone);
+           q.enqueueTask(kernel, &wordWait, &krnlDone);
+           krnlWait.push_back(krnlDone);
  
  
        
       d.  Kernel arguments are set, input buffer is transferred from host to FPGA, kernel is enqueued and the output is read from FPGA           to host for processing the multiple iterations.
       
        // Set Kernel arguments. Read, Enqueue Kernel and Write for each iteration
-        for (int i=0; i<num_iter; i++)
+           for (int i=0; i<num_iter; i++)
         {
-                cl::Event buffDone, krnlDone, flagDone;
-                total_size = subbuf_doc_info[i].size / sizeof(uint);
-                load_filter = false;
-                kernel.setArg(0, subbuf_inh_flags[i]);
-                kernel.setArg(1, subbuf_doc_words[i]);
-                kernel.setArg(3, total_size);
-                kernel.setArg(4, load_filter);
-                q.enqueueMigrateMemObjects({subbuf_doc_words[i]}, 0, &wordWait, &buffDone);
-                wordWait.push_back(buffDone);
-                q.enqueueTask(kernel, &wordWait, &krnlDone);
-                krnlWait.push_back(krnlDone);
-                q.enqueueMigrateMemObjects({subbuf_inh_flags[i]}, CL_MIGRATE_MEM_OBJECT_HOST, &krnlWait, &flagDone);
-                flagWait.push_back(flagDone);
+           cl::Event buffDone, krnlDone, flagDone;
+           total_size = subbuf_doc_info[i].size / sizeof(uint);
+           load_filter = false;
+           kernel.setArg(0, subbuf_inh_flags[i]);
+           kernel.setArg(1, subbuf_doc_words[i]);
+           kernel.setArg(3, total_size);
+           kernel.setArg(4, load_filter);
+           q.enqueueMigrateMemObjects({subbuf_doc_words[i]}, 0, &wordWait, &buffDone);
+           wordWait.push_back(buffDone);
+           q.enqueueTask(kernel, &wordWait, &krnlDone);
+           krnlWait.push_back(krnlDone);
+           q.enqueueMigrateMemObjects({subbuf_inh_flags[i]}, CL_MIGRATE_MEM_OBJECT_HOST, &krnlWait, &flagDone);
+           flagWait.push_back(flagDone);
         }
  
      e.  The host is blocked until the output is read from FPGA to host.
      
         // Wait until all results are copied back to the host before doing the post-processing
-        for (int i=0; i<num_iter; i++)
-        {
-                flagWait[i].wait();
-        }
-        q.finish(); 
+           for (int i=0; i<num_iter; i++)
+         {
+           flagWait[i].wait();
+         }
+           q.finish(); 
  
  The above code is generic enough to split the data into the number of multiple buffers.
 
@@ -434,9 +434,9 @@ Because the total compute is split into multiple iterations, you can start post-
 
        
                // Non-blocking CPU-FPGA overlap using events 
-		           // Check if we have enough flags from the FPGA device to process the next doc
-		           // If not, wait until the next sub-buffer is read back to the host
-		           // Update the number of available words and sub-buffer count (iter)
+	       // Check if we have enough flags from the FPGA device to process the next doc
+	       // If not, wait until the next sub-buffer is read back to the host
+	       // Update the number of available words and sub-buffer count (iter)
                 needed += size;
                 if (needed > available) {
                         flagWait[iter].wait();
