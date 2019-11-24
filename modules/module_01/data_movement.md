@@ -234,7 +234,7 @@ As you can see from the Timeline Trace report , there is an overlap of the read,
 
 ### Conclusion
 
-  From the above Profile Summary and Timeline Trace reports, you can see that the total execution time on the FPGA improved, as the time spent on theFPGA improved from the previous step due to the overlap between the data transfer and compute.
+   From the above Profile Summary and Timeline Trace reports, you can see that the total execution time on the FPGA improved, as the time spent on theFPGA improved from the previous step due to the overlap between the data transfer and compute.
 
 ## Step 3: Overlap of Data Transfer and Compute with Multiple Buffers
 

@@ -38,7 +38,7 @@ run: build
 	mkdir -p $(BUILDDIR)
 	cp runOnfpga_hw.awsxclbin $(BUILDDIR)
 	cp xrt.ini $(BUILDDIR)
-	sudo -E -- bash -c 'source /home/centos/src/project_data/aws-fpga/sdaccel_setup.sh && fpga-clear-local-image -S 0'
+	sudo -E -- bash -c 'source ${AWS_FPGA_REPO_DIR}/sdaccel_setup.sh && fpga-clear-local-image -S 0'
 	sudo -E -- bash -c 'source /opt/xilinx/xrt/setup.sh && cd $(BUILDDIR) && ./host 100000 $(ITER) '
 	 
 
