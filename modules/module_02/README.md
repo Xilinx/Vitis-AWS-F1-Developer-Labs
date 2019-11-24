@@ -2,7 +2,7 @@
 
 <table>
 <tr>
- <td align="center"><h1>Module 2 Methodology for Optimizing Accelerated FPGA Applications
+ <td align="center"><h1>Module 2: Methodology for Optimizing Accelerated FPGA Applications
  </td>
  </tr>
 </table>
