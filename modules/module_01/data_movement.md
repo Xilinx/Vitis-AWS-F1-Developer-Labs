@@ -40,7 +40,7 @@ make run STEP=single_buffer SOLUTION=1
 
 ### Profile Summary Analysis
 
-1. Change your working directory to `/home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_01/build/single_buffer`.
+1. Change your working directory to `modules/module_01/build/single_buffer`.
 
    ```
    cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_01/build/single_buffer
@@ -54,7 +54,9 @@ make run STEP=single_buffer SOLUTION=1
    firefox profile_summary.html
    ```
 
-*  Looking at the *Kernel Execution* section in the report, we see the kernel execution time as 175.286 ms.
+*  Looking at the *Kernel Execution* section in the report, we see the kernel execution time as 175.173 ms.
+
+![DM_Kernel_Execution_time](./images/kernel_execution_time.png)
 
 *  The theoretical number expected from the kernel running at 250MHZ clock and processing eight words in parallel is as follows:
 

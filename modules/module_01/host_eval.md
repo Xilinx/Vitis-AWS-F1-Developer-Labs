@@ -97,7 +97,7 @@ case 1: h ^= data[0];
 
 * FPGA also has dedicated DSP units, which perform multiplication faster than the CPU. Even though the CPU runs at 8 times higher clock frequency than the FPGA, the arithmetic shift and multiplication operations can perform faster on FPGA because of its custom hardware architecture, enabling it to perform in fewer clock cycles compared to the CPU.
 
-* Therefore this function is a good candidate for implemeting on FPGA.
+* Therefore this function is a good candidate for implementing on FPGA.
 
 3. Close the file.
 
@@ -151,17 +151,17 @@ case 1: h ^= data[0];
 ```
 
 
-* From the above code, we see that we are computing two hash outputs for each word in all the documents and creating output flags         accordingly.
+* From the above code, we see that we are computing two hash outputs for each word in all the documents and creating output flags accordingly.
 
 * We already saw that hash function is a good candidate for acceleration on FPGA.
 
-* The computation of hash function of one word is independent of other words and can be done in parallel thereby improving the           execution time.
+* The computation of hash function of one word is independent of other words and can be done in parallel thereby improving the execution time.
 
-* The input words read from the DDR are accessed sequentially from DDR enablng FPGA to infer words from DDR in burst mode thereby         improving DDR read bandwidth.
+* The input words read from the DDR are accessed sequentially from DDR enablng FPGA to infer words from DDR in burst mode thereby improving DDR read bandwidth.
 
  4. Close the file. 
  
- Looking at above code you can see that this code section is a a good candidate for FPGA as hash function can run faster on FPGA and     we can compute hash function for multiple words in parallel by reading multiple words from DDR in burst mode. 
+ Looking at above code you can see that this code section is a a good candidate for FPGA as hash function can run faster on FPGA and we can compute hash function for multiple words in parallel by reading multiple words from DDR in burst mode. 
 
 ### Evaluating Compute Document Score
 
