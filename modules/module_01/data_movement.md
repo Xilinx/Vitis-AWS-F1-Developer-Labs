@@ -429,37 +429,35 @@ Because the total compute is split into multiple iterations, you can start post-
      
         for(unsigned int doc=0, n=0; doc<total_num_docs;doc++)
         {
-                unsigned long ans = 0;
-                unsigned int size = doc_sizes[doc];
-
+           unsigned long ans = 0;
+           unsigned int size = doc_sizes[doc];
        
-               // Non-blocking CPU-FPGA overlap using events 
-	       // Check if we have enough flags from the FPGA device to process the next doc
-	       // If not, wait until the next sub-buffer is read back to the host
-	       // Update the number of available words and sub-buffer count (iter)
-                needed += size;
-                if (needed > available) {
-                        flagWait[iter].wait();
-                        available += subbuf_doc_info[iter].size / sizeof(uint);
-                        iter++;
-                }
+           // Non-blocking CPU-FPGA overlap using events 
+           // Check if we have enough flags from the FPGA device to process the next doc
+           // If not, wait until the next sub-buffer is read back to the host
+           // Update the number of available words and sub-buffer count (iter)
+            
+	     needed += size;
+             if (needed > available)
+	      {
+               flagWait[iter].wait();
+               available += subbuf_doc_info[iter].size / sizeof(uint);
+               iter++;
+              }
         
-                for (unsigned i = 0; i < size ; i++, n++)
-                {
-                        curr_entry = input_doc_words[n];
-                        inh_flags  = output_inh_flags[n];
- 
- 
-                         
-                       if (inh_flags)
-                        {
-                                unsigned frequency = curr_entry & 0x00ff;
-                                unsigned word_id = curr_entry >> 8;
-
-                                ans += profile_weights[word_id] * (unsigned long)frequency;
-                        }
-                }
-                profile_score[doc] = ans;
+             for (unsigned i = 0; i < size ; i++, n++)
+              {
+                curr_entry = input_doc_words[n];
+                inh_flags  = output_inh_flags[n];
+   
+                 if (inh_flags)
+                   {
+                     unsigned frequency = curr_entry & 0x00ff;
+                     unsigned word_id = curr_entry >> 8;
+		     ans += profile_weights[word_id] * (unsigned long)frequency;
+                    }
+               }
+               profile_score[doc] = ans;
         }
 
 
