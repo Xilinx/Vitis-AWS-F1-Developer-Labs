@@ -433,11 +433,12 @@ Because the total compute is split into multiple iterations, you can start post-
            unsigned int size = doc_sizes[doc];
        
            // Non-blocking CPU-FPGA overlap using events 
-           // Check if we have enough flags from the FPGA device to process the next doc
-           // If not, wait until the next sub-buffer is read back to the host
-           // Update the number of available words and sub-buffer count (iter)
             
+	   // Calculate size by needed by CPU for processing next document score
 	     needed += size;
+	     
+	   //Check if flgas processed by FPGA is greater than needed by CPU. Else, block CPU
+	   //Update the number of available words and sub-buffer count(iter)
              if (needed > available)
 	      {
                flagWait[iter].wait();
@@ -447,15 +448,15 @@ Because the total compute is split into multiple iterations, you can start post-
         
              for (unsigned i = 0; i < size ; i++, n++)
               {
-                curr_entry = input_doc_words[n];
-                inh_flags  = output_inh_flags[n];
+               curr_entry = input_doc_words[n];
+               inh_flags  = output_inh_flags[n];
    
-                 if (inh_flags)
-                   {
-                     unsigned frequency = curr_entry & 0x00ff;
-                     unsigned word_id = curr_entry >> 8;
-		     ans += profile_weights[word_id] * (unsigned long)frequency;
-                    }
+               if (inh_flags)
+                {
+                 unsigned frequency = curr_entry & 0x00ff;
+                 unsigned word_id = curr_entry >> 8;
+		 ans += profile_weights[word_id] * (unsigned long)frequency;
+                 }
                }
                profile_score[doc] = ans;
         }
