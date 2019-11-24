@@ -532,7 +532,7 @@ Congratulations. You have successfully completed Module 1!
 
 In this lab, you performed host code optimizations by overlapping data transfers and compute and overlapping CPU processing with FPGA processing. You also saw that the performance of the application on the FPGA is 7 times faster than the CPU by performing host code optimizations without any kernel optimizations.
 
-In the next module, you will perform [2D Convolution]((../module_02/README.md)) of an RGBA video to achieve real-time performnce of 30fps.
+In the next module, you will perform [2D Convolution](../module_02/README.md) of an RGBA video to achieve real-time performnce of 30fps.
 
 >**TIP:** The next module consists of 7 steps and might take longer time to complete the module.
 
