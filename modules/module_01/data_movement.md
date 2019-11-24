@@ -104,19 +104,19 @@ To improve the performance, you can send the input buffer in multiple iterations
   a.   The two sub buffers for "input_doc_words" & "output_inh_flags" are created as follows:
 
      // Make buffers resident in the device
-       q.enqueueMigrateMemObjects({buffer_bloom_filter, buffer_input_doc_words, buffer_output_inh_flags}, CL_MIGRATE_MEM_OBJECT_CONTENT_UNDEFINED);
+        q.enqueueMigrateMemObjects({buffer_bloom_filter, buffer_input_doc_words, buffer_output_inh_flags}, CL_MIGRATE_MEM_OBJECT_CONTENT_UNDEFINED);
 
      // Specify size of sub-buffers, one for each transaction 
-       unsigned subbuf_doc_sz = total_doc_size/2;
-       unsigned subbuf_inh_sz = total_doc_size/2;
+        unsigned subbuf_doc_sz = total_doc_size/2;
+        unsigned subbuf_inh_sz = total_doc_size/2;
   
     // Declare sub-buffer regions to specify offset and size of sub-buffer   
-	cl_buffer_region subbuf_inh_info[2];
-	cl_buffer_region subbuf_doc_info[2];
+        cl_buffer_region subbuf_inh_info[2];
+        cl_buffer_region subbuf_doc_info[2];
 
     // Declare sub-buffers
-	cl::Buffer subbuf_inh_flags[2];
-	cl::Buffer subbuf_doc_words[2];
+        cl::Buffer subbuf_inh_flags[2];
+        cl::Buffer subbuf_doc_words[2];
 
         
     // Specify offset and size of sub-buffers 
