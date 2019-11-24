@@ -433,12 +433,13 @@ Because the total compute is split into multiple iterations, you can start post-
            unsigned int size = doc_sizes[doc];
        
            // Non-blocking CPU-FPGA overlap using events 
-            
+           
 	   // Calculate size by needed by CPU for processing next document score
 	     needed += size;
 	     
 	   //Check if flgas processed by FPGA is greater than needed by CPU. Else, block CPU
-	   //Update the number of available words and sub-buffer count(iter)
+           //Update the number of available words and sub-buffer count(iter)
+           
              if (needed > available)
 	      {
                flagWait[iter].wait();
