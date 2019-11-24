@@ -2,7 +2,7 @@
 <tr>
  <td align="center"><h1>Module 1: Optimize the data movement between CPU and FPGA
  </td>
- </tr>
+</tr>
 </table>
 
 # Module overview
