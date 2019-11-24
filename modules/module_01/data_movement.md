@@ -263,26 +263,26 @@ In the previous step, you split the input buffer into two sub buffers and overla
     a. Multiple sub buffers are created for "input_doc_words" & "output_inh_flags" as follows
     
         // Specify size of sub buffers for each iteration
-	   unsigned subbuf_doc_sz = total_doc_size/num_iter;
-	   unsigned subbuf_inh_sz = total_doc_size/num_iter;
+           unsigned subbuf_doc_sz = total_doc_size/num_iter;
+           unsigned subbuf_inh_sz = total_doc_size/num_iter;
 
        // Declare sub buffer regions to specify offset and size for each iteration
-	   cl_buffer_region subbuf_inh_info[num_iter];
-	   cl_buffer_region subbuf_doc_info[num_iter];
+           cl_buffer_region subbuf_inh_info[num_iter];
+           cl_buffer_region subbuf_doc_info[num_iter];
 
        // Declare sub buffers
-	   cl::Buffer subbuf_inh_flags[num_iter];
-	   cl::Buffer subbuf_doc_words[num_iter];
+           cl::Buffer subbuf_inh_flags[num_iter];
+           cl::Buffer subbuf_doc_words[num_iter];
 
        // Define sub buffers from buffers based on sub-buffer regions
-	   for (int i=0; i<num_iter; i++)  {
-	    subbuf_inh_info[i]={i*subbuf_inh_sz*sizeof(char), subbuf_inh_sz*sizeof(char)};
-	    subbuf_doc_info[i]={i*subbuf_doc_sz*sizeof(uint), subbuf_doc_sz*sizeof(uint)};
-	    subbuf_inh_flags[i] = buffer_output_inh_flags.createSubBuffer(CL_MEM_WRITE_ONLY, CL_BUFFER_CREATE_TYPE_REGION, &subbuf_inh_info[i]);
-	    subbuf_doc_words[i] = buffer_input_doc_words.createSubBuffer (CL_MEM_READ_ONLY,  CL_BUFFER_CREATE_TYPE_REGION, &subbuf_doc_info[i]);
+           for (int i=0; i<num_iter; i++)  {
+            subbuf_inh_info[i]={i*subbuf_inh_sz*sizeof(char), subbuf_inh_sz*sizeof(char)};
+            subbuf_doc_info[i]={i*subbuf_doc_sz*sizeof(uint), subbuf_doc_sz*sizeof(uint)};
+            subbuf_inh_flags[i] = buffer_output_inh_flags.createSubBuffer(CL_MEM_WRITE_ONLY, CL_BUFFER_CREATE_TYPE_REGION, &subbuf_inh_info[i]);
+            subbuf_doc_words[i] = buffer_input_doc_words.createSubBuffer (CL_MEM_READ_ONLY,  CL_BUFFER_CREATE_TYPE_REGION, &subbuf_doc_info[i]);
 	   }
 
-	   printf("\n");
+           printf("\n");
            double mbytes_total  = (double)(total_doc_size * sizeof(int)) / (double)(1000*1000);
            double mbytes_block  = mbytes_total / num_iter;
            printf(" Processing %.3f MBytes of data\n", mbytes_total);
