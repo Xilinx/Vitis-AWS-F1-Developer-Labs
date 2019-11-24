@@ -23,7 +23,7 @@ The output of the kernel is as follows:
 
 1. Go to the `makefile` directory and run the make command.
 
-```
+```bash
 cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_01/makefile
 make run STEP=single_buffer SOLUTION=1
 ```
@@ -42,14 +42,13 @@ make run STEP=single_buffer SOLUTION=1
 
 1. Change your working directory to `modules/module_01/build/single_buffer`.
 
-   ```
+   ```bash
    cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_01/build/single_buffer
    ```
    
-
 2. Run the following command to look at the Profile Summary Report.
 
-   ```
+   ```bash
    sdx_analyze  profile  -f html -i ./profile_summary.csv
    firefox profile_summary.html
    ```
@@ -69,7 +68,7 @@ make run STEP=single_buffer SOLUTION=1
 
 1. Run the following commands to view the Timeline Trace report.
 
-  ```
+  ```bash
   sdx_analyze trace -f wdb -i ./timeline_trace.csv
   sdx -workspace workspace -report timeline_trace.wdb
   ```
@@ -101,123 +100,128 @@ To improve the performance, you can send the input buffer in multiple iterations
 > **NOTE:** If you started sdx to view the profile in the previous step, you may need to exit the application to get back to the terminal.
 
 1. Change your working directory to `modules/module_01/reference_files`.
-    ```
+    ```bash
     cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_01/reference_files
     ```
 2. Open `run_split_buffer.cpp` file with a file editor.
 
 3. The lines 64-148 are modified to optimize the host code to send the input buffer in two iterations to enable overlapping of data        transfer an compute. It is explained in detail as follows
 
+   a. The two sub buffers for "input_doc_words" & "output_inh_flags" are created as follows:
+
+```cpp
+  // Make buffers resident in the device
+  q.enqueueMigrateMemObjects({buffer_bloom_filter, buffer_input_doc_words, buffer_output_inh_flags}, CL_MIGRATE_MEM_OBJECT_CONTENT_UNDEFINED);
   
-  a.   The two sub buffers for "input_doc_words" & "output_inh_flags" are created as follows:
-
-     // Make buffers resident in the device
-        q.enqueueMigrateMemObjects({buffer_bloom_filter, buffer_input_doc_words, buffer_output_inh_flags}, CL_MIGRATE_MEM_OBJECT_CONTENT_UNDEFINED);
-
-     // Specify size of sub-buffers, one for each transaction 
-        unsigned subbuf_doc_sz = total_doc_size/2;
-        unsigned subbuf_inh_sz = total_doc_size/2;
+  // Specify size of sub-buffers, one for each transaction 
+  unsigned subbuf_doc_sz = total_doc_size/2;
+  unsigned subbuf_inh_sz = total_doc_size/2;
   
-    // Declare sub-buffer regions to specify offset and size of sub-buffer   
-        cl_buffer_region subbuf_inh_info[2];
-        cl_buffer_region subbuf_doc_info[2];
-
-    // Declare sub-buffers
-        cl::Buffer subbuf_inh_flags[2];
-        cl::Buffer subbuf_doc_words[2];
-
-        
-    // Specify offset and size of sub-buffers 
-        subbuf_inh_info[0]={0, subbuf_inh_sz*sizeof(char)};
-        subbuf_inh_info[1]={subbuf_inh_sz*sizeof(char), subbuf_inh_sz*sizeof(char)};
-        subbuf_doc_info[0]={0, subbuf_doc_sz*sizeof(uint)};
-        subbuf_doc_info[1]={subbuf_doc_sz*sizeof(uint), subbuf_doc_sz*sizeof(uint)};
-
-    // Create sub-buffers from buffers based on sub-buffer regions
-        subbuf_inh_flags[0] = buffer_output_inh_flags.createSubBuffer(CL_MEM_WRITE_ONLY, CL_BUFFER_CREATE_TYPE_REGION, &subbuf_inh_info[0]);
-        subbuf_inh_flags[1] = buffer_output_inh_flags.createSubBuffer(CL_MEM_WRITE_ONLY, CL_BUFFER_CREATE_TYPE_REGION, &subbuf_inh_info[1]);
-        subbuf_doc_words[0] = buffer_input_doc_words.createSubBuffer (CL_MEM_READ_ONLY,  CL_BUFFER_CREATE_TYPE_REGION, &subbuf_doc_info[0]);
-	subbuf_doc_words[1] = buffer_input_doc_words.createSubBuffer (CL_MEM_READ_ONLY,  CL_BUFFER_CREATE_TYPE_REGION, &subbuf_doc_info[1]);
-
-          
-	printf("\n");
-        double mbytes_total  = (double)(total_doc_size * sizeof(int)) / (double)(1000*1000);
-        double mbytes_block  = mbytes_total / 2;
-        printf(" Processing %.3f MBytes of data\n", mbytes_total);
-        printf(" Splitting data in 2 sub-buffers of %.3f MBytes for FPGA processing\n", mbytes_block);
- 
-  b. Vector of events are created to coordinate the read, compute, and write operations such that each iteration is independent of          other iteration, which allows for overlap between the data transfer and compute.
+  // Declare sub-buffer regions to specify offset and size of sub-buffer   
+  cl_buffer_region subbuf_inh_info[2];
+  cl_buffer_region subbuf_doc_info[2];
   
-        // Create Events to co-ordinate read,compute and write for each iteration 
-        vector<cl::Event> wordWait;
-        vector<cl::Event> krnlWait;
-        vector<cl::Event> flagWait;
+  // Declare sub-buffers
+  cl::Buffer subbuf_inh_flags[2];
+  cl::Buffer subbuf_doc_words[2];
+  
+  // Specify offset and size of sub-buffers 
+  subbuf_inh_info[0]={0, subbuf_inh_sz*sizeof(char)};
+  subbuf_inh_info[1]={subbuf_inh_sz*sizeof(char), subbuf_inh_sz*sizeof(char)};
+  subbuf_doc_info[0]={0, subbuf_doc_sz*sizeof(uint)};
+  subbuf_doc_info[1]={subbuf_doc_sz*sizeof(uint), subbuf_doc_sz*sizeof(uint)};
+  
+  // Create sub-buffers from buffers based on sub-buffer regions
+  subbuf_inh_flags[0] = buffer_output_inh_flags.createSubBuffer(CL_MEM_WRITE_ONLY, CL_BUFFER_CREATE_TYPE_REGION, &subbuf_inh_info[0]);
+  subbuf_inh_flags[1] = buffer_output_inh_flags.createSubBuffer(CL_MEM_WRITE_ONLY, CL_BUFFER_CREATE_TYPE_REGION, &subbuf_inh_info[1]);
+  subbuf_doc_words[0] = buffer_input_doc_words.createSubBuffer (CL_MEM_READ_ONLY,  CL_BUFFER_CREATE_TYPE_REGION, &subbuf_doc_info[0]);
+  subbuf_doc_words[1] = buffer_input_doc_words.createSubBuffer (CL_MEM_READ_ONLY,  CL_BUFFER_CREATE_TYPE_REGION, &subbuf_doc_info[1]);
+  
+  printf("\n");
+  double mbytes_total  = (double)(total_doc_size * sizeof(int)) / (double)(1000*1000);
+  double mbytes_block  = mbytes_total / 2;
+  printf(" Processing %.3f MBytes of data\n", mbytes_total);
+  printf(" Splitting data in 2 sub-buffers of %.3f MBytes for FPGA processing\n", mbytes_block);  
+```
  
-        printf("--------------------------------------------------------------------\n");
- 
-        chrono::high_resolution_clock::time_point t1, t2;
-        t1 = chrono::high_resolution_clock::now();
+   b. Vector of events are created to coordinate the read, compute, and write operations such that each iteration is independent of          other iteration, which allows for overlap between the data transfer and compute.
+  
+```cpp
+  // Create Events to co-ordinate read,compute and write for each iteration 
+  vector<cl::Event> wordWait;
+  vector<cl::Event> krnlWait;
+  vector<cl::Event> flagWait;
+  
+  printf("--------------------------------------------------------------------\n");
+  
+  chrono::high_resolution_clock::time_point t1, t2;
+  t1 = chrono::high_resolution_clock::now();
+```
    
    c. Kernel arguments are set and kernel is enqueued to load the bloom filter coefficients
    
-        // Only load the bloom filter in the kernel
-        cl::Event buffDone,krnlDone,flagDone;
-        total_size = 0;
-        load_filter = true;
-        kernel.setArg(3, total_size);
-        kernel.setArg(4, load_filter);
-        q.enqueueMigrateMemObjects({buffer_bloom_filter}, 0, NULL, &buffDone);
-        wordWait.push_back(buffDone);
-        q.enqueueTask(kernel, &wordWait, &krnlDone);
-        krnlWait.push_back(krnlDone);
-        
-        
-   d. Kernel arguments are set , input buffer is transferred from host to FPGA , kernel is enqueued and the output is read from FPGA to       host for processing the first iteration.   
+```cpp
+  // Only load the bloom filter in the kernel
+  cl::Event buffDone,krnlDone,flagDone;
+  total_size = 0;
+  load_filter = true;
+  kernel.setArg(3, total_size);
+  kernel.setArg(4, load_filter);
+  q.enqueueMigrateMemObjects({buffer_bloom_filter}, 0, NULL, &buffDone);
+  wordWait.push_back(buffDone);
+  q.enqueueTask(kernel, &wordWait, &krnlDone);
+  krnlWait.push_back(krnlDone);
+```
 
-
-        //  Set Kernel Arguments, Read, Enqueue Kernel and Write for first iteration
-        total_size = total_doc_size/2;
-        load_filter=false;
-        kernel.setArg(3, total_size);
-        kernel.setArg(4, load_filter);
-        kernel.setArg(0, subbuf_inh_flags[0]);
-        kernel.setArg(1, subbuf_doc_words[0]);
-        q.enqueueMigrateMemObjects({subbuf_doc_words[0]}, 0, &wordWait, &buffDone); 
-        wordWait.push_back(buffDone);
-        q.enqueueTask(kernel, &wordWait, &krnlDone);
-        krnlWait.push_back(krnlDone);
-        q.enqueueMigrateMemObjects({subbuf_inh_flags[0]}, CL_MIGRATE_MEM_OBJECT_HOST, &krnlWait, &flagDone);
-	flagWait.push_back(flagDone);
-         
-   e.  Kernel arguments are set , input buffer is transferred from host to FPGA , kernel is enqueued and the output is read from FPGA          to host for processing the second iteration  
-       
-        //  Set Kernel Arguments, Read, Enqueue Kernel and Write for second iteration
-        total_size = total_doc_size/2;
-        load_filter=false;
-        kernel.setArg(3, total_size);
-        kernel.setArg(4, load_filter);
-        kernel.setArg(0, subbuf_inh_flags[1]);
-        kernel.setArg(1, subbuf_doc_words[1]);
-        q.enqueueMigrateMemObjects({subbuf_doc_words[1]}, 0, &wordWait, &buffDone); 
-        wordWait.push_back(buffDone);
-        q.enqueueTask(kernel, &wordWait, &krnlDone);
-        krnlWait.push_back(krnlDone);
-        q.enqueueMigrateMemObjects({subbuf_inh_flags[1]}, CL_MIGRATE_MEM_OBJECT_HOST, &krnlWait, &flagDone);
-	flagWait.push_back(flagDone);
- 
-   f. The host is blocked until the output is read from FPGA to host.
+   d. Kernel arguments are set, input buffer is transferred from host to FPGA, kernel is enqueued and the output is read from FPGA to       host for processing the first iteration. 
    
-        // Wait until all results are copied back to the host before doing the post-processing
-        flagWait[0].wait();
-        flagWait[1].wait();
-  
+```cpp
+  //  Set Kernel Arguments, Read, Enqueue Kernel and Write for first iteration
+  total_size = total_doc_size/2;
+  load_filter=false;
+  kernel.setArg(3, total_size);
+  kernel.setArg(4, load_filter);
+  kernel.setArg(0, subbuf_inh_flags[0]);
+  kernel.setArg(1, subbuf_doc_words[0]);
+  q.enqueueMigrateMemObjects({subbuf_doc_words[0]}, 0, &wordWait, &buffDone); 
+  wordWait.push_back(buffDone);
+  q.enqueueTask(kernel, &wordWait, &krnlDone);
+  krnlWait.push_back(krnlDone);
+  q.enqueueMigrateMemObjects({subbuf_inh_flags[0]}, CL_MIGRATE_MEM_OBJECT_HOST, &krnlWait, &flagDone);
+  flagWait.push_back(flagDone);
+```    
+      
+   e. Kernel arguments are set, input buffer is transferred from host to FPGA , kernel is enqueued and the output is read from FPGA          to host for processing the second iteration  
+   
+```cpp
+  //  Set Kernel Arguments, Read, Enqueue Kernel and Write for second iteration
+  total_size = total_doc_size/2;
+  load_filter=false;
+  kernel.setArg(3, total_size);
+  kernel.setArg(4, load_filter);
+  kernel.setArg(0, subbuf_inh_flags[1]);
+  kernel.setArg(1, subbuf_doc_words[1]);
+  q.enqueueMigrateMemObjects({subbuf_doc_words[1]}, 0, &wordWait, &buffDone); 
+  wordWait.push_back(buffDone);
+  q.enqueueTask(kernel, &wordWait, &krnlDone);
+  krnlWait.push_back(krnlDone);
+  q.enqueueMigrateMemObjects({subbuf_inh_flags[1]}, CL_MIGRATE_MEM_OBJECT_HOST, &krnlWait, &flagDone);
+  flagWait.push_back(flagDone);
+```
 
+   f. The host waits until the output is read back from the FPGA.
+
+```cpp
+  // Wait until all results are copied back to the host before doing the post-processing
+  flagWait[0].wait();
+  flagWait[1].wait();
+```  
 
 ### Run the Application
 
 1. Go to the `makefile` directory and run the `make` command.
 
-```
+```bash
 cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_01/makefile
 make run STEP=split_buffer SOLUTION=1
 ```
@@ -235,13 +239,13 @@ make run STEP=split_buffer SOLUTION=1
 ### Timeline Trace Analysis
 1. Change your working directory to `modules/module_01/build/split_buffer`.
 
-   ```
+   ```bash
     cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_01/build/split_buffer
    ```
    
 2. Run the following commands to view the Timeline Trace report.
 
-    ```
+    ```bash
     sdx_analyze trace -f wdb -i ./timeline_trace.csv
     sdx -workspace workspace -report timeline_trace.wdb
     ```
@@ -256,11 +260,11 @@ As you can see from the Timeline Trace report, there is an overlap of the read, 
 
 ### Conclusion
 
-   From the above Profile Summary and Timeline Trace reports, you can see that the total execution time on the FPGA improved, as the time spent on the FPGA improved from the previous step due to the overlap between the data transfer and compute.
+From the above Profile Summary and Timeline Trace reports, you can see that the total execution time on the FPGA improved, as the time spent on the FPGA improved from the previous step due to the overlap between the data transfer and compute.
 
 ## Step 3: Overlap of Data Transfer and Compute with Multiple Buffers
 
-In the previous step, you split the input buffer into two sub buffers and overlapped the compute with a data transfer. In this step, you will write a generic code, so the input data is split into multiple iterations to achieve the optimal execution time.
+In the previous step, you split the input buffer into two sub buffers and overlapped the compute with a data transfer. In this step, you will write generic code, so the input data is split and processed in multiple iterations to achieve the optimal execution time.
 
 ### Host Code Modifications
 
@@ -268,7 +272,7 @@ In the previous step, you split the input buffer into two sub buffers and overla
 
 1. Change your working directory to `modules/module_01/reference_files`.
 
-   ```
+   ```bash
    cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_01/reference_files
    ```
 
@@ -276,103 +280,110 @@ In the previous step, you split the input buffer into two sub buffers and overla
 
 3. The lines 67-139 are modified to optimize the host code to send the input buffer in multiple iterations to enable overlapping of        data transfer an compute. It is explained in detail as follows
 
-  
     a. Multiple sub buffers are created for "input_doc_words" & "output_inh_flags" as follows
     
-        // Specify size of sub buffers for each iteration
-           unsigned subbuf_doc_sz = total_doc_size/num_iter;
-           unsigned subbuf_inh_sz = total_doc_size/num_iter;
-
-       // Declare sub buffer regions to specify offset and size for each iteration
-           cl_buffer_region subbuf_inh_info[num_iter];
-           cl_buffer_region subbuf_doc_info[num_iter];
-
-       // Declare sub buffers
-           cl::Buffer subbuf_inh_flags[num_iter];
-           cl::Buffer subbuf_doc_words[num_iter];
-
-       // Define sub buffers from buffers based on sub-buffer regions
-           for (int i=0; i<num_iter; i++)  {
-            subbuf_inh_info[i]={i*subbuf_inh_sz*sizeof(char), subbuf_inh_sz*sizeof(char)};
-            subbuf_doc_info[i]={i*subbuf_doc_sz*sizeof(uint), subbuf_doc_sz*sizeof(uint)};
-            subbuf_inh_flags[i] = buffer_output_inh_flags.createSubBuffer(CL_MEM_WRITE_ONLY, CL_BUFFER_CREATE_TYPE_REGION, &subbuf_inh_info[i]);
-            subbuf_doc_words[i] = buffer_input_doc_words.createSubBuffer (CL_MEM_READ_ONLY,  CL_BUFFER_CREATE_TYPE_REGION, &subbuf_doc_info[i]);
-	   }
-
-           printf("\n");
-           double mbytes_total  = (double)(total_doc_size * sizeof(int)) / (double)(1000*1000);
-           double mbytes_block  = mbytes_total / num_iter;
-           printf(" Processing %.3f MBytes of data\n", mbytes_total);
-           if (num_iter>1) {
-            printf(" Splitting data in %d sub-buffers of %.3f MBytes for FPGA processing\n", num_iter, mbytes_block);
-           }
+```cpp
+  // Specify size of sub buffers for each iteration
+  unsigned subbuf_doc_sz = total_doc_size/num_iter;
+  unsigned subbuf_inh_sz = total_doc_size/num_iter;
+  
+  // Declare sub buffer regions to specify offset and size for each iteration
+  cl_buffer_region subbuf_inh_info[num_iter];
+  cl_buffer_region subbuf_doc_info[num_iter];
+  
+  // Declare sub buffers
+  cl::Buffer subbuf_inh_flags[num_iter];
+  cl::Buffer subbuf_doc_words[num_iter];
+  
+  // Define sub buffers from buffers based on sub-buffer regions
+  for (int i=0; i<num_iter; i++)  {
+    subbuf_inh_info[i]={i*subbuf_inh_sz*sizeof(char), subbuf_inh_sz*sizeof(char)};
+    subbuf_doc_info[i]={i*subbuf_doc_sz*sizeof(uint), subbuf_doc_sz*sizeof(uint)};
+    subbuf_inh_flags[i] = buffer_output_inh_flags.createSubBuffer(CL_MEM_WRITE_ONLY, CL_BUFFER_CREATE_TYPE_REGION, &subbuf_inh_info[i]);
+    subbuf_doc_words[i] = buffer_input_doc_words.createSubBuffer (CL_MEM_READ_ONLY,  CL_BUFFER_CREATE_TYPE_REGION, &subbuf_doc_info[i]);
+  }
+  
+  printf("\n");
+  double mbytes_total  = (double)(total_doc_size * sizeof(int)) / (double)(1000*1000);
+  double mbytes_block  = mbytes_total / num_iter;
+  printf(" Processing %.3f MBytes of data\n", mbytes_total);
+  if (num_iter>1) {
+    printf(" Splitting data in %d sub-buffers of %.3f MBytes for FPGA processing\n", num_iter, mbytes_block);
+  }
+```
  
-     b. Vector of events are created to coordinate the read, compute, and write operations such that every iteration is independent of         other iterations, which allows for overlap between the data transfer and compute.
+   b. Vector of events are created to coordinate the read, compute, and write operations such that every iteration is independent of         other iterations, which allows for overlap between the data transfer and compute.
      
-       // Create Events for co-ordinating read,compute and write for each iteration
-           vector<cl::Event> wordWait;
-           vector<cl::Event> krnlWait;
-           vector<cl::Event> flagWait;
- 
-           printf("--------------------------------------------------------------------\n");
- 
-           chrono::high_resolution_clock::time_point t1, t2;
-           t1 = chrono::high_resolution_clock::now();
+```cpp
+  // Create Events for co-ordinating read,compute and write for each iteration
+  vector<cl::Event> wordWait;
+  vector<cl::Event> krnlWait;
+  vector<cl::Event> flagWait;
+  
+  printf("--------------------------------------------------------------------\n");
+  
+  chrono::high_resolution_clock::time_point t1, t2;
+  t1 = chrono::high_resolution_clock::now();
+```
         
-      c. Kernel arguments are set and the kernel is enqueued to load the bloom filter coeffecients
+   c. Kernel arguments are set and the kernel is enqueued to load the bloom filter coeffecients
  
-        // Set Kernel arguments and load the bloom filter coefficients in the kernel
-           cl::Event buffDone, krnlDone;
-           total_size = 0;
-           load_filter = true;
-           kernel.setArg(3, total_size);
-           kernel.setArg(4, load_filter);
-           q.enqueueMigrateMemObjects({buffer_bloom_filter}, 0, NULL, &buffDone);
-           wordWait.push_back(buffDone);
-           q.enqueueTask(kernel, &wordWait, &krnlDone);
-           krnlWait.push_back(krnlDone);
- 
- 
-       
-      d.  Kernel arguments are set, input buffer is transferred from host to FPGA, kernel is enqueued and the output is read from FPGA           to host for processing the multiple iterations.
+```cpp
+  // Set Kernel arguments and load the bloom filter coefficients in the kernel
+  cl::Event buffDone, krnlDone;
+  total_size = 0;
+  load_filter = true;
+  kernel.setArg(3, total_size);
+  kernel.setArg(4, load_filter);
+  q.enqueueMigrateMemObjects({buffer_bloom_filter}, 0, NULL, &buffDone);
+  wordWait.push_back(buffDone);
+  q.enqueueTask(kernel, &wordWait, &krnlDone);
+  krnlWait.push_back(krnlDone);
+```
+
+   d. Kernel arguments are set, input buffer is transferred from host to FPGA, kernel is enqueued and the output is read from FPGA           to host for processing the multiple iterations.
       
-       // Set Kernel arguments. Read, Enqueue Kernel and Write for each iteration
-           for (int i=0; i<num_iter; i++)
-        {
-           cl::Event buffDone, krnlDone, flagDone;
-           total_size = subbuf_doc_info[i].size / sizeof(uint);
-           load_filter = false;
-           kernel.setArg(0, subbuf_inh_flags[i]);
-           kernel.setArg(1, subbuf_doc_words[i]);
-           kernel.setArg(3, total_size);
-           kernel.setArg(4, load_filter);
-           q.enqueueMigrateMemObjects({subbuf_doc_words[i]}, 0, &wordWait, &buffDone);
-           wordWait.push_back(buffDone);
-           q.enqueueTask(kernel, &wordWait, &krnlDone);
-           krnlWait.push_back(krnlDone);
-           q.enqueueMigrateMemObjects({subbuf_inh_flags[i]}, CL_MIGRATE_MEM_OBJECT_HOST, &krnlWait, &flagDone);
-           flagWait.push_back(flagDone);
-        }
- 
-     e.  The host is blocked until the output is read from FPGA to host.
+```cpp
+  // Set Kernel arguments. Read, Enqueue Kernel and Write for each iteration
+  for (int i=0; i<num_iter; i++)
+  {
+    cl::Event buffDone, krnlDone, flagDone;
+    total_size = subbuf_doc_info[i].size / sizeof(uint);
+    load_filter = false;
+    kernel.setArg(0, subbuf_inh_flags[i]);
+    kernel.setArg(1, subbuf_doc_words[i]);
+    kernel.setArg(3, total_size);
+    kernel.setArg(4, load_filter);
+    q.enqueueMigrateMemObjects({subbuf_doc_words[i]}, 0, &wordWait, &buffDone);
+    wordWait.push_back(buffDone);
+    q.enqueueTask(kernel, &wordWait, &krnlDone);
+    krnlWait.push_back(krnlDone);
+    q.enqueueMigrateMemObjects({subbuf_inh_flags[i]}, CL_MIGRATE_MEM_OBJECT_HOST, &krnlWait, &flagDone);
+    flagWait.push_back(flagDone);
+  }
+```
+
+   e. The host is blocked until the output is read from FPGA to host.
      
-        // Wait until all results are copied back to the host before doing the post-processing
-           for (int i=0; i<num_iter; i++)
-         {
-           flagWait[i].wait();
-         }
-           q.finish(); 
+```cpp
+  // Wait until all results are copied back to the host before doing the post-processing
+  for (int i=0; i<num_iter; i++)
+  {
+    flagWait[i].wait();
+  }
+  q.finish(); 
+```
  
- The above code is generic enough to split the data into the number of multiple buffers.
+ The above code is generic enough to split the data into an arbitrary number of multiple buffers.
 
 ### Run the Application
    
 
 1. Go to the `makefile` directory and run the `make` command.
  
-    ```
-   cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_01/makefile
-   make run STEP=generic_buffer ITER=16 SOLUTION=1
+    ```bash
+    cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_01/makefile
+    make run STEP=generic_buffer ITER=16 SOLUTION=1
     ```
    The argument `ITER` represents the number of iterations of data transfer from host to FPGA.
 
@@ -397,16 +408,16 @@ In the previous step, you split the input buffer into two sub buffers and overla
 ### Timeline Trace Analysis
 1. Change your working directory to `modules/module_01/build/generic_buffer`.
 
-   ```
+    ```bash
     cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_01/build/generic_buffer
-   ```
+    ```
    
 2. Run the following commands to look at Timeline Trace report.
 
-  ```
-  sdx_analyze trace -f wdb -i ./timeline_trace.csv
-  sdx -workspace workspace -report timeline_trace.wdb
-  ```
+    ```bash
+    sdx_analyze trace -f wdb -i ./timeline_trace.csv
+    sdx -workspace workspace -report timeline_trace.wdb
+    ```
 
 3. Zoom in to display the timeline trace report as follows.
 
@@ -432,9 +443,9 @@ Because the total compute is split into multiple iterations, you can start post-
 
 1. Change your working directory to `modules/module_01/reference_files`.
 
-   ```
-   cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_01/reference_files
-   ```
+    ```bash
+    cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_01/reference_files
+    ```
 
 2. Open `run_sw_overlap.cpp` file with a file editor.
 
@@ -442,81 +453,85 @@ Because the total compute is split into multiple iterations, you can start post-
      
      a. Following variables are created to keep track of the words processed by FPGA 
      
-        // Create variables to keep track of number of words needed by CPU to compute score and number of words processed by FPGA such that CPU processsing can overlap with FPGA
-        unsigned int curr_entry;
-        unsigned char inh_flags;
-        unsigned int  available = 0;
-        unsigned int  needed = 0;
-        unsigned int  iter = 0;
+```cpp
+  // Create variables to keep track of number of words needed by CPU to compute score and number of words processed by FPGA such that CPU processsing can overlap with FPGA
+  unsigned int curr_entry;
+  unsigned char inh_flags;
+  unsigned int  available = 0;
+  unsigned int  needed = 0;
+  unsigned int  iter = 0;
+```
 
-     b. Block the host only if the hash function of the words are still not computed by FPGA thereby allowing overlap between CPU &             FPGA processing.
+   b. Block the host only if the hash function of the words are still not computed by FPGA thereby allowing overlap between CPU &             FPGA processing.
      
-        for(unsigned int doc=0, n=0; doc<total_num_docs;doc++)
-        {
-           unsigned long ans = 0;
-           unsigned int size = doc_sizes[doc];
-	   
-           // Calculate size by needed by CPU for processing next document score
-             needed += size;
-	     
-           // Check if flgas processed by FPGA is greater than needed by CPU. Else, block CPU
-           // Update the number of available words and sub-buffer count(iter)
-           
-             if (needed > available)
-              {
-               flagWait[iter].wait();
-               available += subbuf_doc_info[iter].size / sizeof(uint);
-               iter++;
-              }
-        
-             for (unsigned i = 0; i < size ; i++, n++)
-              {
-               curr_entry = input_doc_words[n];
-               inh_flags  = output_inh_flags[n];
+```cpp
+  for(unsigned int doc=0, n=0; doc<total_num_docs;doc++)
+  {
+    unsigned long ans = 0;
+    unsigned int size = doc_sizes[doc];
+
+    // Calculate size by needed by CPU for processing next document score
+    needed += size;
+ 
+    // Check if flgas processed by FPGA is greater than needed by CPU. Else, block CPU
+    // Update the number of available words and sub-buffer count(iter)
    
-               if (inh_flags)
-                {
-                 unsigned frequency = curr_entry & 0x00ff;
-                 unsigned word_id = curr_entry >> 8;
-                 ans += profile_weights[word_id] * (unsigned long)frequency;
-                }
-              }
-               profile_score[doc] = ans;
-        }
+    if (needed > available)
+    {
+      flagWait[iter].wait();
+      available += subbuf_doc_info[iter].size / sizeof(uint);
+      iter++;
+    }
+
+    for (unsigned i = 0; i < size ; i++, n++)
+    {
+      curr_entry = input_doc_words[n];
+      inh_flags  = output_inh_flags[n];
+
+      if (inh_flags)
+      {
+        unsigned frequency = curr_entry & 0x00ff;
+        unsigned word_id = curr_entry >> 8;
+        ans += profile_weights[word_id] * (unsigned long)frequency;
+      }
+    }
+    profile_score[doc] = ans;
+  }
+```
 
 
 ### Run the Application
 
 1. Go to the `makefile` directory and run the `make` command.
 
-  ```
-  cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_01/makefile
-  make run STEP=sw_overlap ITER=16 SOLUTION=1
-  ```
+    ```bash
+    cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_01/makefile
+    make run STEP=sw_overlap ITER=16 SOLUTION=1
+    ```
 
 2. The output is as follows.
 
-  ```
-  --------------------------------------------------------------------
-  Executed FPGA accelerated version  |   552.5344 ms   ( FPGA 528.744 ms )
-  Executed Software-Only version     |   3864.4070 ms
-  --------------------------------------------------------------------
-  Verification: PASS
-  ```
+    ```
+    --------------------------------------------------------------------
+    Executed FPGA accelerated version  |   552.5344 ms   ( FPGA 528.744 ms )
+    Executed Software-Only version     |   3864.4070 ms
+    --------------------------------------------------------------------
+    Verification: PASS
+    ```
 
 ### Timeline Trace Analysis
 1. Change your working directory to `modules/module_01/build/sw_overlap`.
 
-   ```
+    ```bash
     cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_01/build/sw_overlap
-   ```
+    ```
    
 2. Run the following commands to view the Timeline Trace report.
 
- ```
- sdx_analyze trace -f wdb -i ./timeline_trace.csv
- sdx -workspace workspace -report timeline_trace.wdb
- ```
+    ```bash
+    sdx_analyze trace -f wdb -i ./timeline_trace.csv
+    sdx -workspace workspace -report timeline_trace.wdb
+    ```
 
 3. Zoom in to display the timeline trace report as follows.
 
