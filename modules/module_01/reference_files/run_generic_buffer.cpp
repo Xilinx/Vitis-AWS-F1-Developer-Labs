@@ -113,7 +113,7 @@ void runOnFPGA(
 	q.enqueueTask(kernel, &wordWait, &krnlDone);
 	krnlWait.push_back(krnlDone);
  
-	// Set Kernel arguments. Read, enqueue kernel and write for each iteration
+	// Set Kernel arguments. Read, Enqueue Kernel and Write for each iteration
         for (int i=0; i<num_iter; i++) 
 	{
 		cl::Event buffDone, krnlDone, flagDone;
