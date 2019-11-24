@@ -1,11 +1,8 @@
-## Module 2: Optimize the data movement between CPU and FPGA
 
-### Prerequisites
->>>>>>> 999c526091d4991807bc740214ddac3d3e31409b
 
 <table>
 <tr>
- <td align="center"><h1>Methodology for Optimizing Accelerated FPGA Applications
+ <td align="center"><h1>Module 2 Methodology for Optimizing Accelerated FPGA Applications
  </td>
  </tr>
 </table>
