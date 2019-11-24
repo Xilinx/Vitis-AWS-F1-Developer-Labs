@@ -47,7 +47,7 @@ The algorithm can be divided into two sections
 * Computing output flags created from the hash function of every word in all documents
 * Computing document score based on output flags created above
    
-Let's evaluate which of these sections are a good fit for FPGA, if any.
+Let's evaluate which of these sections are a good fit for FPGA.
 
 ### Evaluating the Hash Function 
 
