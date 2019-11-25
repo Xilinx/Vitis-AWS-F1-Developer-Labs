@@ -93,7 +93,7 @@ void runOnFPGA(
         // Read back the results from FPGA to host  
 	q.enqueueMigrateMemObjects({buffer_output_inh_flags}, CL_MIGRATE_MEM_OBJECT_HOST,&krnlWait,&flagDone);
         flagWait.push_back(flagDone);
-        q.finish();
+        flagWait[0].wait(); 
 
 	// Compute the profile score the CPU using the in-hash flags computed on the FPGA
 	unsigned      curr_entry;

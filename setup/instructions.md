@@ -49,8 +49,13 @@ To be able to connect to the instance, you have two options in order of preferen
    * You should now be able to see your Desktop running on an F1 Instance
         ![DCV Desktop_Browser](../images/setup/dcv_desktop_browser.png)
 
+### Start your workshop
+   ![DCV Start_Terminal](../images/setup/dcv_desktop_start_terminal.png)
+
+   * Once you are on your desktop, you should be able to open the workshop link and follow the same instructions.
+   * Open a terminal and follow the [Workshop Module instructions](../README.md)
 ---------------------------------------
 
 <p align="center"><b>
-<a href="../README.md">Start the SDAccel Developer Labs</a>
+<a href="../README.md">Start the SDAccel Workshop!</a>
 </b></p>

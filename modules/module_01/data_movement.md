@@ -365,14 +365,15 @@ d. For each iteration: kernel arguments are set, commands to write the input buf
 
 e. The host waits until the output of each iteration is read back to the host.
      
-```cpp
+
+```
   // Wait until all results are copied back to the host before doing the post-processing
   for (int i=0; i<num_iter; i++)
-  {
+   {
     flagWait[i].wait();
-  }
-  q.finish(); 
-```
+   }
+```          
+
  
  The above code is generic enough to split the data into an arbitrary number of multiple buffers.
 
