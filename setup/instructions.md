@@ -94,6 +94,7 @@ The FPGA Developer AMI doesn't include a GUI Desktop. These steps install the Gn
 
 You are now connected via RDP to your F1 instance running Centos 7 and the FPGA Developer AMI.
 
+
 ---------------------------------------
 
 <p align="center"><b>
