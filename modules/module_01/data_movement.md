@@ -361,7 +361,7 @@ In the previous step, you split the input buffer into two sub buffers and overla
          {
            flagWait[i].wait();
          }
-           q.finish(); 
+          
  
  The above code is generic enough to split the data into the number of multiple buffers.
 
