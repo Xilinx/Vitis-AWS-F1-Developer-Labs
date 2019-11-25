@@ -1,65 +1,246 @@
-TARGET := hw
-PF     := 8
-ITER   := 
+.PHONY: help
 
-STEP := single_buffer
-STEP := split_buffer
-STEP := generic_buffer
-STEP := sw_overlap
-
-BUILDDIR := ./../build/$(STEP)
-
-
-ifeq ($(SOLUTION),1)
-	SRCDIR := ./../reference_files
-else
-	SRCDIR := ./../src/$(STEP)
-endif
-
-
-
-HOST_SRC_CPP := $(SRCDIR)/compute_score_host.cpp
-HOST_SRC_CPP += $(SRCDIR)/MurmurHash2.c
-HOST_SRC_CPP += $(SRCDIR)/xcl2.cpp
-HOST_SRC_CPP += $(SRCDIR)/main.cpp 
-
-ifeq ($(SOLUTION),1)
-	HOST_SRC_CPP += $(SRCDIR)/run_$(STEP).cpp
-else
-	HOST_SRC_CPP += $(SRCDIR)/run_fpga.cpp
-endif
-
-
-include common.mk
-
-build: host
-
-run: build
-	mkdir -p $(BUILDDIR)
-	cp runOnfpga_hw.awsxclbin $(BUILDDIR)
-	cp xrt.ini $(BUILDDIR)
-	sudo -E -- bash -c 'source /opt/xilinx/xrt/setup.sh && cd $(BUILDDIR) && ./host 100000 $(ITER)' 
-
-
-help:
-	@echo  " "
-	@echo  " "
+help::
 	@echo  " Makefile Usage:"
-	@echo  " "
-	@echo  "  Run Part 2 : "  - 
-	@echo  "     Step 1 : make run STEP=single_buffer SOLUTION=1"
-	@echo  "     Step 2 : make run STEP=split_buffer SOLUTION=1"
-	@echo  "     Step 3 : make run STEP=generic_buffer ITER=16 SOLUTION=1"
-	@echo  "     Step 4 : make run STEP=sw_overlap ITER=16 SOLUTION=1"
-	@echo  " "
-	@echo  "  Generate and View Profile Repprt:"
-	@echo  "  sdx_analyze  profile  –f html -i ./profile_summary.csv; firefox ./profile_summary;"
-	@echo  " "
-	@echo  "  Generate and view timeline Trace:"
-	@echo  "  sdx_analyze trace –f wdb -I ./timeline_trace.csv; sdx –workspace workspace –report timeline_trace.wdb"
+	@echo  ""
+	@echo  "  make build TARGET=<sw_emu/hw_emu/hw> STEP=<baseline/localbuf/fixedpoint/dataflow/multicu> SOLUTION=1"
+	@echo  "  Command to generate the design for specified target and step"
+	@echo  ""
+	@echo  "  make run TARGET=<sw_emu/hw_emu/hw> STEP=<baseline/localbuf/fixedpoint/dataflow/multicu> SOLUTION=1"
+	@echo  "  Command to generate,run and verifiy the design for specified target and step"
+	@echo  ""
+	@echo  "  make clean TARGET=<sw_emu/hw_emu/hw> STEP=<baseline/localbuf/fixedpoint/dataflow/multicu>"
+	@echo  "  Command to remove the generated files for specified target and step."
+	@echo  ""
+	@echo  "  make gen_report TARGET=<sw_emu/hw_emu/hw> STEP=<baseline/localbuf/fixedpoint/dataflow/multicu>"
+	@echo  "  Command to generate profile summary report and application timeline report for specified target and step"
+	@echo  ""
+	@echo  "  make view_prof_report TARGET=<sw_emu/hw_emu/hw> STEP=<baseline/localbuf/fixedpoint/dataflow/multicu>"
+	@echo  "  Command to view profile summary report in SDAccel GUI"
+	@echo  ""
+	@echo  "  make view_timeline_trace TARGET=<sw_emu/hw_emu/hw> STEP=<baseline/localbuf/fixedpoint/dataflow/multicu>"
+	@echo  "  Command to view application timeline report in SDAccel GUI"
 	@echo  ""
 
-reset:
-	@echo  " Resetting FPGA"
-	fpga-clear-local-image -S 0;
-	fpga-load-local-image -S 0 -I agfi-0deec865eb3858a53
+
+## platform selection
+## Several supported platforms are liste here. You may choose the one you want and comment out the others
+## Or you can add other platfom and set PLATFORM variable to it
+#PLATFORM := xilinx_vcu1525_dynamic_5_1
+#PLATFORM := xilinx_u200_xdma_201830_1
+#PLATFORM := xilinx_u200_qdma_201910_1
+PLATFORM := $(AWS_PLATFORM)
+
+## TARGET can be set as:
+## sw_emu: software emulation
+## hw_emu: hardware Emulation
+## hw: hardware run
+TARGET := hw_emu
+
+## Below are the names for host executable and xclbin.
+## Please keep it unchanged.
+HOST_EXE := convolution.exe
+XO_NAME := convolve_fpga_$(TARGET)
+XCLBIN := fpga_container_$(TARGET).xclbin
+
+
+
+## Source file repository selection
+## Step1           - baseline  (The baseline version design)
+## Step2           - localbuf  (Use local buffer to store the data for processing)
+## Step3           - fixedpoint (Use ap_fixed type data)
+## Step4           - dataflow  (Adopt dataflow and static loops optimizations)
+## Step5           - multicu (Adopt different optimizations on host code side, such as out-of-order command queue and multiple compute units)
+
+## BUILD_DIR are used for the generated files, including .exe, .xclbin, and the reports/logs. BUILD_DIR selection should be matched to SRC_REPO for better structure.
+PROJECT_DIR := ..
+
+## Below listed the different steps of the design.
+## The descriptions are in 'HowToRunTutorial.md'.
+## YOu can change the STEP here or specify it when launching makefile.
+
+STEP  := baseline
+#STEP  := localbuf
+#STEP  := fixedpoint
+#STEP := dataflow
+#STEP  := multicu
+
+ifeq ($(SOLUTION), 1)
+SRC_REPO := $(PROJECT_DIR)/reference-files/$(STEP)
+else
+SRC_REPO := $(PROJECT_DIR)/src/$(STEP)
+endif
+
+BUILD_DIR := $(PROJECT_DIR)/build/$(STEP)
+
+
+## Kernel Parameters
+
+## Compute Unit Number
+## Set to 1 for STEP=<baseline/localbuf/fixedpoint/dataflow>
+## Set to 4 for STEP=<multicu>
+
+ifeq ($(STEP), multicu)
+CU_NUM := 4
+else
+CU_NUM := 1
+endif
+
+## Host Application files repository
+
+HOST_SRC_CPP := $(SRC_REPO)/common.cpp
+HOST_SRC_CPP += $(SRC_REPO)/convolve_kernel.cpp
+HOST_SRC_CPP += $(SRC_REPO)/grayscale_kernel.cpp
+HOST_SRC_CPP += $(SRC_REPO)/xcl2.cpp
+HOST_SRC_CPP += $(SRC_REPO)/convolve.cpp
+HOST_SRC_CPP += $(SRC_REPO)/main.cpp
+HOST_SRC_H := $(SRC_REPO)/common.h
+HOST_SRC_H += $(SRC_REPO)/kernels.h
+HOST_SRC_H += $(SRC_REPO)/xcl2.hpp
+HOST_SRC_H += $(SRC_REPO)/constants.h
+
+
+
+## Kernel Source Files repository
+
+KERNEL_SRC_CPP := $(SRC_REPO)/convolve_fpga.cpp
+KERNEL_SRC_H := $(SRC_REPO)/constants.h
+KERNEL_SRC_H += $(SRC_REPO)/kernels.h
+KERNEL_SRC_H += $(SRC_REPO)/types.h
+KERNEL_SRC_H_DIR := $(SRC_REPO)
+
+
+# Host Compiler Global Settings and Include Libraries
+
+#CXXFLAGS :=
+CXXFLAGS += -D__USE_XOPEN2K8
+CXXFLAGS += -D__USE_XOPEN2K8
+CXXFLAGS += -I$(XILINX_XRT)/include/
+CXXFLAGS += -I$(XILINX_VIVADO)/include/
+CXXFLAGS += -I$(SRC_REPO)
+CXXFLAGS += -O0 -g -Wall -fmessage-length=0 -std=c++14
+
+## The following will enable the available solution code for each step
+ifeq ($(SOLUTION), 1)
+CXXFLAGS += -DBASELINE_ADD -DHOST_CODE_OPT -DLOCAL_BUF_OPT -DDF_OPT -DFP_OPT
+endif
+
+
+## Default mode sets 1920x1080 input video format for all types of runs
+## Set # of frame to 1 and scale to 512x10 for quicker turnaround of development cycle
+ifeq ($(NUM_FRAMES), 1)
+ifeq ($(STEP), multicu)
+RUN_OPTS = --scale 512 40 --nframes 1
+GOLDEN_OUT = golden_out_small_40.mp4
+else
+RUN_OPTS = --scale 512 10 --nframes 1
+GOLDEN_OUT = golden_out_small.mp4
+endif
+else
+GOLDEN_OUT = golden_out_full.mp4
+endif
+
+CXXLDFLAGS := -L$(XILINX_XRT)/lib/
+CXXLDFLAGS += -lxilinxopencl -lpthread -lrt
+
+
+## Kernel Compiler and Linker Flags
+
+XOCCFLAGS := -t $(TARGET)
+XOCCFLAGS += --platform $(PLATFORM) -R 1
+XOCCFLAGS += --nk convolve_fpga:$(CU_NUM)
+XOCCFLAGS += -I$(KERNEL_SRC_H_DIR)
+XOCCFLAGS += --temp_dir $(BUILD_DIR)
+XOCCFLAGS += --log_dir $(BUILD_DIR)
+XOCCFLAGS += --profile_kernel data:all:all:all:all
+
+ifeq ($(SOLUTION), 1)
+XOCCFLAGS += -DBASELINE_ADD -DHOST_CODE_OPT -DLOCAL_BUF_OPT -DDF_OPT -DFP_OPT
+endif
+
+
+
+
+## Host Executable File Generation
+
+$(BUILD_DIR)/$(HOST_EXE): $(HOST_SRC_CPP) $(HOST_SRC_H)
+	mkdir -p $(BUILD_DIR)
+	xcpp $(CXXFLAGS) $(HOST_SRC_CPP) $(CXXLDFLAGS) -o $@
+
+
+## Kernel XO and Xclbin File Generation
+
+$(BUILD_DIR)/$(XO_NAME).xo: $(KERNEL_SRC_CPP) $(KERNEL_SRC_H)
+	mkdir -p $(BUILD_DIR)
+	xocc $(XOCCFLAGS) -c -k convolve_fpga $(KERNEL_SRC_CPP) -o $@
+
+$(BUILD_DIR)/$(XCLBIN): $(BUILD_DIR)/$(XO_NAME).xo
+	mkdir -p $(BUILD_DIR)
+	xocc $(XOCCFLAGS) -l -o $@ $(BUILD_DIR)/$(XO_NAME).xo
+
+## Emulation Files Generation
+
+EMCONFIG_FILE = emconfig.json
+
+$(BUILD_DIR)/$(EMCONFIG_FILE):
+	 emconfigutil --nd 1  --platform $(PLATFORM) --od $(BUILD_DIR)
+
+
+#
+# primary build targets
+#
+
+.PHONY: all clean
+
+## build the design without running host application
+
+build: $(BUILD_DIR)/$(HOST_EXE) $(BUILD_DIR)/$(XCLBIN) $(BUILD_DIR)/$(EMCONFIG_FILE)
+
+
+## build the design and then run host application
+## run with 512x10 input video format for emulation and 1280x720 for hardware
+
+run: build
+
+ifeq ($(TARGET), hw)
+	echo "************  Use Command Line to run application!  ************"
+else
+	cp sdaccel.ini $(BUILD_DIR);
+	cd $(BUILD_DIR) && XCL_EMULATION_MODE=$(TARGET) ./$(HOST_EXE)  --kernel_name convolve_fpga $(RUN_OPTS) ../../video.mp4 ./$(XCLBIN) ;
+
+	@cd $(BUILD_DIR) && mv ./sdaccel_profile_summary.csv sdaccel_profile_summary_$(TARGET).csv; 
+	@cd $(BUILD_DIR) && mv ./sdaccel_timeline_trace.csv sdaccel_timeline_trace_$(TARGET).csv;
+## compare the output result with golden result
+	@cmp $(BUILD_DIR)/output.mp4 ../$(GOLDEN_OUT); RETVAL=$$?; \
+	if [ $$RETVAL -eq \0 ];  then \
+	  echo "PASS : Output Video Matches the Golden Output Results" ; \
+	else \
+	  echo "FAIL : Output Video Corrupt" ; \
+	fi
+
+endif
+
+
+## generate profile summary and timeline trace reports
+## convert it to html, xprf and wdb formats after generation
+
+gen_report:
+	cd $(BUILD_DIR) && sdx_analyze profile -f html -i sdaccel_profile_summary_$(TARGET).csv; 
+	cd $(BUILD_DIR) && sdx_analyze trace -f wdb -i ./sdaccel_timeline_trace_$(TARGET).csv;
+
+## view html profile summary report in browser
+
+view_prof_report:
+	cd $(BUILD_DIR) && firefox ./sdaccel_profile_summary_$(TARGET).html &
+
+
+## view timeline trace report in SDx GUI
+
+view_timeline_trace:
+	cd $(BUILD_DIR) && sdx --report sdaccel_timeline_trace_$(TARGET).wdb ;
+
+## Clean generated files
+
+clean:
+	rm -rf $(BUILD_DIR)/$(XCLBIN) $(BUILD_DIR)/$(HOST_EXE) $(BUILD_DIR)/$(EMCONFIG_FILE) $(BUILD_DIR)/$(XO_NAME).xo $(BUILD_DIR)/*.ltx $(BUILD_DIR)/*_$(TARGET).log $(BUILD_DIR)/xocc_*_$(TARGET)_* $(BUILD_DIR)/_x* $(BUILD_DIR)/*.info $(BUILD_DIR)/convolve_fpga_$(TARGET)* $(BUILD_DIR)/link $(BUILD_DIR)/reports/convolve_fpga_$(TARGET)
+
