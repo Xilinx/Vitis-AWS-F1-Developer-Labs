@@ -136,7 +136,7 @@ void runOnFPGA(
 	{
 		flagWait[i].wait();
 	}
-        q.finish();
+    
 
 	// Compute the profile score in CPU using the in-hash flags computed on the FPGA
 	unsigned      curr_entry;
