@@ -41,4 +41,4 @@ These labs are based on SDAccel 2019.1 available with the FPGA Developer AMI v1.
 
 ---------------------------------------
 
-Visit the [SDAccel Developer Zone](https://www.xilinx.com/products/design-tools/software-zone/sdaccel.html) for more information about FPGA acceleration
+Visit the [SDAccel Developer Zone](https://www.xilinx.com/products/design-tools/software-zone/sdaccel.html) for more information about FPGA acceleration.
