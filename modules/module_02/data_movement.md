@@ -21,16 +21,14 @@ The output of the kernel is as follows:
 
 ### Run the Application
 
-Go to the `makefile` directory and run the following command.
+1. Go to the `makefile` directory and run the make command.
 
 ```
-cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_02/makefile
-make run STEP=single_buffer
+cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_02/makefile
+make run STEP=single_buffer SOLUTION=1
 ```
 
-   >**NOTE:** While running the `makefile`, you can add the argument `SOLUTION=1` to run the reference code, which already contains the above optimization.
-
-The output is as follows.
+2. The output is as follows.
 
 ```
 --------------------------------------------------------------------
@@ -42,18 +40,23 @@ The output is as follows.
 
 ### Profile Summary Analysis
 
-1. Change your working directory to `build/single_buffer`.
+1. Change your working directory to `/home/centos/src/project_data/SDAccel-AWS-F1-Developer-  Labs/modules/module_02/build/single_buffer`.
+
+   ```
+   cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_02/build/single_buffer
+   ```
+   
 
 2. Run the following command to look at the Profile Summary Report.
 
    ```
-   sdx_analyze  profile  –f html -i ./profile_summary.csv
+   sdx_analyze  profile  -f html -i ./profile_summary.csv
    firefox profile_summary.html
    ```
 
-*  In the Profile Summary, in the *Kernel Execution* section, the kernel execution time displays as 175.286 ms.
+*  Looking at the *Kernel Execution* section in the report, we see the kernel execution time as 175.286 ms.
 
-*  The theoretical number expected from the kernel running at 250M HZ clock and processing eight words in parallel is as follows:
+*  The theoretical number expected from the kernel running at 250MHZ clock and processing eight words in parallel is as follows:
 
    Number of words/(Clock freq * Parallelization factor in Kernel) =    401022976/(250\*1000000\*8) = 174.86 ms
 
@@ -62,16 +65,18 @@ The output is as follows.
 
 ### Timeline Trace Analysis
 
- Run the following commands to view the Timeline Trace report.
+1. Run the following commands to view the Timeline Trace report.
 
-```
-sdx_analyze trace –f wdb -i ./timeline_trace.csv
-sdx –workspace workspace –report timeline_trace.wdb
-```
+  ```
+  sdx_analyze trace -f wdb -i ./timeline_trace.csv
+  sdx -workspace workspace -report timeline_trace.wdb
+  ```
 
- The Timeline Trace displays as follows.
+2. Zoom in to display the timeline trace report as follows:
 
 ![](./images/single_buffer_timeline_trace.PNG)
+
+
 
 As expected, there is a sequential execution of operations starting from the data transferred from the host to the FPGA, followed by compute in the FPGA and transferring back the results from the FPGA to host.
 
@@ -89,12 +94,14 @@ To improve the performance, you can send the input buffer in multiple iterations
 
 ### Host Code Modifications
   
-1. Change your working directory to `src/split_buffer`.
+1. Change your working directory to `/home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_02/reference_files`.
 
-2. In the `run_fpga.cpp` file, replace lines 64 to 95 with the following.
+2. Open `run_split_buffer.cpp` file with a file editor.
+
+3. The lines 64-144 are modified to optimize the host code to send the input buffer in two iterations to enable overlapping of data        transfer an compute. It is explained in detail as follows
 
   
-  a. Create two sub buffers for "input_doc_words" & "output_inh_flags" as follows:
+  a.   The two sub buffers for "input_doc_words" & "output_inh_flags" are created as follows:
 
         // Make buffers resident in the device
         q.enqueueMigrateMemObjects({buffer_bloom_filter, buffer_input_doc_words, buffer_output_inh_flags}, CL_MIGRATE_MEM_OBJECT_CONTENT_UNDEFINED);
@@ -125,7 +132,7 @@ To improve the performance, you can send the input buffer in multiple iterations
         printf(" Processing %.3f MBytes of data\n", mbytes_total);
         printf(" Splitting data in 2 sub-buffers of %.3f MBytes for FPGA processing\n", mbytes_block);
  
-  b. Create vector of events to coordinate the read, compute, and write operations for each of the two iterations that are only dependent on their respective iterations, which allows for overlap between the data transfer and compute.
+  b. Vector of events are created to coordinate the read, compute, and write operations such that each iteration is independent of          other iteration, which allows for overlap between the data transfer and compute.
   
         // Events 
         vector<cl::Event> wordWait;
@@ -137,7 +144,7 @@ To improve the performance, you can send the input buffer in multiple iterations
         chrono::high_resolution_clock::time_point t1, t2;
         t1 = chrono::high_resolution_clock::now();
  
-   c. Set kernel arguments and enqueue the kernel to load the bloom filter coeffecients
+   c. Kernel arguments are set and kernel is enqueued to load the bloom filter coeffecients
    
         // Only load the bloom filter in the kernel
         cl::Event buffDone,krnlDone,flagDone;
@@ -151,7 +158,7 @@ To improve the performance, you can send the input buffer in multiple iterations
         krnlWait.push_back(krnlDone);
         
         
-   d. Set kernel arguments, transfer input buffer from host to FPGA, enqueue the kernel and read the output from FPGA to host for             processing the first iteration   
+   d. Kernel arguments are set , input buffer is transferred from host to FPGA , kernel is enqueued and the output is read from FPGA to       host for processing the first iteration.   
  
         // Now start processing the documents in chunks
         // The FPGA kernel computes the in-hash flags for each word in the sub-buffer
@@ -171,7 +178,7 @@ To improve the performance, you can send the input buffer in multiple iterations
                 q.enqueueMigrateMemObjects({subbuf_inh_flags[0]}, CL_MIGRATE_MEM_OBJECT_HOST, &krnlWait, &flagDone);
                 flagWait.push_back(flagDone);
  
-   e. Set kernel arguments, transfer input buffer from host to FPGA, enqueue the kernel and read the output from FPGA to host for             processing the second iteration   
+   e.  Kernel arguments are set , input buffer is transferred from host to FPGA , kernel is enqueued and the output is read from FPGA          to host for processing the second iteration  
        
          //    Start kernel for transaction 2
                 kernel.setArg(0, subbuf_inh_flags[1]);
@@ -183,7 +190,7 @@ To improve the performance, you can send the input buffer in multiple iterations
                 q.enqueueMigrateMemObjects({subbuf_inh_flags[1]}, CL_MIGRATE_MEM_OBJECT_HOST, &krnlWait, &flagDone);
                 flagWait.push_back(flagDone);
  
-   f. Block the host until the output is read from FPGA to host.
+   f. The host is blocked until the output is read from FPGA to host.
    
         // Wait until all results are copied back to the host before doing the post-processing
                 flagWait[0].wait();
@@ -193,16 +200,14 @@ To improve the performance, you can send the input buffer in multiple iterations
 
 ### Run the Application
 
-Go to the `makefile` directory and run the following command.
+1. Go to the `makefile` directory and run the `make` command.
 
 ```
-cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_02/makefile
-make run STEP=split_buffer
+cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_02/makefile
+make run STEP=split_buffer SOLUTION=1
 ```
 
->**NOTE:** While running the `makefile`, you can add the argument `SOLUTION=1` to run the reference code, which already contains the above optimization.
-
-The output is as follows.
+2. The output is as follows.
 
 ```
 --------------------------------------------------------------------
@@ -212,33 +217,20 @@ The output is as follows.
  Verification: PASS
 ```
 
-### Profile Summary Analysis
-
-1. Change your working directory to `build/split_buffer`.
-
-2. Run the following command to view the Profile Summary report.
-
-   ```
-   sdx_analyze  profile  –f html -i ./profile_summary.csv
-   firefox profile_summary.html
-   ```
-
-* The time spent in kernel execution = 175.478 ms as shown in the *Kernel Execution* section.
-
  ### Timeline Trace Analysis
 
-Run the following commands to view the Timeline Trace report.
+1. Run the following commands to view the Timeline Trace report.
 
 ```
-sdx_analyze trace –f wdb -i ./timeline_trace.csv
-sdx –workspace workspace –report timeline_trace.wdb
+sdx_analyze trace -f wdb -i ./timeline_trace.csv
+sdx -workspace workspace -report timeline_trace.wdb
 ```
 
-The Timeline Trace report displays as follows.
+2. Zoom in to display the timeline trace report as follows:
 
 ![](./images/double_buffer_timeline_trace.PNG)
 
-As you can see from the Timeline Trace, there is an overlap of the read, compute, and write operations between the first and second iterations, which improves the total execution time on the FPGA.
+As you can see from the Timeline Trace report , there is an overlap of the read, compute, and write operations between the first and second iterations, which improves the total execution time on the FPGA.
 
 ### Conclusion
 
@@ -250,12 +242,18 @@ In the previous step, you split the input buffer into two sub buffers and overla
 
 ### Host Code Modifications
 
-1. Change your working directory to `src/generic_buffer`.
+1. Change your working directory to `/home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_02/reference_files`.
 
-2. In the `run_fpga.cpp` file, replace lines 67 to 144 with the following.
+   ```
+   cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_02/reference_files
+   ```
+
+2. Open `run_generic_buffer.cpp` file with a file editor.
+
+3. The lines 67-137 are modified to optimize the host code to send the input buffer in multiple iterations to enable overlapping of        data transfer an compute. It is explained in detail as follows
 
   
-    a. Create two sub buffers for "input_doc_words" & "output_inh_flags" as follows
+    a. Multiple sub buffers are created for "input_doc_words" & "output_inh_flags" as follows
     
         // Create sub-buffers, one for each transaction 
         unsigned subbuf_doc_sz = total_doc_size/num_iter;
@@ -282,7 +280,7 @@ In the previous step, you split the input buffer into two sub buffers and overla
         printf(" Splitting data in %d sub-buffers of %.3f MBytes for FPGA processing\n", num_iter,mbytes_block);
         }
  
-     b. Create vector of events to coordinate the read, compute, and write operations for each of the two iterations that are only dependent on their respective iterations, which allows for overlap between the data transfer and compute
+     b. Vector of events are created to coordinate the read, compute, and write operations such that every iteration is independent of         other iterations, which allows for overlap between the data transfer and compute.
      
         // Events 
         vector<cl::Event> wordWait;
@@ -294,7 +292,7 @@ In the previous step, you split the input buffer into two sub buffers and overla
         chrono::high_resolution_clock::time_point t1, t2;
         t1 = chrono::high_resolution_clock::now();
         
-      c. Set kernel arguments and enqueue the kernel to load the bloom filter coeffecients
+      c. Kernel arguments are set and the kernel is enqueued to load the bloom filter coeffecients
  
         // Only load the bloom filter in the kernel
         cl::Event buffDone, krnlDone;
@@ -309,7 +307,7 @@ In the previous step, you split the input buffer into two sub buffers and overla
  
        
        
-      d.  Set kernel arguments, transfer input buffer from host to FPGA, enqueue the kernel and read the output from FPGA to host for             processing the iterations
+      d.  Kernel arguments are set, input buffer is transferred from host to FPGA, kernel is enqueued and the output is read from FPGA           to host for processing the multiple iterations.
       
        // Now start processing the documents in chunks
         // The FPGA kernel computes the in-hash flags for each word in the sub-buffer
@@ -330,7 +328,7 @@ In the previous step, you split the input buffer into two sub buffers and overla
                 flagWait.push_back(flagDone);
         }
  
-     e.  Block the host until the output is read from FPGA to host.
+     e.  The host is blocked until the output is read from FPGA to host.
      
         // Wait until all results are copied back to the host before doing the post-processing
         for (int i=0; i<num_iter; i++)
@@ -339,21 +337,18 @@ In the previous step, you split the input buffer into two sub buffers and overla
         }
         q.finish(); 
  
- The above code is generic enough to split the data into the number of multiple buffers you specified.
+ The above code is generic enough to split the data into the number of multiple buffers.
 
 ### Run the Application
    
 
-1. Go to the `makefile` directory and run the following command.
+1. Go to the `makefile` directory and run the `make` command.
  
     ```
-   cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_02/makefile
-   make run STEP=generic_buffer ITER=16
+   cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_02/makefile
+   make run STEP=generic_buffer ITER=16 SOLUTION=1
     ```
    The argument `ITER` represents the number of iterations of data transfer from host to FPGA.
-    
->**NOTE**: You can add the argument `SOLUTION=1` while running the `makefile` to run the reference code, which already contains the above optimization.
-
 
 2. Run the above `make` command with `ITER` values as 1,2,4,8,16,32,64. 
 
@@ -373,31 +368,16 @@ In the previous step, you split the input buffer into two sub buffers and overla
  Verification: PASS
 ```
 
-### Profile Summary Analysis
-
-1. Change your working directory to `build/generic_buffer`.
-
-2. Run the following command to look at Profile Summary report.
-
-   ```
-   sdx_analyze  profile  –f html -i ./profile_summary.csv
-   firefox profile_summary.html
-   ```
-
-* Time spent in kernel execution = 177.378 ms
-
-
-
 ### Timeline Trace Analysis
 
-Run the following commands to look at Timeline Trace report.
+1. Run the following commands to look at Timeline Trace report.
 
-```
-sdx_analyze trace –f wdb -i ./timeline_trace.csv
-sdx –workspace workspace –report timeline_trace.wdb
-```
+  ```
+  sdx_analyze trace -f wdb -i ./timeline_trace.csv
+  sdx -workspace workspace -report timeline_trace.wdb
+  ```
 
-The Timeline Trace displays as follows.
+2. Zoom in to display the timeline trace report as follows.
 
 ![](./images/generic_buffer_timeline_trace.PNG)
 
@@ -417,23 +397,17 @@ Because the total compute is split into multiple iterations, you can start post-
 
 ## Host Code Modifications
 
-1. Navigate to the `src/sw_overlap` directory.
+1. Change your working directory to `/home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_02/reference_files`.
 
-2. In the `run_fpga.cpp` file, replace lines 132 to 165 with the following.
+   ```
+   cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_02/reference_files
+   ```
 
+2. Open `run_sw_overlap.cpp` file with a file editor.
 
-   a. Remove the lines from 132- 137 which are as follows
-      
-        // Wait until all results are copied back to the host before doing the post-processing
-        for (int i=0; i<num_iter; i++)
-        {
-                flagWait[i].wait();
-        }
-        q.finish();
-      
-
+3. The lines 134-171 are modified to optimize the host code such that CPU processing is overlapped with FPGA processing. It is            explained in detail as follows
      
-     b. Create variables to keep track of number of words for which hash function is computed by FPGA and compute the corresponding             document score.
+     a. Following variables are created to keep track of the words processed by FPGA 
      
         // Compute the profile score the CPU using the in-hash flags computed on the FPGA
         unsigned int curr_entry;
@@ -442,7 +416,7 @@ Because the total compute is split into multiple iterations, you can start post-
         unsigned int  needed = 0;
         unsigned int  iter = 0;
 
-     c. Block the host only if the hash function of the words are still not computed by FPGA thereby allowing overlap between host &           FPGA processing.
+     b. Block the host only if the hash function of the words are still not computed by FPGA thereby allowing overlap between CPU &             FPGA processing.
      
         for(unsigned int doc=0, n=0; doc<total_num_docs;doc++)
         {
@@ -481,36 +455,33 @@ Because the total compute is split into multiple iterations, you can start post-
 
 ### Run the Application
 
-Go to the `makefile` directory and run the following command.
+1. Go to the `makefile` directory and run the `make` command.
 
-```
+  ```
+  cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_02/makefile
+  make run STEP=sw_overlap ITER=16 SOLUTION=1
+  ```
 
-cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_02/makefile
-make run STEP=sw_overlap ITER=16
-```
+2. The output is as follows.
 
->**NOTE**: While running the `makefile`, you can add the argument `SOLUTION=1` to run the reference code, which already contains the above optimization.
-
-The output is as follows.
-
-```
---------------------------------------------------------------------
- Executed FPGA accelerated version  |   552.5344 ms   ( FPGA 528.744 ms )
- Executed Software-Only version     |   3864.4070 ms
---------------------------------------------------------------------
- Verification: PASS
-```
+  ```
+  --------------------------------------------------------------------
+  Executed FPGA accelerated version  |   552.5344 ms   ( FPGA 528.744 ms )
+  Executed Software-Only version     |   3864.4070 ms
+  --------------------------------------------------------------------
+  Verification: PASS
+  ```
 
 ### Timeline Trace Analysis
 
-Run the following commands to view the Timeline Trace report.
+1. Run the following commands to view the Timeline Trace report.
 
-```
-sdx_analyze trace –f wdb -i ./timeline_trace.csv
-sdx –workspace workspace –report timeline_trace.wdb
-```
+ ```
+ sdx_analyze trace -f wdb -i ./timeline_trace.csv
+ sdx -workspace workspace -report timeline_trace.wdb
+ ```
 
-The Timeline Trace displays as follows.
+2. Zoom in to display the timeline trace report as follows.
 
 ![](./images/sw_overlap_timeline_trace.PNG)
 
