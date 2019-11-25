@@ -16,18 +16,18 @@ The algorithm can be divided in two sections:
 
 1. Navigate to the `cpu_src` directory and run the following command.
 
-``` 
-cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_01/cpu_src
-make run
-```
+    ```bash 
+    cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_01/cpu_src
+    make run
+    ```
 
 2. The output is as follows.
- ```
- Total execution time of CPU                        |  4112.5895 ms
- Compute Hash & Output Flags processing time        |  3660.4433 ms
- Compute Score processing time                      |   452.1462 ms
---------------------------------------------------------------------
-```
+    ```
+    Total execution time of CPU                        |  4112.5895 ms
+    Compute Hash & Output Flags processing time        |  3660.4433 ms
+    Compute Score processing time                      |   452.1462 ms
+    --------------------------------------------------------------------
+    ```
 
 >**NOTE:** The performance number might vary depending on the CPU machine and workload activity at that time.
 
@@ -55,7 +55,7 @@ Let's evaluate which of these sections are a good fit for FPGA.
 
 2. The `MurmurHash2` hash function code is as follows:
 
-```
+```cpp
 unsigned int MurmurHash2 ( const void * key, int len, unsigned int seed )
 {
   // 'm' and 'r' are mixing constants generated offline.
@@ -108,7 +108,7 @@ unsigned int MurmurHash2 ( const void * key, int len, unsigned int seed )
 
 2. The code at lines 32-58 which computes output flags is shown below.
 
-```
+```cpp
 // Compute output flags based on hash function output for the words in all documents
 for(unsigned int doc=0;doc<total_num_docs;doc++) 
 {
@@ -156,7 +156,7 @@ This code section is a a good candidate for FPGA as the hash function can run fa
 
 The code for computing the document score is shown below:
 
-```
+```cpp
 for(unsigned int doc=0, n=0; doc<total_num_docs;doc++)
 {
   profile_score[doc] = 0.0;
@@ -189,7 +189,7 @@ For the purposes of this lab, we have implemented the FPGA accelerator with an 8
 
 1. Run the following make command for running optimized application on FPGA
 
-   ```
+   ```bash
    make run_fpga
    ```
 
