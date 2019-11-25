@@ -23,35 +23,35 @@ The output of the kernel is as follows:
 
 1. Go to the `makefile` directory and run the make command.
 
-```bash
-cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_01/makefile
-make run STEP=single_buffer SOLUTION=1
-```
+    ```bash
+    cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_01/makefile
+    make run STEP=single_buffer SOLUTION=1
+    ```
 
 2. The output is as follows.
 
-```
---------------------------------------------------------------------
- Executed FPGA accelerated version  |  1030.6703 ms   ( FPGA 616.349 ms )
- Executed Software-Only version     |  3694.6240 ms
---------------------------------------------------------------------
- Verification: PASS
-```
+    ```
+    --------------------------------------------------------------------
+     Executed FPGA accelerated version  |  1030.6703 ms   ( FPGA 616.349 ms )
+     Executed Software-Only version     |  3694.6240 ms
+    --------------------------------------------------------------------
+     Verification: PASS
+    ```
 
 ### Profile Summary Analysis
 
 1. Change your working directory to `modules/module_01/build/single_buffer`.
 
-   ```bash
-   cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_01/build/single_buffer
-   ```
+    ```bash
+    cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_01/build/single_buffer
+    ```
    
 2. Run the following command to look at the Profile Summary Report.
 
-   ```bash
-   sdx_analyze  profile  -f html -i ./profile_summary.csv
-   firefox profile_summary.html
-   ```
+    ```bash
+    sdx_analyze  profile  -f html -i ./profile_summary.csv
+    firefox profile_summary.html
+    ```
 
 *  Looking at the *Kernel Execution* section in the report, we see the kernel execution time as 175.173 ms.
 
@@ -68,10 +68,10 @@ make run STEP=single_buffer SOLUTION=1
 
 1. Run the following commands to view the Timeline Trace report.
 
-  ```bash
-  sdx_analyze trace -f wdb -i ./timeline_trace.csv
-  sdx -workspace workspace -report timeline_trace.wdb
-  ```
+    ```bash
+    sdx_analyze trace -f wdb -i ./timeline_trace.csv
+    sdx -workspace workspace -report timeline_trace.wdb
+    ```
 
 2. Zoom in to display the timeline trace report as follows:
 
@@ -107,7 +107,7 @@ To improve the performance, you can send the input buffer in multiple iterations
 
 3. The lines 64-148 are modified to optimize the host code to send the input buffer in two iterations to enable overlapping of data        transfer an compute. It is explained in detail as follows
 
-   a. The two sub buffers for "input_doc_words" & "output_inh_flags" are created as follows:
+a. The two sub buffers for "input_doc_words" & "output_inh_flags" are created as follows:
 
 ```cpp
   // Make buffers resident in the device
@@ -144,7 +144,7 @@ To improve the performance, you can send the input buffer in multiple iterations
   printf(" Splitting data in 2 sub-buffers of %.3f MBytes for FPGA processing\n", mbytes_block);  
 ```
  
-   b. Vector of events are created to coordinate the read, compute, and write operations such that each iteration is independent of          other iteration, which allows for overlap between the data transfer and compute.
+b. Vector of events are created to coordinate the read, compute, and write operations such that each iteration is independent of          other iteration, which allows for overlap between the data transfer and compute.
   
 ```cpp
   // Create Events to co-ordinate read,compute and write for each iteration 
@@ -158,7 +158,7 @@ To improve the performance, you can send the input buffer in multiple iterations
   t1 = chrono::high_resolution_clock::now();
 ```
    
-   c. Kernel arguments are set and kernel is enqueued to load the bloom filter coefficients
+c. Kernel arguments are set and kernel is enqueued to load the bloom filter coefficients
    
 ```cpp
   // Only load the bloom filter in the kernel
@@ -173,7 +173,7 @@ To improve the performance, you can send the input buffer in multiple iterations
   krnlWait.push_back(krnlDone);
 ```
 
-   d. Kernel arguments are set, input buffer is transferred from host to FPGA, kernel is enqueued and the output is read from FPGA to       host for processing the first iteration. 
+d. First iteration: kernel arguments are set, commands to write the input buffer to the FPGA, execute the kernel and read the results back to the host are enqueued. 
    
 ```cpp
   //  Set Kernel Arguments, Read, Enqueue Kernel and Write for first iteration
@@ -191,7 +191,7 @@ To improve the performance, you can send the input buffer in multiple iterations
   flagWait.push_back(flagDone);
 ```    
       
-   e. Kernel arguments are set, input buffer is transferred from host to FPGA , kernel is enqueued and the output is read from FPGA          to host for processing the second iteration  
+e. Second iteration: kernel arguments are set, commands to write the input buffer to the FPGA, execute the kernel and read the results back to the host are enqueued. 
    
 ```cpp
   //  Set Kernel Arguments, Read, Enqueue Kernel and Write for second iteration
@@ -209,7 +209,7 @@ To improve the performance, you can send the input buffer in multiple iterations
   flagWait.push_back(flagDone);
 ```
 
-   f. The host waits until the output is read back from the FPGA.
+f. The host waits until the output is read back from the FPGA.
 
 ```cpp
   // Wait until all results are copied back to the host before doing the post-processing
@@ -221,26 +221,26 @@ To improve the performance, you can send the input buffer in multiple iterations
 
 1. Go to the `makefile` directory and run the `make` command.
 
-```bash
-cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_01/makefile
-make run STEP=split_buffer SOLUTION=1
-```
+    ```bash
+    cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_01/makefile
+    make run STEP=split_buffer SOLUTION=1
+    ```
 
-2. The output is as follows.
+2. The output is as follows:
 
-```
---------------------------------------------------------------------
- Executed FPGA accelerated version  |   942.3678 ms   ( FPGA 564.939 ms )
- Executed Software-Only version     |   3640.0865 ms
---------------------------------------------------------------------
- Verification: PASS
-```
+    ```
+    --------------------------------------------------------------------
+     Executed FPGA accelerated version  |   942.3678 ms   ( FPGA 564.939 ms )
+     Executed Software-Only version     |   3640.0865 ms
+    --------------------------------------------------------------------
+     Verification: PASS
+    ```
 
 ### Timeline Trace Analysis
 1. Change your working directory to `modules/module_01/build/split_buffer`.
 
    ```bash
-    cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_01/build/split_buffer
+   cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_01/build/split_buffer
    ```
    
 2. Run the following commands to view the Timeline Trace report.
@@ -280,7 +280,7 @@ In the previous step, you split the input buffer into two sub buffers and overla
 
 3. The lines 67-139 are modified to optimize the host code to send the input buffer in multiple iterations to enable overlapping of        data transfer an compute. It is explained in detail as follows
 
-    a. Multiple sub buffers are created for "input_doc_words" & "output_inh_flags" as follows
+a. Multiple sub buffers are created for "input_doc_words" & "output_inh_flags" as follows
     
 ```cpp
   // Specify size of sub buffers for each iteration
@@ -312,7 +312,7 @@ In the previous step, you split the input buffer into two sub buffers and overla
   }
 ```
  
-   b. Vector of events are created to coordinate the read, compute, and write operations such that every iteration is independent of         other iterations, which allows for overlap between the data transfer and compute.
+b. Vector of events are created to coordinate the read, compute, and write operations such that every iteration is independent of         other iterations, which allows for overlap between the data transfer and compute.
      
 ```cpp
   // Create Events for co-ordinating read,compute and write for each iteration
@@ -326,7 +326,7 @@ In the previous step, you split the input buffer into two sub buffers and overla
   t1 = chrono::high_resolution_clock::now();
 ```
         
-   c. Kernel arguments are set and the kernel is enqueued to load the bloom filter coeffecients
+c. Kernel arguments are set and the kernel is enqueued to load the bloom filter coeffecients
  
 ```cpp
   // Set Kernel arguments and load the bloom filter coefficients in the kernel
@@ -341,7 +341,7 @@ In the previous step, you split the input buffer into two sub buffers and overla
   krnlWait.push_back(krnlDone);
 ```
 
-   d. Kernel arguments are set, input buffer is transferred from host to FPGA, kernel is enqueued and the output is read from FPGA           to host for processing the multiple iterations.
+d. For each iteration: kernel arguments are set, commands to write the input buffer to the FPGA, execute the kernel and read the results back to the host are enqueued.
       
 ```cpp
   // Set Kernel arguments. Read, Enqueue Kernel and Write for each iteration
@@ -363,7 +363,7 @@ In the previous step, you split the input buffer into two sub buffers and overla
   }
 ```
 
-   e. The host is blocked until the output is read from FPGA to host.
+e. The host waits until the output of each iteration is read back to the host.
      
 ```cpp
   // Wait until all results are copied back to the host before doing the post-processing
@@ -397,13 +397,13 @@ In the previous step, you split the input buffer into two sub buffers and overla
  
 4. The output with `ITER` 16 is as follows.
 
-```
- --------------------------------------------------------------------
- Executed FPGA accelerated version  |   899.2955 ms   ( FPGA 515.489 ms )
- Executed Software-Only version     |   3639.3084 ms
---------------------------------------------------------------------
- Verification: PASS
-```
+    ```
+    --------------------------------------------------------------------
+     Executed FPGA accelerated version  |   899.2955 ms   ( FPGA 515.489 ms )
+     Executed Software-Only version     |   3639.3084 ms
+    --------------------------------------------------------------------
+     Verification: PASS
+    ```
 
 ### Timeline Trace Analysis
 1. Change your working directory to `modules/module_01/build/generic_buffer`.
@@ -433,9 +433,9 @@ From the above Profile Summary and Timeline Trace reports, you see that the tota
 
 ## Step 4: Overlap Between the CPU and FPGA
 
-In the previous steps, you have looked at optimizing the execution time of the FPGA by overlapping the data transfer and compute. After the FPGA compute is complete, the CPU computes the document scores based on the output from the FPGA. There is sequential execution between the FPGA processing and CPU post-processing. From the previous timeline trace reports, you can find red segments in *OpenCL API Calls* of the *Host* section indicating that the host is blocked during FPGA processing. In this step, you will overlap the FPGA processing with the CPU post-processing.
+In the previous steps, you have looked at optimizing the execution time of the FPGA by overlapping the data transfer and compute. After the FPGA compute is complete, the CPU computes the document scores based on the output from the FPGA. There is sequential execution between the FPGA processing and CPU post-processing. Looking at the previous timeline trace reports, you can see red segments on the very first row which shows the *OpenCL API Calls* made by the *Host* application. This indicates that the host is waiting, staying idle while the FPGA compute the hash and flags. In this step, you will overlap the FPGA processing with the CPU post-processing.
 
-Because the total compute is split into multiple iterations, you can start post-processing in the CPU once the corresponding iteration is complete, allowing the overlap between the CPU and FPGA processing. The performance increases because the CPU is also processing in parallel with the FPGA, which reduces the execution time. The following figure illustrates this type of overlap.
+Because the total compute is split into multiple iterations, you can start post-processing in the CPU once the corresponding iteration is complete, allowing overlap between the CPU and FPGA processing. The performance increases because the CPU is also processing in parallel with the FPGA, which reduces the execution time. The following figure illustrates this type of overlap.
 
    ![](./images/sw_overlap_aws.PNG)
 
@@ -451,7 +451,7 @@ Because the total compute is split into multiple iterations, you can start post-
 
 3. The lines 134-171 are modified to optimize the host code such that CPU processing is overlapped with FPGA processing. It is            explained in detail as follows
      
-     a. Following variables are created to keep track of the words processed by FPGA 
+a. Following variables are created to keep track of the words processed by FPGA 
      
 ```cpp
   // Create variables to keep track of number of words needed by CPU to compute score and number of words processed by FPGA such that CPU processsing can overlap with FPGA
@@ -462,7 +462,7 @@ Because the total compute is split into multiple iterations, you can start post-
   unsigned int  iter = 0;
 ```
 
-   b. Block the host only if the hash function of the words are still not computed by FPGA thereby allowing overlap between CPU &             FPGA processing.
+b. Block the host only if the hash function of the words are still not computed by FPGA thereby allowing overlap between CPU &             FPGA processing.
      
 ```cpp
   for(unsigned int doc=0, n=0; doc<total_num_docs;doc++)
@@ -537,7 +537,7 @@ Because the total compute is split into multiple iterations, you can start post-
 
 ![](./images/sw_overlap_timeline_trace.PNG)
 
-As seen above in *OpenCL API Calls* of the *Host* section with the yellow marking, the red segments are shorter in width indicating that the processing time of the host CPU is now overlapping with FPGA processing, which improved the overall application execution time. In the previous steps, the host was completely blocked until the FPGA processing was complete.
+As seen above in *OpenCL API Calls* of the *Host* section with the yellow marking, the red segments are shorter in width indicating that the processing time of the host CPU is now overlapping with FPGA processing, which improved the overall application execution time. In the previous steps, the host remained completely idle until the FPGA finished all its processing.
 
 4. Exit the SDAccel application to return to the terminal.
 
@@ -545,9 +545,14 @@ As seen above in *OpenCL API Calls* of the *Host* section with the yellow markin
 
 Congratulations. You have successfully completed Module 1!
 
-In this lab, you performed host code optimizations by overlapping data transfers and compute and overlapping CPU processing with FPGA processing. You also saw that the performance of the application on the FPGA is 7 times faster than the CPU by performing host code optimizations without any kernel optimizations.
+In this lab, you worked with a pre-defined FPGA accelerator and learned that optimizing how the host application interacts with the accelerator makes a significant difference. An naive initial implementation delivered a 3.6x performance improvement over the reference software implementation. By leveraging data-parallelism, overlapping data transfers and compute and overlapping CPU processing with FPGA processing, application performance was increased by another 2x, achieving a total of 7x acceleration.
 
-In the next module, you will perform [2D Convolution](../module_02/README.md) of an RGBA video to achieve real-time performnce of 30fps.
+In the next module, you will create and optimize a two-dimensional convolution accelerator used to filter a video stream at 30fps. 
 
->**TIP:** The next module consists of 7 steps and might take longer time to complete the module.
+>**TIP:** The next module consists of 7 steps and might take longer time to complete.
 
+---------------------------------------
+
+<p align="center"><b>
+Start the second lab: <a href="../module_02/README.md">Methodology for Optimizing Accelerated FPGA Applications</a>
+</b></p>
