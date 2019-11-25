@@ -14,7 +14,14 @@ Welcome to the SDAccel AWS F1 Workshop. By going through these modules you will 
 
 [**FOLLOW THE INSTRUCTIONS**](./modules/module_01/README.md)
 
-### Module 2 - Methodology for Optimizing Accelerated FPGA Applications
+#### Optimize the data movement between CPU and FPGA
+* Profile the software application and determine which functions to accelerate on FPGA
+* Working with a predefined FPGA accelerator, optimize performance by overlapping data transfers and FPGA execution
+* Further speed-up the application by overlapping FPGA execution and CPU processing
+
+[**FOLLOW THE INSTRUCTIONS**](./modules/module_02/README.md)
+
+#### Methodology for Optimizing Accelerated FPGA Applications
 * Determine the software functions to be accelerated
 * Begin with a baseline design of 2D convolution of an RGBA video and a set of filter coefficients using ffmpeg
 * Perform a series of optimization methods to achieve the performance target

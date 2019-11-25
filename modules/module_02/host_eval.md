@@ -193,7 +193,7 @@ The code for computing the document score is as follows:
 
 * The size of `profile_weights` array is 128 MB and is placed in FPGA DDR. Non-sequential accesses to DDR are big performance bottlenecks. Since accesses to the `profile_weights` array are random and since this function takes only about 11% of the total running time, we can run this function on the CPU. If this function is implemented on the FPGA, the accesses to this array can slow down the   performance while computing the score, so you can keep this function on CPU.
 
-Based on this analysis of the algorithm, you will not offload Compute Document Score code section and will only offload Compute Hash and Output Flags code section of `compute_score_fpga.cpp` on FPGA.
+Based on this analysis of the algorithm, you will only offload the "Compute Hash & Output Flags" code section in the FPGA.
 
 ## Run the Application on the FPGA
 
