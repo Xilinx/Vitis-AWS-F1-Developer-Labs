@@ -503,7 +503,7 @@ b. Block the host only if the hash function of the words are still not computed 
 
 ### Run the Application
 
-1. Go to the `makefile` directory and run the `make` command.
+1. Go to the `modules/module_01/makefile` directory and run the `make` command.
 
     ```bash
     cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_01/makefile
@@ -550,10 +550,11 @@ In this lab, you worked with a pre-defined FPGA accelerator and learned that opt
 
 In the next module, you will create and optimize a two-dimensional convolution accelerator used to filter a video stream at 30fps. 
 
->**TIP:** The next module consists of 7 steps and might take longer time to complete.
+>**NOTE:** The next module consists of 7 steps and will take longer time to complete. This is meant to be a take-home module to be run on your own F1 instance.
+> If you are done early with Module 1, feel free to run through Module 2 steps and ask questions to the workshop staff about the module at any point!
 
 ---------------------------------------
 
 <p align="center"><b>
-Start the second lab: <a href="../module_02/README.md">Methodology for Optimizing Accelerated FPGA Applications</a>
+Start the second module: <a href="../module_02/README.md">Methodology for Optimizing Accelerated FPGA Applications</a>
 </b></p>
