@@ -214,5 +214,5 @@ In the next lab you will dive deeper into the details of the FPGA-accelerated ap
 ---------------------------------------
 
 <p align="center"><b>
-Start the next module: <a href="./data_movement.md">2: Optimizing CPU and FPGA interactions</a>
+Start the next step: <a href="./data_movement.md">2: Optimizing CPU and FPGA interactions</a>
 </b></p>

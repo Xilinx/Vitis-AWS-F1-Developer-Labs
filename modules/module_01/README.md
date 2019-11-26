@@ -15,7 +15,6 @@ You will profile the Bloom filter application and evaluate which sections are be
 1. **Optimizing CPU and FPGA interactions for improved performance** \
 You will learn the coding techniques used to create the optimized version run in the first lab. Working with a predefined FPGA accelerator, you will experience how to optimize data movements between host and FPGA, how to efficiently invoke the FPGA kernel and how to overlap computation on the CPU and the FPGA to maximize application performance. 
 
-After you complete the last lab, you will be guided to close your RDP session, stop your F1 instance and explore next steps to continue your experience with SDAccel on AWS.
 
 ---------------------------------------
 
