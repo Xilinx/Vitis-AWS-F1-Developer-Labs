@@ -35,6 +35,8 @@ The above command computes the score for 100,000 documents, amounting to 1.39 GB
 
 Throughput = Total data/Total time = 1.39 GB/4.112s = 338 MB/s
 
+With the above throughput, processing 15 TB of data would take 12.3 hours to compute the score. 
+
 ## Profiling the Application
 
 To improve the performance, you need to identify bottlenecks where the application is spending the majority of the total running time.
@@ -141,11 +143,11 @@ for(unsigned int doc=0;doc<total_num_docs;doc++)
 
 * From the above code, we see that we are computing two hash outputs for each word in all the documents and creating output flags accordingly.
 
-* We already determined that the Hash function is a good candidate for acceleration on FPGA.
+* We already determined that the Hash function(MurmurHash2()) is a good candidate for acceleration on FPGA.
 
-* Computation of the hash of one word is independent of other words and can be done in parallel thereby improving the execution time.
+* Computation of the hash(MurmurHash2()) of one word is independent of other words and can be done in parallel thereby improving the execution time.
 
-* The input words read from the DDR are accessed sequentially from DDR enablng FPGA to infer words from DDR in burst mode thereby improving DDR read bandwidth.
+* Input words are transferred to FPGA DDR using a data mover (DMA) without host CPU intervention. Accelerated hash function in FPGA reads input words from DDR sequentially. This allows the hash function to process words from DDR in burst mode which improves DDR read bandwidth.  
 
  4. Close the file. 
  
@@ -179,13 +181,13 @@ for(unsigned int doc=0, n=0; doc<total_num_docs;doc++)
 
 * The memory accesses are random, since they depend on the word ID and therefore the content of each document. 
 
-* The `profile_weights` array is 128 MB and would have to stored in DDR attached to the FPGA. Non-sequential accesses to DDR are big performance bottlenecks. Since accesses to the `profile_weights` array are random, implementing this function on the FPGA wouldn't provide much performance benefit, And since this function takes only about 11% of the total running time, we can keep this function on the CPU. 
+* The size of `profile_weights` array is 128 MB and has to be stored in DDR memory connected to the FPGA. Non-sequential accesses to DDR are big performance bottlenecks. Since accesses to the `profile_weights` array are random, implementing this function on the FPGA wouldn't provide much performance benefit, And since this function takes only about 11% of the total running time, we can keep this function on host CPU. 
 
 Based on this analysis of the algorithm, you will not offload the "Compute Document Score" code section and will only offload the "Compute Output Flags from Hash" code section of `compute_score_fpga.cpp` on FPGA.
 
 ## Run the Application on the FPGA
 
-For the purposes of this lab, we have implemented the FPGA accelerator with an 8x parallelization factor. It processes 8 input words in parallel, producing 8 output flags in parallel each clock cycle. Each output flag is stored as byte and indicates whether the corresponding word is present in the search array. Since each word requires two calls to the MurmurHash2 function, this means that the accelerator performs 16 hash computations in parallel. In addition, we have optimized the host application to efficiently interact with the parallelized FPGA-accelerator. The result is an application which runs significantly faster thanks for FPGAs and AWS F1 instances.
+For the purposes of this lab, we have implemented the FPGA accelerator with an 8x parallelization factor. It processes 8 input words in parallel, producing 8 output flags in parallel each clock cycle. Each output flag is stored as byte and indicates whether the corresponding word is present in the search array. Since each word requires two calls to the MurmurHash2 function, this means that the accelerator performs 16 hash computations in parallel. In addition, we have optimized the host application to efficiently interact with the parallelized FPGA-accelerator. The result is an application which runs significantly faster. Thanks for FPGAs and AWS F1 instances.
 
 1. Run the following make command for running optimized application on FPGA
 
@@ -202,8 +204,11 @@ For the purposes of this lab, we have implemented the FPGA accelerator with an 8
    --------------------------------------------------------------------
     Verification: PASS
    ```
+Throughput = Total data/Total time = 1.39 GB/552.534s = 2.516 GB/s
 
-You can see that the execution time of the application has increased almost by a factor of 7 by offloading the "Compute Output Flags from Hash" code section to the FPGA.  
+You can see that the throughput of the application has increased almost by a factor of 7 by offloading the "Compute Output Flags from Hash" code section to the FPGA.  
+
+With the above throughput, processing 15 GB of data would take 1.65 hours to compute the score as opposed to 12.3 hours on host CPU.
 
 ## Conclusion
 
