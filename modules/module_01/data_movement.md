@@ -551,8 +551,9 @@ In this lab, you worked with a pre-defined FPGA accelerator and learned that opt
 In the next module, you will create and optimize a two-dimensional convolution accelerator used to filter a video stream at 30fps. 
 
 >**NOTE:** The next module consists of 7 steps and will take longer time to complete. This is meant to be a take-home module to be run on your own F1 instance.
-> If you are done early with Module 1, feel free to run through Module 2 steps and ask questions to the workshop staff about the module at any point!
+> If you are done early with Module 1, feel free to run through Module 2 steps during the workshop and ask questions to the workshop staff about the module at any point!
 
+>**TIP:** To run through Module 2 on your own F1 instance, feel free to follow the steps from the [Xilinx AWS F1 Developer Labs Github page](https://github.com/Xilinx/SDAccel-AWS-F1-Developer-Labs)
 ---------------------------------------
 
 <p align="center"><b>

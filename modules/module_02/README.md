@@ -25,6 +25,9 @@ This tutorial follows the *SDAccel Methodology Guide* ([UG1346](https://www.xili
 
 # Before You Begin
 
+> **NOTE:** This lab takes an estimated 4+ hrs to go through and is best done on your own F1 instance.
+> It can be run from the [Xilinx AWS F1 Developer Labs Github page](https://github.com/Xilinx/SDAccel-AWS-F1-Developer-Labs).
+
 ## ffmpeg plugin setup
 
 This tutorial requires that the ffmpeg framework is installed on the machine where the steps will be executed. 
