@@ -1,4 +1,5 @@
-# SDAccel AWS F1 Developer Labs
+#AWS re:Invent 19 – Accelerate your C/C++ applications with Amazon EC2 F1 Instances
+
 Welcome to the workshop on accelerating your C/C++ applications with Amazon EC2 F1 instances.
 
 This workshop will provide you with hands-on development experience on AWS EC2 F1 instances using FPGAs to enable custom hardware accelerations. Using F1 instances to deploy hardware accelerations can be useful in many applications to solve complex science, engineering, and business problems that require high bandwidth, enhanced networking, and very high compute capabilities. F1 instances provide diverse development environments: from low-level hardware developers to software developers who are more comfortable with C/C++ and openCL environments [available on our GitHub](https://github.com/aws/aws-fpga).
