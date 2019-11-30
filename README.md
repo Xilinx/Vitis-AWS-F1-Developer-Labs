@@ -1,4 +1,4 @@
-#AWS re:Invent 19 – Accelerate your C/C++ applications with Amazon EC2 F1 Instances
+# AWS re:Invent 19 – Accelerate your C/C++ applications with Amazon EC2 F1 Instances
 
 Welcome to the workshop on accelerating your C/C++ applications with Amazon EC2 F1 instances.
 
