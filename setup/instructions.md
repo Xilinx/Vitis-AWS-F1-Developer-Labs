@@ -58,27 +58,30 @@ To be able to connect to the instance, you have two options in order of preferen
 
 ### Start your workshop
 
-   * Open a terminal and follow the Workshop Module instructions.
+   1. Open a terminal and follow the Workshop Module instructions.
    ![DCV Start_Terminal](../images/setup/dcv_desktop_start_terminal.png)
 
-   * The [SDAccel AWS F1 Labs repository](https://github.com/Xilinx/SDAccel-AWS-F1-Developer-Labs) and the [aws-fpga](htttps://github.com/aws/aws-fpga) Development Kit have already been down
+   1. The [SDAccel AWS F1 Labs repository](https://github.com/Xilinx/SDAccel-AWS-F1-Developer-Labs) and the [aws-fpga](htttps://github.com/aws/aws-fpga) Development Kit have already been downloaded.
 
-   * To check that your instance has your workshop cloned, run the following command:
+   1. Check that your instance has your workshop cloned:
         ```bash
         ls -la /home/centos/src/project_data/
-        total 28
-        drwxr-xr-x  5 centos centos  4096 Nov 22 22:36 .
-        drwxrwxr-x. 4 centos centos    79 Sep 13 18:46 ..
-        **drwxrwxr-x  9 centos centos  4096 Nov 22 22:35 aws-fpga**
-        **drwxrwxr-x  6 centos centos  4096 Nov 25 20:06 SDAccel-AWS-F1-Developer-Labs**
         ```
-   * Once you are on your desktop, you should be able to open the workshop link and follow the workshop.
+   1. Update the `SDAccel-AWS-F1-Developer-Labs` directory if necessary.
+        ```bash
+        cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs && git pull -r
+        ```
+   1. Source the `sdaccel_setup.sh` script from the `aws-fpga repository. This sets up environment variables as well as provides the AWS Platform file.
+        ```bash
+        source $AWS_FPGA_REPO_DIR/sdaccel_setup.sh
+        ``` 
+      > **NOTE:** You would need to source this on every new terminal you use for this workshop.
+
+   1. Open the `F1_ReInvent_Workshop.desktop` file on the desktop and follow the workshop!
    > **NOTE** Clicking the `F1_ReInvent_Workshop.desktop` file will prompt to trust the document launcher. Click Trust and Proceed as that will open up the main README from Github.
-   * If Github is down/slow, you can use local webserver to look at the workshop material locally on the instance. Run the following command to open the instructions on a browser.
-        ```
-        firefox http://localhost:6419
-        ```
-   * You are all setup to start the first module!
+       
+   > **NOTE:** If Github is down/slow, you can use local webserver to look at the workshop material locally on the instance. Run the following command on the terminal to open the instructions on a browser: `firefox http://localhost:6419`
+   1. You are all setup to start the first module!
    
 ---------------------------------------
 
