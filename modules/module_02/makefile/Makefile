@@ -36,10 +36,10 @@ build: host
 
 run: build
 	mkdir -p $(BUILDDIR)
-	cp runOnfpga_hw.awsxclbin $(BUILDDIR)
+	cp runOnfpga_hw.xclbin $(BUILDDIR)
 	cp xrt.ini $(BUILDDIR)
-	cd $(BUILDDIR) && ./host 100000 $(ITER) 
-
+	sudo -E -- bash -c 'source /opt/xilinx/xrt/setup.sh && cd $(BUILDDIR) && ./host 100000 $(ITER) '
+	 
 
 help:
 	@echo  " "
@@ -58,8 +58,3 @@ help:
 	@echo  "  Generate and view timeline Trace:"
 	@echo  "  sdx_analyze trace –f wdb -I ./timeline_trace.csv; sdx –workspace workspace –report timeline_trace.wdb"
 	@echo  ""
-
-reset:
-	@echo  " Resetting FPGA"
-	fpga-clear-local-image -S 0;
-	fpga-load-local-image -S 0 -I agfi-0deec865eb3858a53
