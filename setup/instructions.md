@@ -23,14 +23,7 @@ To be able to connect to the instance, you have two options in order of preferen
       ![DCV Login](../images/setup/dcv_login.png)
    * Login using the username `centos` and the password provided to you.
    * You should now be able to see your Desktop running on an F1 Instance
-      ![DCV Desktop](../images/setup/dcv_desktop.png)
-> **NOTE:** If you see a blank/blue screen, press the escape key to login again. Use the same password as you used before.
-> This happens because Gnome locks the screen every 5m by default.
-
-> To disable this from happening again, select the power settings:
->       ![DCV Desktop](../images/setup/desktop_lock_1.png)     
-> Turn screen lock off:  
->       ![DCV Desktop](../images/setup/desktop_lock_2.png)     
+      ![DCV Desktop](../images/setup/dcv_desktop.png) 
                                                                                                                  
 #### Option 2. **Using a web browser**
 
@@ -62,6 +55,9 @@ To be able to connect to the instance, you have two options in order of preferen
       ![DCV Login](../images/setup/dcv_login.png)
    * You should now be able to see your Desktop running on an F1 Instance
         ![DCV Desktop_Browser](../images/setup/dcv_desktop_browser.png)
+  
+
+### Start your workshop
 
 > **NOTE:** If you see a blank/blue screen, press the escape key to login again. Use the same password as you used before.
 > This happens because Gnome locks the screen every 5m by default.
@@ -69,9 +65,7 @@ To be able to connect to the instance, you have two options in order of preferen
 > To disable this from happening again, select the power settings:
 >       ![DCV Desktop](../images/setup/desktop_lock_1.png)     
 > Turn screen lock off:  
->       ![DCV Desktop](../images/setup/desktop_lock_2.png)     
-
-### Start your workshop
+>       ![DCV Desktop](../images/setup/desktop_lock_2.png)   
 
    1. Open a terminal and follow the Workshop Module instructions.
    ![DCV Start_Terminal](../images/setup/dcv_desktop_start_terminal.png)
