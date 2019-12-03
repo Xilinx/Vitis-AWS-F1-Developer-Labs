@@ -13,7 +13,7 @@ This module is divided in two labs focusing on interactions between the host CPU
 You will profile the Bloom filter application and evaluate which sections are best suited for FPGA acceleration. You will also experience the acceleration potential of AWS F1 instances by running the application first as a software-only version and then as an optimized FPGA-accelerated version.
 
 1. **Optimizing host CPU and FPGA interactions for improved performance** \
-You will learn the coding techniques used to create the optimized version run in the first lab. Working with a predefined FPGA accelerator, you will experience how to optimize data movements between host and FPGA, how to efficiently implement FPGA accelerators and how to overlap computation on the host CPU and the FPGA to maximize accelerator performance. 
+You will learn the coding techniques used to create the optimized version run in the first lab. Working with a predefined FPGA accelerator, you will experience how to optimize data movements between host and FPGA, how to efficiently schedule the FPGA accelerator and how to overlap computation on the host CPU and the FPGA to maximize application performance. 
 
 
 ---------------------------------------
