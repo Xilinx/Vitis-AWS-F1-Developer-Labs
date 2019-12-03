@@ -2,7 +2,7 @@
 
 ## Algorithm Overview  
 
-The application used in this lab reads a stream of incoming documents, and computes a score for each document based on the user’s interest, represented by a search array. It is representative of real-time filtering systems, which monitors news feeds and sends relevant articles to end users.
+The application used in this lab reads a stream of incoming documents, and computes a score for each document based on the user’s interest, represented by a search array. It is representative of real-time filtering systems that monitor news feeds and send relevant articles to end users.
 
 In practical scenarios, the number and size of the documents to be searched can be very large and because the monitoring of events must run in real time, a smaller execution time is required for processing all the documents.
 
@@ -35,7 +35,7 @@ The above command computes the score for 100,000 documents, amounting to 1.39 GB
 
 Throughput = Total data/Total time = 1.39 GB/4.112s = 338 MB/s
 
-3. It is estimated that in 2012, all the data in the American Library of Congress amounted to 15 TB. Running the application on CPU for the American Library of Congress would take 12.3 hours (15TB/338MB/s) based on the above throughput.
+3. It is estimated that in 2012, all the data in the American Library of Congress amounted to 15 TB. Based on the above numbers, we can estimate that run processing the entire American Library of Congress on the host CPU would take about 12.3 hours (15TB / 338MB/s).
 
 ## Profiling the Application
 
@@ -96,11 +96,11 @@ unsigned int MurmurHash2 ( const void * key, int len, unsigned int seed )
 
 * A shift of 1-bit in an arithmetic shift operation takes one clock cycle on the CPU.
 
-* The three arithmetic operations shift a total of 44-bits (in the above code, when`len=3`) to compute the hash which requires 44 clock cycles just to shift the bits on CPU. Due to the custom hardware architecture possible on the FPGA, shifting by an arbitrary number of bits on the FPGA can complete the operation in one clock cycle.
+* The three arithmetic operations shift a total of 44-bits (when`len=3` in the above code) to compute the hash which requires 44 clock cycles just to shift the bits on the host CPU. On the FPGA, it is possible to create custom architectures and therefore create an accelerator that will shift data by an arbitrary number of bits in a single clock cycle.
 
-* FPGA also has dedicated DSP units, which perform multiplication faster than the CPU. Even though the CPU runs at 8 times higher clock frequency than the FPGA, the arithmetic shift and multiplication operations can perform faster on FPGA because of its custom hardware architecture, enabling it to perform in fewer clock cycles compared to the CPU.
+* FPGA also has dedicated DSP units, which perform multiplications faster than the CPU. Even though the CPU runs at a frequency 8 times higher than the FPGA, the arithmetic shift and multiplication operations can perform faster on the FPGA because of its customizable hardware architecture.
 
-* Therefore this function is a good candidate for implementing on FPGA.
+* Therefore this function is a good candidate for FPGA acceleration.
 
 3. Close the file.
 
@@ -145,7 +145,7 @@ for(unsigned int doc=0;doc<total_num_docs;doc++)
 
 * We already determined that the Hash function(MurmurHash2()) is a good candidate for acceleration on FPGA.
 
-* Computation of the hash(MurmurHash2()) of one word is independent of other words and can be done in parallel thereby improving the execution time.
+* Computation of the hash (`MurmurHash2()`) of one word is independent of other words and can be done in parallel thereby improving the execution time.
 
 * The algorithm makes sequential access to the `input_doc_words` array. This is an important property as it allows very efficient accesses to DDR when implemented in the FPGA.  
 
@@ -183,7 +183,8 @@ for(unsigned int doc=0, n=0; doc<total_num_docs;doc++)
 
 * The size of `profile_weights` array is 128 MB and has to be stored in DDR memory connected to the FPGA. Non-sequential accesses to DDR are big performance bottlenecks. Since accesses to the `profile_weights` array are random, implementing this function on the FPGA wouldn't provide much performance benefit, And since this function takes only about 11% of the total running time, we can keep this function on host CPU. 
 
-Based on this analysis of the algorithm, you will not offload the "Compute Document Score" code section and will only offload the "Compute Output Flags from Hash" code section of `compute_score_fpga.cpp` on FPGA.
+Based on this analysis, it is only beneficial to accelerate the "Compute Output Flags from Hash" section on the FPGA. The "Compute Document Score" section is best kept on the host CPU.
+
 
 ## Run the Application on the FPGA
 
@@ -204,11 +205,12 @@ For the purposes of this lab, we have implemented the FPGA accelerator with an 8
    --------------------------------------------------------------------
     Verification: PASS
    ```
+
 Throughput = Total data/Total time = 1.39 GB/552.534ms = 2.516 GB/s
 
 You can see that by efficiently leveraging FPGA acceleration, the throughput of the application has increased by a factor of 7.  
 
-3. Running the application for the American library of Congress would take 1.65 hours (15TB/2.52GB/s) by leveraging FPGA acceleration based on the above throughput as opposed to 12.3 hours on host CPU.
+3. With FPGA acceleration, processing the entire American Library of Congress would take about 1.65 hours (15TB/2.52GB/s), as opposed to 12.3 hours with a software-only approach.
 
 ## Conclusion
 
