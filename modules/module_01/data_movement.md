@@ -105,7 +105,7 @@ To improve the performance, you can split and send the input buffer in multiple 
     ```
 2. Open `run_split_buffer.cpp` file with a file editor.
 
-3. The lines 64-148 are modified to optimize the host code to send the input buffer in two iterations to enable overlapping of data transfer with the accelerator. This is explained in detail as follows:
+3. The lines 64-148 are modified to optimize the host code to send the input buffer in two iterations, enabling overlap of data transfers with accelerator execution. This is explained in detail as follows:
 
 a. The two sub buffers for "input_doc_words" & "output_inh_flags" are created as follows:
 
