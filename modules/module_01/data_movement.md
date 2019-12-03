@@ -432,7 +432,7 @@ As you can see from the report, the input buffer is split into 16 sub buffers, a
 
 From the above Profile Summary and Timeline Trace reports, you see that the total execution time on the FPGA improved from the previous steps after splitting the input data into multiple buffers, allowing overlap between the data transfer and compute.
 
-## Step 4: Overlap Between the CPU and FPGA
+## Step 4: Overlap Between the host CPU and FPGA
 
 In the previous steps, you have looked at optimizing the execution time of the FPGA by overlapping the data transfer and compute. After the FPGA compute is complete, the CPU computes the document scores based on the output from the FPGA. There is sequential execution between the FPGA processing and CPU post-processing. Looking at the previous timeline trace reports, you can see red segments on the very first row which shows the *OpenCL API Calls* made by the *Host* application. This indicates that the host is waiting, staying idle while the FPGA compute the hash and flags. In this step, you will overlap the FPGA processing with the CPU post-processing.
 
