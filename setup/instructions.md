@@ -24,8 +24,15 @@ To be able to connect to the instance, you have two options in order of preferen
    * Login using the username `centos` and the password provided to you.
    * You should now be able to see your Desktop running on an F1 Instance
       ![DCV Desktop](../images/setup/dcv_desktop.png)
-   
-##### Option 2. **Using a web browser**
+> **NOTE:** If you see a blank/blue screen, press the escape key to login again. Use the same password as you used before.
+> This happens because Gnome locks the screen every 5m by default.
+
+> To disable this from happening again, select the power settings:
+>       ![DCV Desktop](../images/setup/desktop_lock_1.png)     
+> Turn screen lock off:  
+>       ![DCV Desktop](../images/setup/desktop_lock_2.png)     
+                                                                                                                 
+#### Option 2. **Using a web browser**
 
    * You can use this option if you cannot download/use the DCV Viewer.
    * Make sure that you are using a [supported web browser](https://docs.aws.amazon.com/dcv/latest/adminguide/what-is-dcv.html#what-is-dcv-requirements).
@@ -55,6 +62,14 @@ To be able to connect to the instance, you have two options in order of preferen
       ![DCV Login](../images/setup/dcv_login.png)
    * You should now be able to see your Desktop running on an F1 Instance
         ![DCV Desktop_Browser](../images/setup/dcv_desktop_browser.png)
+
+> **NOTE:** If you see a blank/blue screen, press the escape key to login again. Use the same password as you used before.
+> This happens because Gnome locks the screen every 5m by default.
+
+> To disable this from happening again, select the power settings:
+>       ![DCV Desktop](../images/setup/desktop_lock_1.png)     
+> Turn screen lock off:  
+>       ![DCV Desktop](../images/setup/desktop_lock_2.png)     
 
 ### Start your workshop
 
