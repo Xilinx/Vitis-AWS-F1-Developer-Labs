@@ -98,7 +98,7 @@ unsigned int MurmurHash2 ( const void * key, int len, unsigned int seed )
 
 * The three arithmetic operations shift a total of 44-bits (when`len=3` in the above code) to compute the hash which requires 44 clock cycles just to shift the bits on the host CPU. On the FPGA, it is possible to create custom architectures and therefore create an accelerator that will shift data by an arbitrary number of bits in a single clock cycle.
 
-* FPGA also has dedicated DSP units, which perform multiplications faster than the CPU. Even though the CPU runs at a frequency 8 times higher than the FPGA, the arithmetic shift and multiplication operations can perform faster on the FPGA because of its customizable hardware architecture.
+* The FPGA also has dedicated DSP units, which perform multiplications faster than the CPU. Even though the CPU runs at a frequency 8 times higher than the FPGA, the arithmetic shift and multiplication operations can perform faster on the FPGA because of its customizable hardware architecture.
 
 * Therefore this function is a good candidate for FPGA acceleration.
 
@@ -181,9 +181,9 @@ for(unsigned int doc=0, n=0; doc<total_num_docs;doc++)
 
 * The memory accesses are random, since they depend on the word ID and therefore the content of each document. 
 
-* The size of `profile_weights` array is 128 MB and has to be stored in DDR memory connected to the FPGA. Non-sequential accesses to DDR are big performance bottlenecks. Since accesses to the `profile_weights` array are random, implementing this function on the FPGA wouldn't provide much performance benefit, And since this function takes only about 11% of the total running time, we can keep this function on host CPU. 
+* The size of the `profile_weights` array is 128 MB and has to be stored in DDR memory connected to the FPGA. Non-sequential accesses to DDR are big performance bottlenecks. Since accesses to the `profile_weights` array are random, implementing this function on the FPGA wouldn't provide much performance benefit, And since this function takes only about 11% of the total running time, we can keep this function on the host CPU. 
 
-Based on this analysis, it is only beneficial to accelerate the "Compute Output Flags from Hash" section on the FPGA. The "Compute Document Score" section is best kept on the host CPU.
+Based on this analysis, it is only beneficial to accelerate the "Compute Output Flags from Hash" section on the FPGA. Execution of the "Compute Document Score" section can be kept on the host CPU.
 
 
 ## Run the Application on the FPGA
