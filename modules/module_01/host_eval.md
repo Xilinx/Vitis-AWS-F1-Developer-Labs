@@ -2,11 +2,11 @@
 
 ## Algorithm Overview  
 
-The application used in this lab reads a stream of incoming documents, and computes a score for each document based on the user’s interest, represented by a search array. It is representative of real-time filtering systems, which monitor news feeds and send relevant articles to end users.
+The application used in this lab reads a stream of incoming documents, and computes a score for each document based on the user’s interest, represented by a search array. It is representative of real-time filtering systems, which monitors news feeds and sends relevant articles to end users.
 
-In practical scenarios, the number and the size of the documents to be searched can be very large and because the monitoring of events must run in real time, a smaller execution time is required for processing all the documents.
+In practical scenarios, the number and size of the documents to be searched can be very large and because the monitoring of events must run in real time, a smaller execution time is required for processing all the documents.
 
-The core of the application is a Bloom filter, a space-efficient probabilistic data structure used to test whether an element is a member of a set. The algorithm attempts to find the best matching documents for a specific search array. The search array is the filter that matches documents against the user’s interest. In this application, each document is reduced to a set of 32-bit words, where each word is a pair of 24-bit word ID and 8-bit frequency representing the occurrence of the word ID in the document. The search array consists of smaller set of word IDs and each word ID has a weight associated with it, which represents the significance of the word. The application computes a score for each document to determine its relevance to the given search array.
+The core of the application is a Bloom filter, a space-efficient probabilistic data structure used to test whether an element is a member of a set. The algorithm attempts to find the best matching documents for a specific search array. The search array is the filter that matches documents against the user’s interest. In this application, each document is reduced to a set of 32-bit words, where each word is a pair of 24-bit word ID and 8-bit frequency representing the occurrence of the word ID in the document. The search array consists of a smaller set of word IDs and each word ID has a weight associated with it, which represents the significance of the word. The application computes a score for each document to determine its relevance to the given search array.
 
 The algorithm can be divided in two sections:  
 * Computing the hash function of the words and creating output flags
@@ -29,7 +29,7 @@ The algorithm can be divided in two sections:
     --------------------------------------------------------------------
     ```
 
->**NOTE:** The performance number might vary depending on the CPU machine and workload activity at that time.
+>**NOTE:** The performance number might vary depending on the EC2 instance type and workload activity at that time.
 
 The above command computes the score for 100,000 documents, amounting to 1.39 GBytes of data. The execution time is 4.112 seconds and throughput is computed as follows:
 
@@ -204,17 +204,17 @@ For the purposes of this lab, we have implemented the FPGA accelerator with an 8
    --------------------------------------------------------------------
     Verification: PASS
    ```
-Throughput = Total data/Total time = 1.39 GB/552.534s = 2.516 GB/s
+Throughput = Total data/Total time = 1.39 GB/552.534ms = 2.516 GB/s
 
 You can see that the throughput of the application has increased almost by a factor of 7 by offloading the "Compute Output Flags from Hash" code section to the FPGA.  
 
-With the above throughput, processing 15 GB of data would take 1.65 hours to compute the score as opposed to 12.3 hours on host CPU.
+With the above throughput, processing 15 TB of data would take 1.65 hours to compute the score as opposed to 12.3 hours on host CPU.
 
 ## Conclusion
 
-In this lab, you have seen how to profile an application and determine which parts are best suited for FPGA acceleration. You've also  experienced that once efficiently implemented, FPGA-accelerated applications on AWS F1 instances execute significantly faster than conventional software-only applications.
+In this lab, you have seen how to profile an application and determine which parts are best suited for FPGA acceleration. You've also experienced that once an accelerator is efficiently implemented, FPGA-accelerated applications on AWS F1 instances execute significantly faster than conventional software-only applications.
 
-In the next lab you will dive deeper into the details of the FPGA-accelerated application and learn some of the fundamental optimization techniques leveraged in this example. In particular, you will discover how to optimize data movements between host and FPGA, how to efficiently invoke the FPGA kernel and how to overlap computation on the CPU and the FPGA to maximize application performance.
+In the next lab you will dive deeper into the details of the FPGA-accelerated application and learn some of the fundamental optimization techniques leveraged in this example. In particular, you will discover how to optimize data movements between host and FPGA, how to efficiently invoke the FPGA kernel and how to overlap computation on the host CPU and the FPGA to maximize application performance.
 
 ---------------------------------------
 
