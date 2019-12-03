@@ -35,7 +35,7 @@ The above command computes the score for 100,000 documents, amounting to 1.39 GB
 
 Throughput = Total data/Total time = 1.39 GB/4.112s = 338 MB/s
 
-With the above throughput, processing 15 TB of data would take 12.3 hours to compute the score. 
+3. It is estimated that in 2012, all the data in the American Library of Congress amounted to 15 TB. Running the application on CPU for the American Library of Congress would take 12.3 hours (15TB/338MB/s) based on the above throughput.
 
 ## Profiling the Application
 
@@ -147,7 +147,7 @@ for(unsigned int doc=0;doc<total_num_docs;doc++)
 
 * Computation of the hash(MurmurHash2()) of one word is independent of other words and can be done in parallel thereby improving the execution time.
 
-* Input words are transferred to FPGA DDR using a data mover (DMA) without host CPU intervention. Accelerated hash function in FPGA reads input words from DDR sequentially. This allows the hash function to process words from DDR in burst mode which improves DDR read bandwidth.  
+* The algorithm makes sequential access to the `input_doc_words` array. This is an important property as it allows very efficient accesses to DDR when implemented in the FPGA.  
 
  4. Close the file. 
  
@@ -187,7 +187,7 @@ Based on this analysis of the algorithm, you will not offload the "Compute Docum
 
 ## Run the Application on the FPGA
 
-For the purposes of this lab, we have implemented the FPGA accelerator with an 8x parallelization factor. It processes 8 input words in parallel, producing 8 output flags in parallel each clock cycle. Each output flag is stored as byte and indicates whether the corresponding word is present in the search array. Since each word requires two calls to the MurmurHash2 function, this means that the accelerator performs 16 hash computations in parallel. In addition, we have optimized the host application to efficiently interact with the parallelized FPGA-accelerator. The result is an application which runs significantly faster. Thanks for FPGAs and AWS F1 instances.
+For the purposes of this lab, we have implemented the FPGA accelerator with an 8x parallelization factor. It processes 8 input words in parallel, producing 8 output flags in parallel each clock cycle. Each output flag is stored as byte and indicates whether the corresponding word is present in the search array. Since each word requires two calls to the MurmurHash2 function, this means that the accelerator performs 16 hash computations in parallel. In addition, we have optimized the host application to efficiently interact with the parallelized FPGA-accelerator. The result is an application which runs significantly faster, thanks to FPGAs and AWS F1 instances.
 
 1. Run the following make command for running optimized application on FPGA
 
@@ -195,7 +195,7 @@ For the purposes of this lab, we have implemented the FPGA accelerator with an 8
    make run_fpga
    ```
 
-1. The output is as follows:
+2. The output is as follows:
 
    ```
    --------------------------------------------------------------------
@@ -206,9 +206,9 @@ For the purposes of this lab, we have implemented the FPGA accelerator with an 8
    ```
 Throughput = Total data/Total time = 1.39 GB/552.534s = 2.516 GB/s
 
-You can see that the throughput of the application has increased almost by a factor of 7 by offloading the "Compute Output Flags from Hash" code section to the FPGA.  
+You can see that by efficiently leveraging FPGA acceleration, the throughput of the application has increased by a factor of 7.  
 
-With the above throughput, processing 15 GB of data would take 1.65 hours to compute the score as opposed to 12.3 hours on host CPU.
+3. Running the application for the American library of Congress would take 1.65 hours (15TB/2.52GB/s) by leveraging FPGA acceleration based on the above throughput as opposed to 12.3 hours on host CPU.
 
 ## Conclusion
 
