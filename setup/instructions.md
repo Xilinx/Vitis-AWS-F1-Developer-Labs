@@ -89,7 +89,9 @@ To be able to connect to the instance, you have two options in order of preferen
    1. Open the `F1_ReInvent_Workshop.desktop` file on the desktop and follow the workshop!
    > **NOTE** Clicking the `F1_ReInvent_Workshop.desktop` file will prompt to trust the document launcher. Click Trust and Proceed as that will open up the main README from Github.
        
-   > **NOTE:** If Github is down/slow, you can use local webserver to look at the workshop material locally on the instance. Run the following command on the terminal to open the instructions on a browser: `firefox http://localhost:6419`
+   > **NOTE:** If Github is down/slow, you can use a local webserver to look at the workshop material located on the instance.
+   > Open the following link in firefox on your instance: `http://localhost:6419`
+   
    1. You are all setup to start the first module!
    
 ---------------------------------------
