@@ -12,7 +12,7 @@ This workshop will focus on developing accelerated applications using the Xilinx
 * This workshop is focused on identifying parts of your your C/C++ program that are best suited for acceleration on an FPGA. We will also use profiling data to analyze how to further optimize data movement.
 * In the interest of time, this workshop will use pre-built AFIs and pre-provisioned F1 instances. 
     * We have modified this branch(Reinvent_2019.1) of the [Xilinx SDAccel AWS F1 Developer Labs](https://github.com/Xilinx/SDAccel-AWS-F1-Developer-Labs) specifically for use during the CMP411 workshop at Re:Invent 2019.
-    * Attendee will not use their personal or corporate accounts for this workshop.
+    * Attendee will not use their personal or corporate accounts for the duration of this workshop.
 * Each attendee will receive information to connect to an F1 instance. Use it while following the [setup steps](./setup/instructions.md) before beginning this workshop.
 * If at any point, you feel stuck or have questions, please raise your hand and we would be happy to assist you.
 
