@@ -43,7 +43,7 @@ void runOnFPGA(
 	cl::CommandQueue q(context,device, CL_QUEUE_PROFILING_ENABLE | CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE );
 
 	string run_type = xcl::is_emulation()?(xcl::is_hw_emulation()?"hw_emu":"sw_emu"):"hw";
-	string binary_file = kernel_name + "_" + run_type + ".awsxclbin";
+	string binary_file = kernel_name + "_" + run_type + ".xclbin";
 	cl::Program::Binaries bins = xcl::import_binary_file(binary_file);
 	cl::Program program(context, devices, bins);
 	cl::Kernel kernel(program,kernel_name_charptr,NULL);
