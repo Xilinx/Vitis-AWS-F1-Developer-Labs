@@ -71,7 +71,7 @@ To be able to connect to the instance, you have two options in order of preferen
         ```bash
         cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs && git pull -r
         ```
-   1. Source the `sdaccel_setup.sh` script from the `aws-fpga repository. This sets up environment variables as well as provides the AWS Platform file.
+   1. Source the `sdaccel_setup.sh` script from the `aws-fpga` repository. This sets up environment variables as well as provides the AWS Platform file.
         ```bash
         source $AWS_FPGA_REPO_DIR/sdaccel_setup.sh
         ``` 
