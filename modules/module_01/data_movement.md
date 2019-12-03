@@ -91,7 +91,7 @@ To further improve performance, you can look into overlapping data transfers and
 
 In the previous step, you noticed a sequential execution of the read, compute, and write (that is, the compute does not start until the entire input is read into the FPGA and similarly, the host read from the FPGA does not start until compute is done).
 
-To improve the performance, you can send the input buffer in multiple iterations and start the compute for the corresponding iteration as soon as the data for the iteration is transferred.  Because the compute of each iteration is independent of the other iterations, you can overlap the data transfer of the next iteration and compute of the current iteration. The performance is expected to increase, instead of the sequential execution of the data transfer and compute, you are now overlapping the data transfer and compute. The following figure shows an illustrated representation of sending data as a whole, versus sending it in two buffers.
+To improve the performance, you can split and send the input buffer in multiple iterations and start the compute for the corresponding iteration as soon as the data for the iteration is transferred. Because the compute of each iteration is independent of the other iterations, you can overlap the data transfer of the next iteration and compute of the current iteration. The performance is expected to increase: instead of the sequential execution of the data transfer and compute, you are now overlapping the data transfer and compute. The following figure shows an illustrated representation of sending data as a whole, versus sending it in two buffers.
 
    ![](./images/overlap_split_buffer.PNG)
 
