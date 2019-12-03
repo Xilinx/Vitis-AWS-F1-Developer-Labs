@@ -96,7 +96,7 @@ unsigned int MurmurHash2 ( const void * key, int len, unsigned int seed )
 
 * A shift of 1-bit in an arithmetic shift operation takes one clock cycle on the CPU.
 
-* The three arithmetic operations shift a total of 44-bits (in the above code,`len=3` in above code) to compute the hash which requires 44 clock cycles just to shift the bits on CPU. Due to the custom hardware architecture possible on the FPGA, shifting by an arbitrary number of bits on the FPGA can complete the operation in one clock cycle.
+* The three arithmetic operations shift a total of 44-bits (in the above code, when`len=3`) to compute the hash which requires 44 clock cycles just to shift the bits on CPU. Due to the custom hardware architecture possible on the FPGA, shifting by an arbitrary number of bits on the FPGA can complete the operation in one clock cycle.
 
 * FPGA also has dedicated DSP units, which perform multiplication faster than the CPU. Even though the CPU runs at 8 times higher clock frequency than the FPGA, the arithmetic shift and multiplication operations can perform faster on FPGA because of its custom hardware architecture, enabling it to perform in fewer clock cycles compared to the CPU.
 
