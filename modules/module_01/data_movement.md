@@ -2,22 +2,29 @@
 
 ## Step 1: Naive Approach
 
-The initial version of the accelerated application follows the structure of original software version. We are transferring the entire input buffer from the host to the FPGA in one iteration followed by compute and reading the output from the FPGA to the host. The following figure shows the read-compute-write pattern in this step
+The initial version of the accelerated application follows the structure of original software version. The entire input buffer is transfered from the host to the FPGA in a single transaction. Then, the FPGA accelerator performs the computation. Lastly, the results are read back from the FPGA to the host before being post-processed. 
+
+The following figure shows the sequential write-compute-read pattern implemented in this first step
 
   ![](./images/overlap_single_buffer.PNG)
 
-The FPGA kernel code is already given, which computes the hash values for words in the document and returns back to the host.
+The FPGA accelerator computes the hash values and flags for the provided input words.
 
-The input arguments to the kernel are as follows:
+The inputs to the accelerator are as follows:
 
 * `input_doc_words`: Input array which contains the 32-bit words for all the documents.
 * `bloom_filter`: Bloom filter array which contains the inserted hash values of search array.
 * `total_size`: Unsigned int which represents the total size processed by the FPGA when it is called.
 * `load_weights`: Boolean which allows to load the `bloom_filter` array only once to the FPGA in the case of multiple kernel invocations.
 
-The output of the kernel is as follows:
+The output of the accelerator is as follows:
 
 * `output_inh_flags`: Output array of 8-bit outputs where each bit in the 8-bit output indicates whether a word is present in the bloom filter which is then used for computing score in the CPU.
+
+The accelerator is architected to process 8 words in parallel at 250Mhz. In the test runs we process 401,022,976 words. We can therefore estimate the theoretical FPGA computation time as follows:
+
+* Number of words/(Clock freq * Parallelization factor in Kernel) = 401022976 / (250\*1000000\*8) = 174.86 ms
+
 
 ### Run the Application
 
@@ -37,6 +44,9 @@ The output of the kernel is as follows:
     --------------------------------------------------------------------
      Verification: PASS
     ```
+    
+    While this initial version is already 3.5x faster than the software-only version, you can see that is noticeably slower than the optimized version which you ran at then of the previous lab. 
+    
 
 ### Profile Summary Analysis
 
@@ -57,11 +67,7 @@ The output of the kernel is as follows:
 
     ![DM_Kernel_Execution_time](./images/kernel_execution_time.png)
 
-*  The theoretical number expected from the kernel running at 250MHZ clock and processing eight words in parallel is as follows:
-
-   Number of words/(Clock freq * Parallelization factor in Kernel) =    401022976/(250\*1000000\*8) = 174.86 ms
-
-   As you can see, the compute time of kernel closely matches with the theoretical number. 
+   As you can see, the actual kernel execution time closely matches the theoretical number. 
     
 
 ### Timeline Trace Analysis
@@ -83,15 +89,15 @@ As expected, there is a sequential execution of operations starting from the dat
 
 ### Conclusion
 
-From the Profile Summary and Timeline Trace reports, you see that the kernel execution time closely matches with the expected theoretical number. There is sequential execution with the data transfers between the FPGA and host and compute in the FPGA. 
-
-To further improve performance, you can look into overlapping data transfers and compute.
+The Profile Summary and Timeline Trace reports are useful tools to analyze the performance of the FPGA-accelerated application. The kernel execution times matches the theoretical expectations and the Timeline Trace provides a visual confirmation that this initial version performs data transfers and computation sequentially.  
+ 
+To further improve performance, you will look into overlapping data transfers and compute.
 
 ## Step 2: Overlapping Data Transfer and Compute
 
-In the previous step, you noticed a sequential execution of the read, compute, and write (that is, the compute does not start until the entire input is read into the FPGA and similarly, the host read from the FPGA does not start until compute is done).
+In the previous step, you noticed a sequential execution of the write, compute, and read (that is, the compute does not start until the entire input is read into the FPGA and similarly, the host read from the FPGA does not start until compute is done).
 
-To improve the performance, you can split and send the input buffer in multiple iterations and start the compute for the corresponding iteration as soon as the data for the iteration is transferred. Because the compute of each iteration is independent of the other iterations, you can overlap the data transfer of the next iteration and compute of the current iteration. The performance is expected to increase: instead of the sequential execution of the data transfer and compute, you are now overlapping the data transfer and compute. The following figure shows an illustrated representation of sending data as a whole, versus sending it in two buffers.
+To improve performance, you can split and send the input buffer in multiple iterations and start the compute as soon as the data for the corresponding iteration is transferred to the FPGA. Because the compute of a given iteration is independent of other iterations, you can overlap the compute of a given iteration with the data transfer for the next iteration. This will improve performance: instead of executing sequentially, data transfer and compute are overlapped. The following figure illustrates this for the case where the input data is split in two sub-buffers.
 
    ![](./images/overlap_split_buffer.PNG)
 
@@ -254,17 +260,17 @@ f. The host waits until the output is read back from the FPGA.
 
 ![](./images/double_buffer_timeline_trace.PNG)
 
-As you can see from the Timeline Trace report, there is an overlap of the read, compute, and write operations between the first and second iterations, which improves the total execution time on the FPGA.
+The Timeline Trace confirms that we have achieved the execution schedule that we aspired to obtain: there is an overlap of the read, compute, and write operations between the first and second iterations. The execution time of the first kernel run and the first data read are effectively "hidden" behind the data write time. This results in a faster overall run.
 
 4. Exit the SDAccel application to return to the terminal.
 
 ### Conclusion
 
-From the above Profile Summary and Timeline Trace reports, you can see that the total execution time on the FPGA improved, as the time spent on the FPGA improved from the previous step due to the overlap between the data transfer and compute.
+The total execution time on the FPGA has been improved by vertue of overlapping computation with data transfers. The execution time of the first kernel run and the first data read have been eliminated.
 
 ## Step 3: Overlap of Data Transfer and Compute with Multiple Buffers
 
-In the previous step, you split the input buffer into two sub buffers and overlapped the compute with a data transfer. In this step, you will write generic code, so the input data is split and processed in multiple iterations to achieve the optimal execution time.
+In the previous step, you split the input buffer into two sub-buffers and overlapped the first compute with the second data transfer. In this step, you will write generic code, so the input data is split and processed in an arbitrary number of iterations to achieve the optimal execution time.
 
 ### Host Code Modifications
 
@@ -424,19 +430,21 @@ e. The host waits until the output of each iteration is read back to the host.
 
 ![](./images/generic_buffer_timeline_trace.PNG)
 
-As you can see from the report, the input buffer is split into 16 sub buffers, and there are overlaps between read, compute, and write.
+As you can see from the report, the input buffer is split into 16 sub buffers, and there are overlaps between read, compute, and write for all iterations. The total computation is divided in 16 iterations, but 15 of them are happening simultaneously with data transfers and therefore only the last compute counts towards total FPGA execution time.
 
 4. Exit the SDAccel application to return to the terminal.
 
 ### Conclusion
 
-From the above Profile Summary and Timeline Trace reports, you see that the total execution time on the FPGA improved from the previous steps after splitting the input data into multiple buffers, allowing overlap between the data transfer and compute.
+From the above Profile Summary and Timeline Trace reports, you see that the total execution time on the FPGA improved from the previous steps after splitting the input data into multiple buffers, allowing additional overlap between the data transfer and compute. 
 
 ## Step 4: Overlap Between the host CPU and FPGA
 
-In the previous steps, you have looked at optimizing the execution time of the FPGA by overlapping the data transfer and compute. After the FPGA compute is complete, the CPU computes the document scores based on the output from the FPGA. There is sequential execution between the FPGA processing and CPU post-processing. Looking at the previous timeline trace reports, you can see red segments on the very first row which shows the *OpenCL API Calls* made by the *Host* application. This indicates that the host is waiting, staying idle while the FPGA compute the hash and flags. In this step, you will overlap the FPGA processing with the CPU post-processing.
+In the previous steps, you looked at optimizing the execution time of the FPGA by overlapping the data transfer and compute. After the FPGA compute is complete, the CPU computes the document scores based on the output from the FPGA. FPGA processing and CPU post-processing execute sequentially. 
 
-Because the total compute is split into multiple iterations, you can start post-processing in the CPU once the corresponding iteration is complete, allowing overlap between the CPU and FPGA processing. The performance increases because the CPU is also processing in parallel with the FPGA, which reduces the execution time. The following figure illustrates this type of overlap.
+Looking at the previous timeline trace reports, you can see red segments on the very first row which shows the *OpenCL API Calls* made by the *Host* application. This indicates that the host is waiting, staying idle while the FPGA compute the hash and flags. In this step, you will overlap the FPGA processing with the CPU post-processing.
+
+Because the total compute is split into multiple iterations, you can start post-processing on the host CPU once the corresponding iteration is complete, allowing overlap between the CPU and FPGA processing. The performance increases because the CPU is also processing in parallel with the FPGA, which reduces the execution time. The following figure illustrates this type of overlap.
 
    ![](./images/sw_overlap_aws.PNG)
 
@@ -450,7 +458,7 @@ Because the total compute is split into multiple iterations, you can start post-
 
 2. Open `run_sw_overlap.cpp` file with a file editor.
 
-3. The lines 134-171 are modified to optimize the host code such that CPU processing is overlapped with FPGA processing. It is            explained in detail as follows
+3. The lines 134-171 are modified to optimize the host code such that CPU processing is overlapped with FPGA processing. It is explained in detail as follows
      
 a. Following variables are created to keep track of the words processed by FPGA 
      
@@ -463,7 +471,7 @@ a. Following variables are created to keep track of the words processed by FPGA
   unsigned int  iter = 0;
 ```
 
-b. Block the host only if the hash function of the words are still not computed by FPGA thereby allowing overlap between CPU &             FPGA processing.
+b. Block the host only if the hash function of the words are still not computed by FPGA thereby allowing overlap between CPU & FPGA processing.
      
 ```cpp
   for(unsigned int doc=0, n=0; doc<total_num_docs;doc++)
