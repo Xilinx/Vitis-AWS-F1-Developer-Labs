@@ -555,5 +555,5 @@ In the next module, you will create and optimize a two-dimensional convolution a
 ---------------------------------------
 
 <p align="center"><b>
-Start the second lab: <a href="../module_02/README.md">Methodology for Optimizing Accelerated FPGA Applications</a>
+Start the third lab: <a href="../module_03/README.md">Methodology for Optimizing Accelerated FPGA Applications</a>
 </b></p>
