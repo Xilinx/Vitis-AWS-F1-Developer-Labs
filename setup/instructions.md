@@ -23,9 +23,9 @@ To be able to connect to the instance, you have two options in order of preferen
       ![DCV Login](../images/setup/dcv_login.png)
    * Login using the username `centos` and the password provided to you.
    * You should now be able to see your Desktop running on an F1 Instance
-      ![DCV Desktop](../images/setup/dcv_desktop.png)
-   
-##### Option 2. **Using a web browser**
+      ![DCV Desktop](../images/setup/dcv_desktop.png) 
+                                                                                                                 
+#### Option 2. **Using a web browser**
 
    * You can use this option if you cannot download/use the DCV Viewer.
    * Make sure that you are using a [supported web browser](https://docs.aws.amazon.com/dcv/latest/adminguide/what-is-dcv.html#what-is-dcv-requirements).
@@ -55,8 +55,17 @@ To be able to connect to the instance, you have two options in order of preferen
       ![DCV Login](../images/setup/dcv_login.png)
    * You should now be able to see your Desktop running on an F1 Instance
         ![DCV Desktop_Browser](../images/setup/dcv_desktop_browser.png)
+  
 
 ### Start your workshop
+
+> **NOTE:** If you see a blank/blue screen, press the escape key to login again. Use the same password as you used before.
+> This happens because Gnome locks the screen every 5m by default.
+
+> To disable this from happening again, select the power settings:
+>       ![DCV Desktop](../images/setup/desktop_lock_1.png)     
+> Turn screen lock off:  
+>       ![DCV Desktop](../images/setup/desktop_lock_2.png)   
 
    1. Open a terminal and follow the Workshop Module instructions.
    ![DCV Start_Terminal](../images/setup/dcv_desktop_start_terminal.png)
@@ -78,9 +87,10 @@ To be able to connect to the instance, you have two options in order of preferen
       > **NOTE:** You would need to source this on every new terminal you use for this workshop.
 
    1. Open the `F1_ReInvent_Workshop.desktop` file on the desktop and follow the workshop!
-   > **NOTE** Clicking the `F1_ReInvent_Workshop.desktop` file will prompt to trust the document launcher. Click Trust and Proceed as that will open up the main README from Github.
-       
-   > **NOTE:** If Github is down/slow, you can use local webserver to look at the workshop material locally on the instance. Run the following command on the terminal to open the instructions on a browser: `firefox http://localhost:6419`
+       > **NOTE** Clicking the `F1_ReInvent_Workshop.desktop` file will prompt to trust the document launcher. Click Trust and Proceed as that will open up the main README from Github.
+           
+       > **NOTE:** If Github is down/slow, you can use a local webserver to look at the workshop material located on the instance.
+       > Open the following link in firefox on your instance: `http://localhost:6419`
    1. You are all setup to start the first module!
    
 ---------------------------------------
