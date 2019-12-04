@@ -157,7 +157,13 @@ Now you have completed all the modifications, and you can run hardware emulation
 
 ## Run Hardware Emulation
 
-1. Go to the `Makefile` directory, and use the following command to run hardware emulation.
+1. Go to the `Makefile` directory
+
+   ```
+   cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_03/design/makefile
+   ```
+
+2. Use the following command to run hardware emulation.
 
    ```
    make run TARGET=hw_emu STEP=localbuf SOLUTION=1 NUM_FRAMES=1
