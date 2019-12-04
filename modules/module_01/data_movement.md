@@ -2,7 +2,9 @@
 
 ## Step 1: Naive Approach
 
-The initial version of the accelerated application follows the structure of original software version. We are transferring the entire input buffer from the host to the FPGA in one iteration followed by compute and reading the output from the FPGA to the host. The following figure shows the read-compute-write pattern in this step
+The initial version of the accelerated application follows the structure of original software version. The entire input buffer is transfered from the host to the FPGA in a single transaction. Then, the FPGA accelerator performs the computation. Lastly, the results are read back from the FPGA to the host before being post-processed. 
+
+The following figure shows the sequential write-compute-read pattern implemented in this first step
 
   ![](./images/overlap_single_buffer.PNG)
 
@@ -93,9 +95,9 @@ To further improve performance, you will look into overlapping data transfers an
 
 ## Step 2: Overlapping Data Transfer and Compute
 
-In the previous step, you noticed a sequential execution of the read, compute, and write (that is, the compute does not start until the entire input is read into the FPGA and similarly, the host read from the FPGA does not start until compute is done).
+In the previous step, you noticed a sequential execution of the write, compute, and read (that is, the compute does not start until the entire input is read into the FPGA and similarly, the host read from the FPGA does not start until compute is done).
 
-To improve the performance, you can split and send the input buffer in multiple iterations and start the compute as soon as the data for the corresponding iteration is transferred to the FPGA. Because the compute of a given iteration is independent of the other iterations, you can overlap the data transfer of the next iteration and compute of the current iteration. This will improve performance: instead of the sequential execution of the data transfer and compute, you are now overlapping data transfers and compute. The following figure illustrates this for the case where the input data is split in two sub-buffers.
+To improve performance, you can split and send the input buffer in multiple iterations and start the compute as soon as the data for the corresponding iteration is transferred to the FPGA. Because the compute of a given iteration is independent of other iterations, you can overlap the compute of a given iteration with the data transfer for the next iteration. This will improve performance: instead of executing sequentially, data transfer and compute are overlapped. The following figure illustrates this for the case where the input data is split in two sub-buffers.
 
    ![](./images/overlap_split_buffer.PNG)
 
