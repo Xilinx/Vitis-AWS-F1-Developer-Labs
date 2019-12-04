@@ -87,6 +87,10 @@ Open the `convolve_fpga.cpp` file from `src/fixedpoint`, and make the following 
 ## Run Hardware Emulation
 
 1. Go to the `design/makefile` directory.
+
+   ```
+   cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_03/design/makefile
+   ```
 2. Use the following command to run hardware emulation.
 
    ```
