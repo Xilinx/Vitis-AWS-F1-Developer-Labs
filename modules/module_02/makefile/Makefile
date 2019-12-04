@@ -38,6 +38,7 @@ run: build
 	mkdir -p $(BUILDDIR)
 	cp runOnfpga_hw.xclbin $(BUILDDIR)
 	cp xrt.ini $(BUILDDIR)
+	sudo -E -- bash -c 'fpga-clear-local-image -S 0'
 	sudo -E -- bash -c 'cd $(BUILDDIR) && ./host 100000 $(ITER) '
 	 
 
