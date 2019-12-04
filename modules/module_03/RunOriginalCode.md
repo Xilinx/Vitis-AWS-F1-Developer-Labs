@@ -54,6 +54,7 @@ As stated in the *SDAccel Methodology Guide* ([UG1346](https://www.xilinx.com/su
 
    ```
    cd cpu_src
+   make
    ```
 
 3. Run the executable file.
