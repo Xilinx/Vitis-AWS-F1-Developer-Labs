@@ -9,7 +9,7 @@ Once your FPGA design is complete, you can register it as an Amazon FPGA Image(A
 This workshop will focus on developing accelerated applications using the Xilinx SDAccel development environment.
 
 ### Overview
-* This workshop is focused on identifying parts of your your C/C++ program that are best suited for acceleration on an FPGA. We will also use profiling data to analyze how to further optimize data movement.
+* This workshop is focused on identifying parts of your C/C++ program that are best suited for acceleration on an FPGA. We will also use profiling data to analyze how to further optimize data movement.
 * In the interest of time, this workshop will use pre-built AFIs and pre-provisioned F1 instances. 
     * We have modified this branch(Reinvent_2019.1) of the [Xilinx SDAccel AWS F1 Developer Labs](https://github.com/Xilinx/SDAccel-AWS-F1-Developer-Labs) specifically for use during the CMP411 workshop at Re:Invent 2019.
     * Attendee will not use their personal or corporate accounts for the duration of this workshop.

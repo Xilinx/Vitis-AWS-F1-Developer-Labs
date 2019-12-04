@@ -3,7 +3,7 @@
 
 For this workshop, an F1 instance is pre-setup for you and instance connection details should have been provided to you by the workshop support staff.
 
-We will be using NICE DCV to start a remote desktop session to your instance.
+We will be using AWS NICE DCV to help with running a cloud desktop session on your instance.
 
 Please feel free to reach out to any of our workshop support staff to ask questions about this setup or if you get stuck at any point!
 

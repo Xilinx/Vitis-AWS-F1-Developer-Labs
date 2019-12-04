@@ -77,9 +77,9 @@ The output of the kernel is as follows:
 
 ![](./images/single_buffer_timeline_trace.PNG)
 
-3. Exit the SDAccel application to return to the terminal.
-
 As expected, there is a sequential execution of operations starting from the data transferred from the host to the FPGA, followed by compute in the FPGA and transferring back the results from the FPGA to host.
+
+3. Exit the SDAccel application to return to the terminal.
 
 ### Conclusion
 
@@ -91,7 +91,7 @@ To further improve performance, you can look into overlapping data transfers and
 
 In the previous step, you noticed a sequential execution of the read, compute, and write (that is, the compute does not start until the entire input is read into the FPGA and similarly, the host read from the FPGA does not start until compute is done).
 
-To improve the performance, you can send the input buffer in multiple iterations and start the compute for the corresponding iteration as soon as the data for the iteration is transferred.  Because the compute of each iteration is independent of the other iterations, you can overlap the data transfer of the next iteration and compute of the current iteration. The performance is expected to increase, because instead of the sequential execution of the data transfer and compute, you are now overlapping the data transfer and compute. The following figure shows an illustrated representation of sending data as a whole, versus sending it in two buffers.
+To improve the performance, you can split and send the input buffer in multiple iterations and start the compute for the corresponding iteration as soon as the data for the iteration is transferred. Because the compute of each iteration is independent of the other iterations, you can overlap the data transfer of the next iteration and compute of the current iteration. The performance is expected to increase: instead of the sequential execution of the data transfer and compute, you are now overlapping the data transfer and compute. The following figure shows an illustrated representation of sending data as a whole, versus sending it in two buffers.
 
    ![](./images/overlap_split_buffer.PNG)
 
@@ -105,7 +105,7 @@ To improve the performance, you can send the input buffer in multiple iterations
     ```
 2. Open `run_split_buffer.cpp` file with a file editor.
 
-3. The lines 64-148 are modified to optimize the host code to send the input buffer in two iterations to enable overlapping of data        transfer an compute. It is explained in detail as follows
+3. The lines 64-148 are modified to optimize the host code to send the input buffer in two iterations, enabling overlap of data transfers with accelerator execution. This is explained in detail as follows:
 
 a. The two sub buffers for "input_doc_words" & "output_inh_flags" are created as follows:
 
@@ -432,7 +432,7 @@ As you can see from the report, the input buffer is split into 16 sub buffers, a
 
 From the above Profile Summary and Timeline Trace reports, you see that the total execution time on the FPGA improved from the previous steps after splitting the input data into multiple buffers, allowing overlap between the data transfer and compute.
 
-## Step 4: Overlap Between the CPU and FPGA
+## Step 4: Overlap Between the host CPU and FPGA
 
 In the previous steps, you have looked at optimizing the execution time of the FPGA by overlapping the data transfer and compute. After the FPGA compute is complete, the CPU computes the document scores based on the output from the FPGA. There is sequential execution between the FPGA processing and CPU post-processing. Looking at the previous timeline trace reports, you can see red segments on the very first row which shows the *OpenCL API Calls* made by the *Host* application. This indicates that the host is waiting, staying idle while the FPGA compute the hash and flags. In this step, you will overlap the FPGA processing with the CPU post-processing.
 
