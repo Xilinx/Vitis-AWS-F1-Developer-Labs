@@ -3,7 +3,7 @@
 
 For this workshop, an F1 instance is pre-setup for you and instance connection details should have been provided to you by the workshop support staff.
 
-We will be using NICE DCV to start a remote desktop session to your instance.
+We will be using AWS NICE DCV to help with running a cloud desktop session on your instance.
 
 Please feel free to reach out to any of our workshop support staff to ask questions about this setup or if you get stuck at any point!
 
@@ -71,7 +71,7 @@ To be able to connect to the instance, you have two options in order of preferen
         ```bash
         cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs && git pull -r
         ```
-   1. Source the `sdaccel_setup.sh` script from the `aws-fpga repository. This sets up environment variables as well as provides the AWS Platform file.
+   1. Source the `sdaccel_setup.sh` script from the `aws-fpga` repository. This sets up environment variables as well as provides the AWS Platform file.
         ```bash
         source $AWS_FPGA_REPO_DIR/sdaccel_setup.sh
         ``` 
