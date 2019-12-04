@@ -17,7 +17,7 @@ The algorithm can be divided in two sections:
 1. Navigate to the `cpu_src` directory and run the following command.
 
     ```bash 
-    cd SDAccel-AWS-F1-Developer-Labs/modules/module_01/cpu_src
+    cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_01/cpu_src
     make run
     ```
 
