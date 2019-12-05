@@ -1,3 +1,5 @@
+## **NOTE:** This branch is for use during re:Invent 2019 only. Examples may have changed and setup might not work correctly. To run this workshop in your own account, please go to [Xilinx SDAccel AWS F1 Developer Labs](https://github.com/Xilinx/SDAccel-AWS-F1-Developer-Labs)
+
 # AWS re:Invent 19 – Accelerate your C/C++ applications with Amazon EC2 F1 Instances
 
 Welcome to the workshop on accelerating your C/C++ applications with Amazon EC2 F1 instances.
