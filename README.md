@@ -27,7 +27,7 @@ This workshop will focus on developing accelerated applications using the Xilinx
 
 [**FOLLOW THE INSTRUCTIONS**](./setup/instructions.md)
 
-### Module 1 - Optimize the data movement between CPU and FPGA [Time: ~1.5hrs]
+### Module 1 - Optimize Interactions between the host CPU and the FPGA [Time: ~1.5hrs]
 * Profile the software application and determine which functions to accelerate on the FPGA
 * Working with a predefined FPGA accelerator, optimize performance by overlapping data transfers and FPGA execution
 * Further speed-up the application by overlapping FPGA execution and CPU processing
