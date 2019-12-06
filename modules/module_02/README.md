@@ -1,4 +1,4 @@
-## Module 2: Optimize Interations between the host CPU and the FPGA
+## Module 2: Optimize Interactions between the host CPU and the FPGA
 
 ### Preparing to run the labs
 
