@@ -42,7 +42,7 @@ void runOnFPGA(
 	cl::CommandQueue q(context,device, CL_QUEUE_PROFILING_ENABLE | CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE );
 
 	string run_type = xcl::is_emulation()?(xcl::is_hw_emulation()?"hw_emu":"sw_emu"):"hw";
-	string binary_file = kernel_name + "_" + run_type + ".awsxclbin";
+	string binary_file = kernel_name + "_" + run_type + ".xclbin";
 	cl::Program::Binaries bins = xcl::import_binary_file(binary_file);
 	cl::Program program(context, devices, bins);
 	cl::Kernel kernel(program,kernel_name_charptr,NULL);
@@ -64,33 +64,39 @@ void runOnFPGA(
 	// Make buffers resident in the device
 	q.enqueueMigrateMemObjects({buffer_bloom_filter, buffer_input_doc_words, buffer_output_inh_flags}, CL_MIGRATE_MEM_OBJECT_CONTENT_UNDEFINED);
 
-	// Create sub-buffers, one for each transaction 
+	// Specify size of sub-buffers, one for each transaction 
 	unsigned subbuf_doc_sz = total_doc_size/2;
 	unsigned subbuf_inh_sz = total_doc_size/2;
-
+ 
+        // Declare sub-buffer regions to specify offset and size of sub-buffer   
 	cl_buffer_region subbuf_inh_info[2];
 	cl_buffer_region subbuf_doc_info[2];
 
+        // Declare sub-buffers
 	cl::Buffer subbuf_inh_flags[2];
 	cl::Buffer subbuf_doc_words[2];
 
         
+        // Specify offset and size of sub-buffers 
         subbuf_inh_info[0]={0, subbuf_inh_sz*sizeof(char)};
         subbuf_inh_info[1]={subbuf_inh_sz*sizeof(char), subbuf_inh_sz*sizeof(char)};
         subbuf_doc_info[0]={0, subbuf_doc_sz*sizeof(uint)};
         subbuf_doc_info[1]={subbuf_doc_sz*sizeof(uint), subbuf_doc_sz*sizeof(uint)};
+
+        // Create sub-buffers from buffers based on sub-buffer regions
 	subbuf_inh_flags[0] = buffer_output_inh_flags.createSubBuffer(CL_MEM_WRITE_ONLY, CL_BUFFER_CREATE_TYPE_REGION, &subbuf_inh_info[0]);
 	subbuf_inh_flags[1] = buffer_output_inh_flags.createSubBuffer(CL_MEM_WRITE_ONLY, CL_BUFFER_CREATE_TYPE_REGION, &subbuf_inh_info[1]);
 	subbuf_doc_words[0] = buffer_input_doc_words.createSubBuffer (CL_MEM_READ_ONLY,  CL_BUFFER_CREATE_TYPE_REGION, &subbuf_doc_info[0]);
 	subbuf_doc_words[1] = buffer_input_doc_words.createSubBuffer (CL_MEM_READ_ONLY,  CL_BUFFER_CREATE_TYPE_REGION, &subbuf_doc_info[1]);
 
+          
 	printf("\n");
     double mbytes_total  = (double)(total_doc_size * sizeof(int)) / (double)(1000*1000);
     double mbytes_block  = mbytes_total / 2;
     printf(" Processing %.3f MBytes of data\n", mbytes_total);
     printf(" Splitting data in 2 sub-buffers of %.3f MBytes for FPGA processing\n", mbytes_block);
 
-    // Events 
+    // Create Events to co-ordinate read,compute and write for each iteration
 	vector<cl::Event> wordWait;
 	vector<cl::Event> krnlWait;
 	vector<cl::Event> flagWait;
@@ -100,7 +106,7 @@ void runOnFPGA(
 	chrono::high_resolution_clock::time_point t1, t2;
 	t1 = chrono::high_resolution_clock::now();
 
-	// Only load the bloom filter in the kernel
+	// Set kernel arguments. Load bloom filter coefficients
 	cl::Event buffDone,krnlDone,flagDone;
 	total_size = 0;
 	load_filter = true;
@@ -111,15 +117,12 @@ void runOnFPGA(
 	q.enqueueTask(kernel, &wordWait, &krnlDone);
 	krnlWait.push_back(krnlDone);
  
-	// Now start processing the documents in chuncks
-	// The FPGA kernel computes the in-hash flags for each word in the sub-buffer
+	//  Set Kernel Arguments, Read, Enqueue Kernel and Write for first iteration
 		
                 total_size = total_doc_size/2;
                 load_filter=false;
 		kernel.setArg(3, total_size);
 		kernel.setArg(4, load_filter);
-          
-         //    Start kernel for transaction 1
 		kernel.setArg(0, subbuf_inh_flags[0]);
 		kernel.setArg(1, subbuf_doc_words[0]);
 		q.enqueueMigrateMemObjects({subbuf_doc_words[0]}, 0, &wordWait, &buffDone); 
@@ -129,7 +132,7 @@ void runOnFPGA(
 		q.enqueueMigrateMemObjects({subbuf_inh_flags[0]}, CL_MIGRATE_MEM_OBJECT_HOST, &krnlWait, &flagDone);
 		flagWait.push_back(flagDone);
 
-         //    Start kernel for transaction 2
+	//  Set Kernel Arguments, Read, Enqueue Kernel and Write for second iteration
 		kernel.setArg(0, subbuf_inh_flags[1]);
 		kernel.setArg(1, subbuf_doc_words[1]);
 		q.enqueueMigrateMemObjects({subbuf_doc_words[1]}, 0, &wordWait, &buffDone); 
@@ -142,9 +145,9 @@ void runOnFPGA(
 	// Wait until all results are copied back to the host before doing the post-processing
 		flagWait[0].wait();
 		flagWait[1].wait();
-                q.finish();
+        
 
-	// Compute the profile score the CPU using the in-hash flags computed on the FPGA
+	// Compute the profile score in CPU using the in-hash flags computed on the FPGA
 	unsigned      curr_entry;
 	unsigned char inh_flags;
 			

@@ -21,9 +21,9 @@ In the first operation, you will read three lines into the local memory, and per
 
 ## Kernel Code Modifications
 
->**TIP:** The completed kernel source file is provided under the `reference-files/localbuf` folder. You can use it as a reference if needed.
+>**TIP:** The completed kernel source file is provided under the `~/SDAccel-AWS-F1-Developer-Labs/modules/module_03/design/reference-files/localbuf` folder. You can use it as a reference if needed.
 
-From the `src/localbuf` folder, open the `convolve_fpga.cpp` file, and make the following modifications:
+From the `~/SDAccel-AWS-F1-Developer-Labs/modules/module_03/design/src/localbuf` folder, open the `convolve_fpga.cpp` file, and make the following modifications:
 
 1. Add the `cstring` header at the top of the file to add the declaration of the `memcpy` function.
 
@@ -157,7 +157,13 @@ Now you have completed all the modifications, and you can run hardware emulation
 
 ## Run Hardware Emulation
 
-1. Go to the `Makefile` directory, and use the following command to run hardware emulation.
+1. Go to the `Makefile` directory
+
+   ```
+   cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_03/design/makefile
+   ```
+
+2. Use the following command to run hardware emulation.
 
    ```
    make run TARGET=hw_emu STEP=localbuf SOLUTION=1 NUM_FRAMES=1

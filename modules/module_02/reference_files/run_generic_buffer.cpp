@@ -42,7 +42,7 @@ void runOnFPGA(
 	cl::CommandQueue q(context,device, CL_QUEUE_PROFILING_ENABLE | CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE );
 
 	string run_type = xcl::is_emulation()?(xcl::is_hw_emulation()?"hw_emu":"sw_emu"):"hw";
-	string binary_file = kernel_name + "_" + run_type + ".awsxclbin";
+	string binary_file = kernel_name + "_" + run_type + ".xclbin";
 	cl::Program::Binaries bins = xcl::import_binary_file(binary_file);
 	cl::Program program(context, devices, bins);
 	cl::Kernel kernel(program,kernel_name_charptr,NULL);
@@ -64,16 +64,19 @@ void runOnFPGA(
 	// Make buffers resident in the device
 	q.enqueueMigrateMemObjects({buffer_bloom_filter, buffer_input_doc_words, buffer_output_inh_flags}, CL_MIGRATE_MEM_OBJECT_CONTENT_UNDEFINED);
 
-	// Create sub-buffers, one for each transaction 
+	// Specify size of sub buffers for each iteration
 	unsigned subbuf_doc_sz = total_doc_size/num_iter;
 	unsigned subbuf_inh_sz = total_doc_size/num_iter;
 
+        // Declare sub buffer regions to specify offset and size for each iteration
 	cl_buffer_region subbuf_inh_info[num_iter];
 	cl_buffer_region subbuf_doc_info[num_iter];
 
+        // Declare sub buffers
 	cl::Buffer subbuf_inh_flags[num_iter];
 	cl::Buffer subbuf_doc_words[num_iter];
 
+        // Define sub buffers from buffers based on sub-buffer regions
 	for (int i=0; i<num_iter; i++) {
 		subbuf_inh_info[i]={i*subbuf_inh_sz*sizeof(char), subbuf_inh_sz*sizeof(char)};
 		subbuf_doc_info[i]={i*subbuf_doc_sz*sizeof(uint), subbuf_doc_sz*sizeof(uint)};
@@ -89,7 +92,7 @@ void runOnFPGA(
     printf(" Splitting data in %d sub-buffers of %.3f MBytes for FPGA processing\n", num_iter, mbytes_block);
     }
 
-    // Events 
+    // Create Events for co-ordinating read,compute and write for each iteration
 	vector<cl::Event> wordWait;
 	vector<cl::Event> krnlWait;
 	vector<cl::Event> flagWait;
@@ -99,7 +102,7 @@ void runOnFPGA(
 	chrono::high_resolution_clock::time_point t1, t2;
 	t1 = chrono::high_resolution_clock::now();
 
-	// Only load the bloom filter in the kernel
+	// Set Kernel arguments and load the bloom filter coefficients in the kernel
 	cl::Event buffDone, krnlDone;
 	total_size = 0;
 	load_filter = true;
@@ -110,9 +113,8 @@ void runOnFPGA(
 	q.enqueueTask(kernel, &wordWait, &krnlDone);
 	krnlWait.push_back(krnlDone);
  
-	// Now start processing the documents in chuncks
-	// The FPGA kernel computes the in-hash flags for each word in the sub-buffer
-	for (int i=0; i<num_iter; i++) 
+	// Set Kernel arguments. Read, Enqueue Kernel and Write for each iteration
+        for (int i=0; i<num_iter; i++) 
 	{
 		cl::Event buffDone, krnlDone, flagDone;
 		total_size = subbuf_doc_info[i].size / sizeof(uint);
@@ -134,9 +136,9 @@ void runOnFPGA(
 	{
 		flagWait[i].wait();
 	}
-        q.finish();
+    
 
-	// Compute the profile score the CPU using the in-hash flags computed on the FPGA
+	// Compute the profile score in CPU using the in-hash flags computed on the FPGA
 	unsigned      curr_entry;
 	unsigned char inh_flags;
 			

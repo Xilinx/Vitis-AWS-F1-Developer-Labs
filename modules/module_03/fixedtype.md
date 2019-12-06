@@ -41,9 +41,9 @@ The inner loop is multiplying individual members of an `RGBPixel` object which a
 
 ## Kernel Code Modifications
 
->**TIP:** The completed kernel source file is provided in the `reference-files/fixedpoint` folder. You can use it as a reference if needed.
+>**TIP:** The completed kernel source file is provided in the `~/SDAccel-AWS-F1-Developer-Labs/modules/module_03/design/reference-files/fixedpoint` folder. You can use it as a reference if needed.
 
-Open the `convolve_fpga.cpp` file from `src/fixedpoint`, and make the following modifications.
+Open the `convolve_fpga.cpp` file from `~/SDAccel-AWS-F1-Developer-Labs/modules/module_03/design/src/fixedpoint`, and make the following modifications.
 
 1. Include the `ap_fixed.h` header at the top of the file.
 
@@ -87,6 +87,10 @@ Open the `convolve_fpga.cpp` file from `src/fixedpoint`, and make the following 
 ## Run Hardware Emulation
 
 1. Go to the `design/makefile` directory.
+
+   ```
+   cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_03/design/makefile
+   ```
 2. Use the following command to run hardware emulation.
 
    ```
