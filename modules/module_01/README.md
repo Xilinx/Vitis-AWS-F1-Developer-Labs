@@ -1,6 +1,6 @@
 <table>
 <tr>
- <td align="center"><h1>Module 1: Optimize the data movement between CPU and FPGA
+ <td align="center"><h1>Module 1: Optimize Interactions between the host CPU and the FPGA
  </td>
 </tr>
 </table>
