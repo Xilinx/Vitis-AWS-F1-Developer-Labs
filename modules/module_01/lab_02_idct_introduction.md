@@ -125,12 +125,12 @@ After the emulation run completes, an sdaccel_profile_summary.csv file is genera
 
 1. Convert the .csv file to the .xprf format
 ```
-sdx_analyze profile -i profile_summary.csv -f protobuf
+sdx_analyze profile -i profile_summary_hw_emu.csv -f protobuf
 ```
 
 2. Open the converted profile summary .xprf file in the SDAccel GUI
 ```
-sdx -workspace tmp -report profile_summary.xprf
+sdx -workspace tmp -report profile_summary_hw_emu.xprf
 ```
 
   ![](../../images/module_01/lab_02_idct/HWProfile.PNG)
