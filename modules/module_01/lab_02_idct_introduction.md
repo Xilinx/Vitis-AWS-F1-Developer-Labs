@@ -180,7 +180,7 @@ In addition to the sdacccel_profile_summary.csv file, the emulation run also gen
 
 1. Convert the .csv file to the .wdb format
     ```
-    sdx_analyze trace -i sdaccel_timeline_trace.csv -f wdb
+    sdx_analyze trace -i timeline_trace_hw_emu.csv -f wdb
     ```
 
 1. In the SDAccel GUI, select **File → Open File** , browse to the sdaccel_timeline_trace.wdb file and click **Open**.
