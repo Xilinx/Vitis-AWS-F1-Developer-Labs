@@ -183,7 +183,7 @@ In addition to the sdacccel_profile_summary.csv file, the emulation run also gen
     sdx_analyze trace -i timeline_trace_hw_emu.csv -f wdb
     ```
 
-1. In the SDAccel GUI, select **File → Open File** , browse to the sdaccel_timeline_trace.wdb file and click **Open**.
+1. In the SDAccel GUI, select **File → Open File** , browse to the timeline_trace_hw_emu.wdb file and click **Open**.
 
 ![](../../images/module_01/lab_02_idct/SWTimeline.PNG)
 
