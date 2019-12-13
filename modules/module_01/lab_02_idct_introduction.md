@@ -125,12 +125,12 @@ After the emulation run completes, an sdaccel_profile_summary.csv file is genera
 
 1. Convert the .csv file to the .xprf format
 ```
-sdx_analyze profile -i profile_summary_hw_emu.csv -f protobuf
+sdx_analyze profile -i sdaccel_profile_summary.csv -f protobuf
 ```
 
 2. Open the converted profile summary .xprf file in the SDAccel GUI
 ```
-sdx -workspace tmp -report profile_summary_hw_emu.xprf
+sdx -workspace tmp -report sdaccel_profile_summary.xprf
 ```
 
   ![](../../images/module_01/lab_02_idct/HWProfile.PNG)
@@ -180,10 +180,10 @@ In addition to the sdacccel_profile_summary.csv file, the emulation run also gen
 
 1. Convert the .csv file to the .wdb format
     ```
-    sdx_analyze trace -i timeline_trace_hw_emu.csv -f wdb
+    sdx_analyze trace -i sdaccel_timeline_trace.csv -f wdb
     ```
 
-1. In the SDAccel GUI, select **File → Open File** , browse to the timeline_trace_hw_emu.wdb file and click **Open**.
+1. In the SDAccel GUI, select **File → Open File** , browse to the sdaccel_timeline_trace.wdb file and click **Open**.
 
 ![](../../images/module_01/lab_02_idct/SWTimeline.PNG)
 
