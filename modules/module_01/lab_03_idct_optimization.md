@@ -98,22 +98,14 @@ These steps would take too long to complete during this lab, therefore a precomp
     ```
 
 ### Executing on F1
-
-1. Copy the host application executable built by SDAccel to the local directory.
-
-	```bash
-    # Copy the host application executable
-    cp ~/SDAccel-AWS-F1-Developer-Labs/modules/module_01/idct/workspace/IDCT/Emulation-HW/IDCT.exe IDCT-NS1.exe
-    ```
-
 1. Execute the accelerated application on F1 using the precompiled FPGA binary.
 
     ```bash
     sudo sh
     # Source the SDAccel runtime environment
     source /opt/xilinx/xrt/setup.sh
-    # Execute the host application with the .awsxclbin FPGA binary
-    ./IDCT-NS1.exe ./xclbin/krnl_idct.hw.xilinx_aws-vu9p-f1-04261818_dynamic_5_0.awsxclbin
+    # Execute the host application with the krnl_idct.hw.awsxclbin FPGA binary
+    ./build/IDCT.exe ./xclbin/krnl_idct.hw.awsxclbin
     exit
     ```
 
@@ -195,15 +187,6 @@ For optimal performance both the hardware and software components of the applica
 
 The next step is to confirm these results by running on the FPGA attached to the F1 instance. Since only the host application was modified, the same precompiled FPGA binary can used.
 
-1. Bring-up the terminal from which you ran the first IDCT executable.
-
-1. Copy the host application executable built by SDAccel to the local directory.
-
-    ```bash
-    # Copy the host application executable
-    cp ~/SDAccel-AWS-F1-Developer-Labs/modules/module_01/idct/workspace/IDCT/Emulation-HW/IDCT.exe IDCT-NS6.exe
-    ```
-
 1. Execute the accelerated application on F1 using the precompiled FPGA binary.
 
     ```bash
@@ -211,7 +194,7 @@ The next step is to confirm these results by running on the FPGA attached to the
     # Source the SDAccel runtime environment
     source /opt/xilinx/xrt/setup.sh
     # Execute the host application with the .awsxclbin FPGA binary
-    ./IDCT-NS6.exe ./xclbin/krnl_idct.hw.xilinx_aws-vu9p-f1-04261818_dynamic_5_0.awsxclbin
+    ./build/IDCT.exe ./xclbin/krnl_idct.hw.awsxclbin
     ```
 
     Note the performance difference between the IDCT running on the CPU and the IDCT running in the FPGA. Note as well the performance difference with the previous run on F1. Using exactly the same FPGA binary but an optimized host application, the overall performance is significantly improved.
