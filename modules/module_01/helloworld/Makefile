@@ -114,7 +114,7 @@ compile_host: $(BUILD_DIR)/$(HOST_EXE)
 ## run with 512x10 input video format for emulation and 1280x720 for hardware
 
 run: build
-	cd $(BUILD_DIR) && ./$(HOST_EXE)  ./xclbin/$(XCLBIN) ;
+	./$(HOST_EXE)  ./xclbin/$(XCLBIN) ;
 
 
 ## Clean generated files
