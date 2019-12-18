@@ -130,7 +130,12 @@ For optimal performance both the hardware and software components of the applica
 
 	These OpenCL functions use events to signal their completion and synchronize execution.
 
-1. Return to the SDAccel GUI look at the application timeline report. If you closed the view, simply re-open it by selecting **File → Open File** and browsing to the sdaccel_time_trace.wdb file.
+
+1. Execute the following command to to convert the timeline trace to wdb format and then load timeline trace in SDAccel GUI. You may need to close the previous opened SDAccel GUI.
+   ```
+   sdx_analyze trace -f wdb -i ./timeline_trace_hw_emu.csv
+   sdx -workspace tmp --report timeline_trace.wdb
+   ```
 
 1. Zoom in by performing a **Left mouse drag** to get a more detailed view.  
 
@@ -174,10 +179,10 @@ For optimal performance both the hardware and software components of the applica
 1. Convert the newly generated application timeline report
 
     ```bash
-    sdx_analyze trace -i sdaccel_timeline_trace.csv -f wdb
+    sdx_analyze trace -i timeline_trace_hw_emu.csv -f wdb
     ```
 
-1. Open the sdaccel_timeline_trace.wdb file in the GUI. Observe how **software pipelining** enables overlapping of data transfers and kernel execution.
+1. Open the timeline_trace_hw_emu.wdb file in the GUI. Observe how **software pipelining** enables overlapping of data transfers and kernel execution.
 
     ![](../../images/module_01/lab_02_idct/ZoomApplicationTimelineEnd.PNG)
 
