@@ -56,7 +56,7 @@ help:
 	@echo  "  sdx_analyze  profile  –f html -i ./profile_summary.csv; firefox ./profile_summary;"
 	@echo  " "
 	@echo  "  Generate and view timeline Trace:"
-	@echo  "  sdx_analyze trace –f wdb -I ./timeline_trace.csv; sdx –workspace workspace –report timeline_trace.wdb"
+	@echo  "  sdx_analyze trace –f wdb -i ./timeline_trace.csv; sdx –workspace workspace --report timeline_trace.wdb"
 	@echo  ""
 
 reset:
