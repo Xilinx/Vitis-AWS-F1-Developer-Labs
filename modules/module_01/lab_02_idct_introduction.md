@@ -20,7 +20,7 @@ The kernel used in this lab is an Inverse Discrete Cosine Transform (IDCT), a fu
 1.  Go to design folder and investigate the files.
     ```bash
     # Go to the lab directory
-    cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_01/idct/design
+    cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_01/idct/
     ls
     ```
 	  This command listed the files and directory under `design`. The `src` folder contains the kernel source file and host code. The `Makefile` is provided for design compilation and execution. Let's open up the make file and take a look at its contents.
