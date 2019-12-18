@@ -185,7 +185,7 @@ In addition to the profile_summary_hw_emu.csv file, the emulation run also gener
 
 1. Execute the following command to load timeline trace in SDAccel GUI
    ```
-   sdx -workspace ddd --report timeline_trace_hw_emu.wdb
+   sdx -workspace tmp --report timeline_trace_hw_emu.wdb
    ```
 
 ![](../../images/module_01/lab_02_idct/SWTimeline.PNG)
