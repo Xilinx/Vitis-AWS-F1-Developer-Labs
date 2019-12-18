@@ -133,7 +133,7 @@ For optimal performance both the hardware and software components of the applica
 
 1. Execute the following command to to convert the timeline trace to wdb format and then load timeline trace in SDAccel GUI. You may need to close the previous opened SDAccel GUI.
    ```
-   sdx_analyze trace -f wdb -i ./timeline_trace_hw_emu.csv
+   sdx_analyze trace -f wdb -i ./timeline_trace.csv
    sdx -workspace tmp --report timeline_trace.wdb
    ```
 
@@ -180,6 +180,8 @@ For optimal performance both the hardware and software components of the applica
 
     ```bash
     sdx_analyze trace -i timeline_trace_hw_emu.csv -f wdb
+    sdx -workspace tmp --report timeline_trace_hw_emu.wdb
+
     ```
 
 1. Open the timeline_trace_hw_emu.wdb file in the GUI. Observe how **software pipelining** enables overlapping of data transfers and kernel execution.
