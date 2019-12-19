@@ -101,10 +101,11 @@ These steps would take too long to complete during this lab, therefore a precomp
 1. Execute the accelerated application on F1 using the precompiled FPGA binary.
 
     ```bash
+    cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_01/idct
     sudo sh
     # Source the SDAccel runtime environment
     source /opt/xilinx/xrt/setup.sh
-    # Execute the host application with the krnl_idct.hw.awsxclbin FPGA binary
+    # Execute the host application with the .awsxclbin FPGA binary
     ./build/IDCT.exe ./xclbin/krnl_idct.hw.awsxclbin
     exit
     ```
@@ -115,7 +116,6 @@ These steps would take too long to complete during this lab, therefore a precomp
    CPU Throughput:  214.43 MB/s
    FPGA Time:       0.431608 s
    FPGA Throughput: 1186.26 MB/s
-   FPGA PCIe Throughput: 2372.52 MB/s
    ```
    Note the performance difference between the IDCT running on the CPU and the IDCT running in the FPGA is about 5x faster than running on CPU
 
@@ -206,13 +206,15 @@ For optimal performance both the hardware and software components of the applica
 The next step is to confirm these results by running on the FPGA attached to the F1 instance. Since only the host application was modified, the same precompiled FPGA binary can used.
 
 1. Execute the accelerated application on F1 using the precompiled FPGA binary.
-
+    
     ```bash
+    cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_01/idct
     sudo sh
     # Source the SDAccel runtime environment
     source /opt/xilinx/xrt/setup.sh
     # Execute the host application with the .awsxclbin FPGA binary
     ./build/IDCT.exe ./xclbin/krnl_idct.hw.awsxclbin
+    exit
     ```
 1. Here is the output of the above comamnd 
    ```
@@ -220,7 +222,6 @@ The next step is to confirm these results by running on the FPGA attached to the
    CPU Throughput:  214.361 MB/s
    FPGA Time:       0.23884 s
    FPGA Throughput: 2143.7 MB/s
-   FPGA PCIe Throughput: 4287.39 MB/s
    ```
    Note the performance difference between the IDCT running on the CPU and the IDCT running in the FPGA is about 10x faster than running on CPU. Note as well the performance difference with the previous run on F1. Using exactly the same FPGA binary but an optimized host application, the overall performance is significantly improved.
 
