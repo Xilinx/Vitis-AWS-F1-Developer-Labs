@@ -113,7 +113,9 @@ ifeq ($(TARGET), hw)
 else
 	cd $(BUILD_DIR) && XCL_EMULATION_MODE=$(TARGET) ./IDCT.exe  ./$(XCLBIN) ;
 endif
-
+	@cd $(BUILD_DIR) && mv ./profile_summary.csv profile_summary_$(TARGET).csv;
+	@cd $(BUILD_DIR) && mv ./timeline_trace.csv timeline_trace_$(TARGET).csv;
+	
 ## Clean generated files
 
 clean:
