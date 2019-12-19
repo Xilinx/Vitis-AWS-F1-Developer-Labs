@@ -29,6 +29,8 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **********/
+#define CL_USE_DEPRECATED_OPENCL_1_2_APIS
+
 #include "CL/opencl.h"
 #include <vector>
 #include <math.h>
@@ -43,6 +45,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 typedef short int16_t;
 typedef unsigned short uint16_t;
+
+
 
 void idctSoft(const int16_t block[64], const uint16_t q[64], int16_t outp[64], bool ignore_dc);
 
@@ -391,6 +395,7 @@ void oclDct::write(
   
   // Prepare Kernel to run
   m_dev_ignore_dc = ignore_dc ? 1 : 0;
+ 
 
   // Schedule actual writing of data
   clEnqueueMigrateMemObjects(mQ, 2, mInBuffer, 0, 0, nullptr, &inEvVec[mCount]);
@@ -564,7 +569,7 @@ int main(int argc, char* argv[]) {
   int banks = 1;
   const size_t cus = banks;
   const size_t threads = cus;
-  size_t numBlocks64 = 512; // 2^16
+  size_t numBlocks64 = 16384;
 
   if (xcl_mode != NULL) {
     numBlocks64 = 256;
@@ -641,6 +646,7 @@ int main(int argc, char* argv[]) {
   krnl_size = load_file_to_memory(binaryName.c_str(), &krnl_bin);
 
   printf("INFO: Loaded file\n");
+  printf("NUM_SCHED: %d\n", NUM_SCHED);
 
   cl_program program = clCreateProgramWithBinary(context, 1,
 						 (const cl_device_id* ) &device_id, &krnl_size,
