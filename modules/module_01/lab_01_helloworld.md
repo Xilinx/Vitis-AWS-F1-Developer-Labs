@@ -52,8 +52,8 @@ The "hello world" example is an OpenCL application with a simple vector-addition
 
 1. The host application executes using the vector_addition kernel running in the FPGA and produces the following results:
 
-    ```
-    	shell
+	```
+	shell
 	xclProbe found 1 FPGA slots with xocl driver running
     	Found Platform
 	Platform Name: Xilinx
@@ -81,8 +81,8 @@ The "hello world" example is an OpenCL application with a simple vector-addition
 	Hello World !!! 
 	Hello World !!! 
 	TEST PASSED
-    sh-4.2#
-    ```
+	sh-4.2#
+	```
 
 1. You compiled a host application and successfully executed it on F1 using a pre-compiled Amazon FPGA Image (AFI).
 
