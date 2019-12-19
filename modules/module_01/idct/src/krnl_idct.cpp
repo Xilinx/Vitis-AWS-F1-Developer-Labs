@@ -319,14 +319,14 @@ void krnl_idct_dataflow(const ap_int<512> *block,
 			ap_int<512> *voutp, 
 			int ignore_dc, 
 			unsigned int blocks) {
-  #pragma HLS DATAFLOW
+  //#pragma HLS DATAFLOW
 
   hls::stream<int512_t> iblock;
   hls::stream<uint512_t> iq;
   hls::stream<int512_t> ivoutp;
-  //#pragma  HLS stream variable=iblock depth=512
-  //#pragma  HLS stream variable=iq     depth=2
-  //#pragma  HLS stream variable=ivoutp depth=512
+  #pragma  HLS stream variable=iblock depth=512
+  #pragma  HLS stream variable=iq     depth=2
+  #pragma  HLS stream variable=ivoutp depth=512
 
 
   read_blocks<uint512_t>(q, iq, 1);
