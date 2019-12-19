@@ -109,7 +109,15 @@ These steps would take too long to complete during this lab, therefore a precomp
     exit
     ```
 
-    Note the performance difference between the IDCT running on the CPU and the IDCT running in the FPGA.
+1. Here are the output of the above comamnd 
+   ```
+   CPU Time:        2.38773 s
+   CPU Throughput:  214.43 MB/s
+   FPGA Time:       0.431608 s
+   FPGA Throughput: 1186.26 MB/s
+   FPGA PCIe Throughput: 2372.52 MB/s
+   ```
+   Note the performance difference between the IDCT running on the CPU and the IDCT running in the FPGA is about 5x faster than running on CPU
 
 
 ### Optimizing the host code
@@ -203,8 +211,15 @@ The next step is to confirm these results by running on the FPGA attached to the
     # Execute the host application with the .awsxclbin FPGA binary
     ./build/IDCT.exe ./xclbin/krnl_idct.hw.awsxclbin
     ```
-
-    Note the performance difference between the IDCT running on the CPU and the IDCT running in the FPGA. Note as well the performance difference with the previous run on F1. Using exactly the same FPGA binary but an optimized host application, the overall performance is significantly improved.
+1. Here are the output of the above comamnd 
+   ```
+   CPU Time:        2.38849 s
+   CPU Throughput:  214.361 MB/s
+   FPGA Time:       0.23884 s
+   FPGA Throughput: 2143.7 MB/s
+   FPGA PCIe Throughput: 4287.39 MB/s
+   ```
+   Note the performance difference between the IDCT running on the CPU and the IDCT running in the FPGA is about 10x faster than running on CPU. Note as well the performance difference with the previous run on F1. Using exactly the same FPGA binary but an optimized host application, the overall performance is significantly improved.
 
 
 ### Summary  
