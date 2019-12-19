@@ -733,9 +733,7 @@ int main(int argc, char* argv[]) {
     std::cout << "FPGA Throughput: " 
 	      << (double) blocks*128 / fpga_duration.count() / (1024.0*1024.0)
 	      << " MB/s" << std::endl;
-    std::cout << "FPGA PCIe Throughput: " 
-	      << (2*(double) blocks*128 + 128) / fpga_duration.count() / (1024.0*1024.0)
-	      << " MB/s" << std::endl;
+
   } else {
     std::cout << "RUN COMPLETE" << std::endl;
   }
