@@ -117,7 +117,8 @@ These steps would take too long to complete during this lab, therefore a precomp
    FPGA Time:       0.431608 s
    FPGA Throughput: 1186.26 MB/s
    ```
-   Note the performance difference between the IDCT running on the CPU and the IDCT running in the FPGA is about 5x faster than running on CPU
+
+Note the performance difference between the IDCT running on the CPU and on the FPGA. FPGA s about 5x faster than running on CPU. 
 
 
 ### Optimizing the host code
@@ -223,7 +224,7 @@ The next step is to confirm these results by running on the FPGA attached to the
    FPGA Time:       0.23884 s
    FPGA Throughput: 2143.7 MB/s
    ```
-   Note the performance difference between the IDCT running on the CPU and the IDCT running in the FPGA is about 10x faster than running on CPU. Note as well the performance difference with the previous run on F1. Using exactly the same FPGA binary but an optimized host application, the overall performance is significantly improved.
+   Note the performance difference between the IDCT running on the CPU and on the FPGA. FPGA s about 10x faster than running on CPU. Note as well the performance difference with the previous run on F1. Using exactly the same FPGA binary but an optimized host application, the overall performance is significantly improved.
 
 
 ### Summary  
