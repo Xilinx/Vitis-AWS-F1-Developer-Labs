@@ -65,16 +65,19 @@ void runOnFPGA(
 	// Make buffers resident in the device
 	q.enqueueMigrateMemObjects({buffer_bloom_filter, buffer_input_doc_words, buffer_output_inh_flags}, CL_MIGRATE_MEM_OBJECT_CONTENT_UNDEFINED);
 
-	// Create sub-buffers, one for each transaction 
+	// Specify size of sub-buffers for each iteration 
 	unsigned subbuf_doc_sz = total_doc_size/num_iter;
 	unsigned subbuf_inh_sz = total_doc_size/num_iter;
 
+        // Declare sub-buffer regions which specify offset and size for each iteration
 	cl_buffer_region subbuf_inh_info[num_iter];
 	cl_buffer_region subbuf_doc_info[num_iter];
 
+        // Declare sub-buffers for each iteration
 	cl::Buffer subbuf_inh_flags[num_iter];
 	cl::Buffer subbuf_doc_words[num_iter];
 
+        // Define sub-buffers from buffers based on sub-buffer regions
 	for (int i=0; i<num_iter; i++) {
 		subbuf_inh_info[i]={i*subbuf_inh_sz*sizeof(char), subbuf_inh_sz*sizeof(char)};
 		subbuf_doc_info[i]={i*subbuf_doc_sz*sizeof(uint), subbuf_doc_sz*sizeof(uint)};
@@ -90,7 +93,7 @@ void runOnFPGA(
     printf(" Splitting data in %d sub-buffers of %.3f MBytes for FPGA processing\n", num_iter, mbytes_block);
     }
 
-    // Events 
+    // Create Events to co-ordinate read,compute and write for each iteration 
 	vector<cl::Event> wordWait;
 	vector<cl::Event> krnlWait;
 	vector<cl::Event> flagWait;
@@ -100,7 +103,7 @@ void runOnFPGA(
 	chrono::high_resolution_clock::time_point t1, t2;
 	t1 = chrono::high_resolution_clock::now();
 
-	// Only load the bloom filter in the kernel
+	// Set Kernel arguments and load bloom filter coefficients
 	cl::Event buffDone, krnlDone;
 	total_size = 0;
 	load_filter = true;
@@ -111,8 +114,7 @@ void runOnFPGA(
 	q.enqueueTask(kernel, &wordWait, &krnlDone);
 	krnlWait.push_back(krnlDone);
  
-	// Now start processing the documents in chuncks
-	// The FPGA kernel computes the in-hash flags for each word in the sub-buffer
+        // Set Kernel arguments. Read,enqueue the kernel and write for each iteration
 	for (int i=0; i<num_iter; i++) 
 	{
 		cl::Event buffDone, krnlDone, flagDone;
@@ -131,8 +133,8 @@ void runOnFPGA(
 	}
 
 
-	// Compute the profile score the CPU using the in-hash flags computed on the FPGA
-	unsigned      curr_entry;
+	// Create variables to keep track of number of words needed by CPU to compute score and number of words processed by FPGA such that CPU processing can overlap with FPGA
+        unsigned int curr_entry;
 	unsigned char inh_flags;
 	unsigned int  available = 0;
 	unsigned int  needed = 0;
@@ -142,20 +144,19 @@ void runOnFPGA(
 	{
 		unsigned long ans = 0;
 		unsigned int size = doc_sizes[doc];
-
-
-		// Check if we have enough flags from the FPGA device to process the next doc
-		// If not, wait until the next sub-buffer is read back to the host
-		// Update the number of available words and sub-buffer count (iter)
+		
+                // Calculate size by needed by CPU for processing next document score
 		needed += size;
 		if (needed > available) {
 			flagWait[iter].wait();
 			available += subbuf_doc_info[iter].size / sizeof(uint);
 			iter++;
 		}
-
+ 
+	        // Check if flgas processed by FPGA is greater than needed by CPU. Else, block CPU
+                // Update the number of available words and sub-buffer count(iter)
 		for (unsigned i = 0; i < size ; i++, n++)
-		{ 
+		  { 
 			curr_entry = input_doc_words[n];
 			inh_flags  = output_inh_flags[n];
 
@@ -166,7 +167,7 @@ void runOnFPGA(
 
 				ans += profile_weights[word_id] * (unsigned long)frequency;
 			}
-		}
+		 }
 		profile_score[doc] = ans;
 	}
 
