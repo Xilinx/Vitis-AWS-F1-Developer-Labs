@@ -14,7 +14,7 @@ cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_01/idct
 
 Remember when we Looked at the **HLS Report**, we identified that the read, execute and write functions of the **krnl_idct_dataflow** function have roughly the same latency and are executing sequentially. We still start by focusing on this performance aspect.
 
-1. Open **krnl_idct.cpp** file.  
+1. Open **krnl_idct.cpp** file inside src directory.
 
 1. Navigate to the **krnl_idct_dataflow** function.
 
@@ -180,13 +180,16 @@ For optimal performance both the hardware and software components of the applica
 1. Save the file.
 
 1. Rerun hardware emulation.
-
+    ```bash
+    make run TARGET=hw_emu
+    ```
     - Since only the **idct.cpp** file was changed, the incremental makefile rebuilds only the host code before running emulation.
     - This results in a much faster iteration loop since it is usually the compilation of the kernel to hardware which takes the most time.
 
 1. Convert the newly generated application timeline report
 
     ```bash
+    cd build;
     sdx_analyze trace -i timeline_trace_hw_emu.csv -f wdb
     sdx -workspace tmp --report timeline_trace_hw_emu.wdb
 
