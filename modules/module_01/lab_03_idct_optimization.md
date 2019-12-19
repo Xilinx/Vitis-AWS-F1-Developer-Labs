@@ -78,13 +78,13 @@ These steps would take too long to complete during this lab, therefore a precomp
 1. Retrieve the Fpga Image Global Id (agfi) from the \<timestamp\>_afi_id.txt file.
 
     ```bash
-    more ./xclbin/18_08_24-150600_afi_id.txt
+    more ./xclbin/19_12_18-170118_afi_id.txt
     ```
 
 1. Confirm that the AFI is ready and available using the retrieved global AFI Id.
 
     ``` bash
-    aws ec2 describe-fpga-images --filters Name=fpga-image-global-id,Values=agfi-007640d8fca34316e
+    aws ec2 describe-fpga-images --fpga-image-ids afi-014f8e35d6d00344c
     ```
 
    The output of this command should contain:
@@ -109,7 +109,7 @@ These steps would take too long to complete during this lab, therefore a precomp
     exit
     ```
 
-1. Here are the output of the above comamnd 
+1. Here is the output of the above comamnd 
    ```
    CPU Time:        2.38773 s
    CPU Throughput:  214.43 MB/s
@@ -211,7 +211,7 @@ The next step is to confirm these results by running on the FPGA attached to the
     # Execute the host application with the .awsxclbin FPGA binary
     ./build/IDCT.exe ./xclbin/krnl_idct.hw.awsxclbin
     ```
-1. Here are the output of the above comamnd 
+1. Here is the output of the above comamnd 
    ```
    CPU Time:        2.38849 s
    CPU Throughput:  214.361 MB/s
