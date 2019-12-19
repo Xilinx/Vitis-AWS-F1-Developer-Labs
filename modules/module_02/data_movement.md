@@ -31,7 +31,7 @@ The accelerator is architected to process 8 words in parallel at 250Mhz. In the 
 1. Go to the `makefile` directory and run the make command.
 
     ```bash
-    cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_01/makefile
+    cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_01/makefile
     make run STEP=single_buffer SOLUTION=1
     ```
 
@@ -53,7 +53,7 @@ The accelerator is architected to process 8 words in parallel at 250Mhz. In the 
 1. Change your working directory to `modules/module_01/build/single_buffer`.
 
     ```bash
-    cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_01/build/single_buffer
+    cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_01/build/single_buffer
     ```
    
 2. Run the following command to look at the Profile Summary Report.
@@ -107,7 +107,7 @@ To improve performance, you can split and send the input buffer in multiple iter
 
 1. Change your working directory to `modules/module_01/reference_files`.
     ```bash
-    cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_01/reference_files
+    cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_01/reference_files
     ```
 2. Open `run_split_buffer.cpp` file with a file editor.
 
@@ -228,7 +228,7 @@ f. The host waits until the output is read back from the FPGA.
 1. Go to the `makefile` directory and run the `make` command.
 
     ```bash
-    cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_01/makefile
+    cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_01/makefile
     make run STEP=split_buffer SOLUTION=1
     ```
 
@@ -246,7 +246,7 @@ f. The host waits until the output is read back from the FPGA.
 1. Change your working directory to `modules/module_01/build/split_buffer`.
 
    ```bash
-   cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_01/build/split_buffer
+   cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_01/build/split_buffer
    ```
    
 2. Run the following commands to view the Timeline Trace report.
@@ -279,7 +279,7 @@ In the previous step, you split the input buffer into two sub-buffers and overla
 1. Change your working directory to `modules/module_01/reference_files`.
 
    ```bash
-   cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_01/reference_files
+   cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_01/reference_files
    ```
 
 2. Open `run_generic_buffer.cpp` file with a file editor.
@@ -389,7 +389,7 @@ e. The host waits until the output of each iteration is read back to the host.
 1. Go to the `makefile` directory and run the `make` command.
  
     ```bash
-    cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_01/makefile
+    cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_01/makefile
     make run STEP=generic_buffer ITER=16 SOLUTION=1
     ```
    The argument `ITER` represents the number of iterations of data transfer from host to FPGA.
@@ -416,7 +416,7 @@ e. The host waits until the output of each iteration is read back to the host.
 1. Change your working directory to `modules/module_01/build/generic_buffer`.
 
     ```bash
-    cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_01/build/generic_buffer
+    cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_01/build/generic_buffer
     ```
    
 2. Run the following commands to look at Timeline Trace report.
@@ -453,7 +453,7 @@ Because the total compute is split into multiple iterations, you can start post-
 1. Change your working directory to `modules/module_01/reference_files`.
 
     ```bash
-    cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_01/reference_files
+    cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_01/reference_files
     ```
 
 2. Open `run_sw_overlap.cpp` file with a file editor.
@@ -514,7 +514,7 @@ b. Block the host only if the hash function of the words are still not computed 
 1. Go to the `modules/module_01/makefile` directory and run the `make` command.
 
     ```bash
-    cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_01/makefile
+    cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_01/makefile
     make run STEP=sw_overlap ITER=16 SOLUTION=1
     ```
 
@@ -532,7 +532,7 @@ b. Block the host only if the hash function of the words are still not computed 
 1. Change your working directory to `modules/module_01/build/sw_overlap`.
 
     ```bash
-    cd /home/centos/src/project_data/SDAccel-AWS-F1-Developer-Labs/modules/module_01/build/sw_overlap
+    cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_01/build/sw_overlap
     ```
    
 2. Run the following commands to view the Timeline Trace report.
@@ -558,12 +558,8 @@ In this lab, you worked with a pre-defined FPGA accelerator and learned that opt
 
 In the next module, you will create and optimize a two-dimensional convolution accelerator used to filter a video stream at 30fps. 
 
->**NOTE:** The next module consists of 7 steps and will take longer time to complete. This is meant to be a take-home module to be run on your own F1 instance.
-> If you are done early with Module 1, feel free to run through Module 2 steps during the workshop and ask questions to the workshop staff about the module at any point!
-
->**TIP:** To run through Module 2 on your own F1 Instance after the workshop ends, please follow the steps from the [Xilinx AWS F1 Developer Labs Github page](https://github.com/Xilinx/SDAccel-AWS-F1-Developer-Labs)
 ---------------------------------------
 
 <p align="center"><b>
-Start the second module: <a href="../module_02/README.md">Methodology for Optimizing Accelerated FPGA Applications</a>
+Start the second module: <a href="../module_03/README.md">Methodology for Optimizing Accelerated FPGA Applications</a>
 </b></p>
