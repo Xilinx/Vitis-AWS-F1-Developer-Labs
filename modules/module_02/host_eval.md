@@ -175,6 +175,13 @@ Based on this analysis of the algorithm, you will only offload Compute Hash and 
 
 When the Compute Hash & Output Flags code section is implemented in the FPGA, the FPGA returns a byte for each input document word received, indicating if the word is present in the search array. In this  implementation, we are processing 8 32-bit input document words in parallel computing hash and output flags for 8 words in every clock cycle. After offloading the compute hash and output flags code section on FPGA, you see the following results.
 
+1. Run the following make command for running optimized application on FPGA
+
+   ```bash
+   make run_fpga
+   ```
+
+2. The output is as follows:
 ```
 --------------------------------------------------------------------
  Executed FPGA accelerated version  |   552.5344 ms   ( FPGA 528.744 ms )
