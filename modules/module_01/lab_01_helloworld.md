@@ -52,7 +52,8 @@ The "hello world" example is an OpenCL application with a simple vector-addition
 
 1. The host application executes using the vector_addition kernel running in the FPGA and produces the following results:
 
-    ```shell
+    ```
+        shell
     	xclProbe found 1 FPGA slots with xocl driver running
     	Found Platform
 	Platform Name: Xilinx
@@ -89,7 +90,7 @@ The "hello world" example is an OpenCL application with a simple vector-addition
 
     ```bash
     exit
-    exit
+    
     ```
 
 This concludes this first lab.
