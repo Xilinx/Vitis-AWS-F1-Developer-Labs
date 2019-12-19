@@ -125,6 +125,7 @@ After the emulation run completes, an profile_summary_hw_emu.csv file is generat
 
 1. Convert the .csv file to the .xprf format
 ```
+cd build; 
 sdx_analyze profile -i profile_summary_hw_emu.csv -f protobuf
 ```
 
@@ -180,6 +181,7 @@ In addition to the profile_summary_hw_emu.csv file, the emulation run also gener
 
 1. Convert the .csv file to the .wdb format
     ```
+    cd build; 
     sdx_analyze trace -i timeline_trace_hw_emu.csv -f wdb
     ```
 
