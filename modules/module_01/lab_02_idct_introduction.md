@@ -82,7 +82,7 @@ The kernel used in this lab is an Inverse Discrete Cosine Transform (IDCT), a fu
   * Software emulation is used to identify syntax issues and verify the behavior of application.
   * Hardware emulation is used to get performance estimates for the accelerated application.
 
-1. Make sure current directory is `design`. Run below commands in the terminal window.
+1. Run below commands in the terminal window.
     ```bash
     make run TARGET=sw_emu
     ```
