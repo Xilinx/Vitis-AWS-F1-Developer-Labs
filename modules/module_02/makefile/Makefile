@@ -1,4 +1,5 @@
 TARGET := hw
+
 PF     := 8
 ITER   := 
 
@@ -32,14 +33,23 @@ endif
 
 include common.mk
 
+setup:
+	if ! [ -f temp.txt ]; \
+  	then \
+		touch temp.txt; \
+		sudo -E -- bash -c 'source ~/aws-fpga/sdaccel_setup.sh'; \
+	fi;
+
+
+
 build: host
 
-run: build
+run: build setup
 	mkdir -p $(BUILDDIR)
-	cp runOnfpga_hw.xclbin $(BUILDDIR)
+	cp runOnfpga_hw.awsxclbin $(BUILDDIR)
 	cp xrt.ini $(BUILDDIR)
 	sudo -E -- bash -c 'fpga-clear-local-image -S 0'
-	sudo -E -- bash -c 'cd $(BUILDDIR) && ./host 100000 $(ITER) '
+	sudo -E -- bash -c 'source /opt/xilinx/xrt/setup.sh && cd $(BUILDDIR) && ./host 100000 $(ITER) '
 	 
 
 help:
