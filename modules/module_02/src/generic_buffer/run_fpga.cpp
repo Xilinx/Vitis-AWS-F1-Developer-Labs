@@ -42,7 +42,7 @@ void runOnFPGA(
 	cl::CommandQueue q(context,device, CL_QUEUE_PROFILING_ENABLE | CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE );
 
 	string run_type = xcl::is_emulation()?(xcl::is_hw_emulation()?"hw_emu":"sw_emu"):"hw";
-	string binary_file = kernel_name + "_" + run_type + ".xclbin";
+	string binary_file = kernel_name + "_" + run_type + ".awsxclbin";
 	cl::Program::Binaries bins = xcl::import_binary_file(binary_file);
 	cl::Program program(context, devices, bins);
 	cl::Kernel kernel(program,kernel_name_charptr,NULL);
@@ -142,7 +142,7 @@ void runOnFPGA(
 	// Wait until all results are copied back to the host before doing the post-processing
 		flagWait[0].wait();
 		flagWait[1].wait();
-     
+                q.finish();
 
 	// Compute the profile score the CPU using the in-hash flags computed on the FPGA
 	unsigned      curr_entry;

@@ -33,13 +33,13 @@ The "hello world" example is an OpenCL application with a simple vector-addition
     cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_01/helloworld
 
     # Compile the host application (./helloworld)
-    make TARGETS=hw DEVICES=$AWS_PLATFORM exe
+    make compile_host
     ```
 
 1. Confirm the presence of the precompiled FPGA binary.
 
     ```bash
-    ls -la ./xclbin/vector_addition.hw.xilinx_aws-vu9p-f1-04261818_dynamic_5_0.awsxclbin
+    ls -la ./xclbin/vector_addition_hw.awsxclbin
     ```
 
 1. Execute the host application with the precompiled FPGA binary on the F1 instance.
@@ -47,41 +47,42 @@ The "hello world" example is an OpenCL application with a simple vector-addition
     ```bash
     sudo sh
     source /opt/xilinx/xrt/setup.sh
-    ./helloworld
+    make run TARGET=hw
     ```
 
 1. The host application executes using the vector_addition kernel running in the FPGA and produces the following results:
 
-    ```shell
-    xclProbe found 1 FPGA slots with xocl driver running
-    Found Platform
-    Platform Name: Xilinx
-    Found Device=xilinx_aws-vu9p-f1-04261818_dynamic_5_0
-    XCLBIN File Name: vector_addition
-    INFO: Importing xclbin/vector_addition.hw.xilinx_aws-vu9p-f1-04261818_dynamic_5_0.awsxclbin
-    Loading: 'xclbin/vector_addition.hw.xilinx_aws-vu9p-f1-04261818_dynamic_5_0.awsxclbin'
-    INFO: Could not load AFI for data retention, code: 18 - Loading in classic mode.
-    AFI load complete.
-    Result =
-    Hello World !!!
-    Hello World !!!
-    Hello World !!!
-    Hello World !!!
-    Hello World !!!
-    Hello World !!!
-    Hello World !!!
-    Hello World !!!
-    Hello World !!!
-    Hello World !!!
-    Hello World !!!
-    Hello World !!!
-    Hello World !!!
-    Hello World !!!
-    Hello World !!!
-    Hello World !!!
-    TEST PASSED
-    sh-4.2#
-    ```
+	```
+	shell
+	xclProbe found 1 FPGA slots with xocl driver running
+    	Found Platform
+	Platform Name: Xilinx
+	Found Device=xilinx_aws-vu9p-f1-04261818_dynamic_5_0
+	INFO: Reading ../xclbin/vector_addition_hw.awsxclbin
+	Loading: '../xclbin/vector_addition_hw.awsxclbin'
+	This AFI already loaded. Skip reload!
+	Successfully skipped reloading of local image.
+	AFI load complete.
+	Result = 
+	Hello World !!! 
+	Hello World !!! 
+	Hello World !!! 
+	Hello World !!! 
+	Hello World !!! 
+	Hello World !!! 
+	Hello World !!! 
+	Hello World !!! 
+	Hello World !!! 
+	Hello World !!! 
+	Hello World !!! 
+	Hello World !!! 
+	Hello World !!! 
+	Hello World !!! 
+	Hello World !!! 
+	Hello World !!! 
+	TEST PASSED
+	sh-4.2#
+	```
 
 1. You compiled a host application and successfully executed it on F1 using a pre-compiled Amazon FPGA Image (AFI).
 
@@ -89,7 +90,7 @@ The "hello world" example is an OpenCL application with a simple vector-addition
 
     ```bash
     exit
-    exit
+    
     ```
 
 This concludes this first lab.

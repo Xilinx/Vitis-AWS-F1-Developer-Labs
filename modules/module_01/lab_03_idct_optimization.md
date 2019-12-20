@@ -14,7 +14,7 @@ cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_01/idct
 
 Remember when we Looked at the **HLS Report**, we identified that the read, execute and write functions of the **krnl_idct_dataflow** function have roughly the same latency and are executing sequentially. We still start by focusing on this performance aspect.
 
-1. Open **krnl_idct.cpp** file.  
+1. Open **krnl_idct.cpp** file inside src directory.
 
 1. Navigate to the **krnl_idct_dataflow** function.
 
@@ -78,13 +78,13 @@ These steps would take too long to complete during this lab, therefore a precomp
 1. Retrieve the Fpga Image Global Id (agfi) from the \<timestamp\>_afi_id.txt file.
 
     ```bash
-    more ./xclbin/18_08_24-150600_afi_id.txt
+    more ./xclbin/19_12_18-170118_afi_id.txt
     ```
 
 1. Confirm that the AFI is ready and available using the retrieved global AFI Id.
 
     ``` bash
-    aws ec2 describe-fpga-images --filters Name=fpga-image-global-id,Values=agfi-007640d8fca34316e
+    aws ec2 describe-fpga-images --fpga-image-ids afi-014f8e35d6d00344c
     ```
 
    The output of this command should contain:
@@ -98,26 +98,27 @@ These steps would take too long to complete during this lab, therefore a precomp
     ```
 
 ### Executing on F1
-
-1. Copy the host application executable built by SDAccel to the local directory.
-
-	```bash
-    # Copy the host application executable
-    cp ~/SDAccel-AWS-F1-Developer-Labs/modules/module_01/idct/workspace/IDCT/Emulation-HW/IDCT.exe IDCT-NS1.exe
-    ```
-
 1. Execute the accelerated application on F1 using the precompiled FPGA binary.
 
     ```bash
+    cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_01/idct
     sudo sh
     # Source the SDAccel runtime environment
     source /opt/xilinx/xrt/setup.sh
     # Execute the host application with the .awsxclbin FPGA binary
-    ./IDCT-NS1.exe ./xclbin/krnl_idct.hw.xilinx_aws-vu9p-f1-04261818_dynamic_5_0.awsxclbin
+    ./build/IDCT.exe ./xclbin/krnl_idct.hw.awsxclbin
     exit
     ```
 
-    Note the performance difference between the IDCT running on the CPU and the IDCT running in the FPGA.
+1. Here is the output of the above comamnd 
+   ```
+   CPU Time:        2.38773 s
+   CPU Throughput:  214.43 MB/s
+   FPGA Time:       0.431608 s
+   FPGA Throughput: 1186.26 MB/s
+   ```
+
+Note the performance difference between the IDCT running on the CPU and on the FPGA. FPGA s about 5x faster than running on CPU. 
 
 
 ### Optimizing the host code
@@ -138,7 +139,12 @@ For optimal performance both the hardware and software components of the applica
 
 	These OpenCL functions use events to signal their completion and synchronize execution.
 
-1. Return to the SDAccel GUI look at the application timeline report. If you closed the view, simply re-open it by selecting **File → Open File** and browsing to the sdaccel_time_trace.wdb file.
+
+1. Execute the following command to to convert the timeline trace to wdb format and then load timeline trace in SDAccel GUI. You may need to close the previous opened SDAccel GUI.
+   ```
+   sdx_analyze trace -f wdb -i ./timeline_trace.csv
+   sdx -workspace tmp --report timeline_trace.wdb
+   ```
 
 1. Zoom in by performing a **Left mouse drag** to get a more detailed view.  
 
@@ -175,17 +181,22 @@ For optimal performance both the hardware and software components of the applica
 1. Save the file.
 
 1. Rerun hardware emulation.
-
+    ```bash
+    make run TARGET=hw_emu
+    ```
     - Since only the **idct.cpp** file was changed, the incremental makefile rebuilds only the host code before running emulation.
     - This results in a much faster iteration loop since it is usually the compilation of the kernel to hardware which takes the most time.
 
 1. Convert the newly generated application timeline report
 
     ```bash
-    sdx_analyze trace -i sdaccel_timeline_trace.csv -f wdb
+    cd build;
+    sdx_analyze trace -i timeline_trace_hw_emu.csv -f wdb
+    sdx -workspace tmp --report timeline_trace_hw_emu.wdb
+
     ```
 
-1. Open the sdaccel_timeline_trace.wdb file in the GUI. Observe how **software pipelining** enables overlapping of data transfers and kernel execution.
+1. Open the timeline_trace_hw_emu.wdb file in the GUI. Observe how **software pipelining** enables overlapping of data transfers and kernel execution.
 
     ![](../../images/module_01/lab_02_idct/ZoomApplicationTimelineEnd.PNG)
 
@@ -195,26 +206,25 @@ For optimal performance both the hardware and software components of the applica
 
 The next step is to confirm these results by running on the FPGA attached to the F1 instance. Since only the host application was modified, the same precompiled FPGA binary can used.
 
-1. Bring-up the terminal from which you ran the first IDCT executable.
-
-1. Copy the host application executable built by SDAccel to the local directory.
-
-    ```bash
-    # Copy the host application executable
-    cp ~/SDAccel-AWS-F1-Developer-Labs/modules/module_01/idct/workspace/IDCT/Emulation-HW/IDCT.exe IDCT-NS6.exe
-    ```
-
 1. Execute the accelerated application on F1 using the precompiled FPGA binary.
-
+    
     ```bash
+    cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_01/idct
     sudo sh
     # Source the SDAccel runtime environment
     source /opt/xilinx/xrt/setup.sh
     # Execute the host application with the .awsxclbin FPGA binary
-    ./IDCT-NS6.exe ./xclbin/krnl_idct.hw.xilinx_aws-vu9p-f1-04261818_dynamic_5_0.awsxclbin
+    ./build/IDCT.exe ./xclbin/krnl_idct.hw.awsxclbin
+    exit
     ```
-
-    Note the performance difference between the IDCT running on the CPU and the IDCT running in the FPGA. Note as well the performance difference with the previous run on F1. Using exactly the same FPGA binary but an optimized host application, the overall performance is significantly improved.
+1. Here is the output of the above comamnd 
+   ```
+   CPU Time:        2.38849 s
+   CPU Throughput:  214.361 MB/s
+   FPGA Time:       0.23884 s
+   FPGA Throughput: 2143.7 MB/s
+   ```
+   Note the performance difference between the IDCT running on the CPU and on the FPGA. FPGA s about 10x faster than running on CPU. Note as well the performance difference with the previous run on F1. Using exactly the same FPGA binary but an optimized host application, the overall performance is significantly improved.
 
 
 ### Summary  
