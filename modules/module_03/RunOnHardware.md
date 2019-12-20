@@ -57,7 +57,7 @@ sudo sh
 # Source the SDAccel runtime environment
 source /opt/xilinx/xrt/setup.sh
 # Execute the host application with the .awsxclbin FPGA binary
-cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_03/design/build/baseline
+cd build/baseline
 ./convolution.exe  --kernel_name convolve_fpga ../../video.mp4 ./fpga_container_hw.awsxclbin
 ```
 
@@ -66,7 +66,7 @@ cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_03/design/build/baseline
 ```
 mv ./sdaccel_profile_summary.csv sdaccel_profile_summary_hw.csv
 mv ./sdaccel_profile_summary.csv sdaccel_profile_summary_hw.csv
-cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_03/design/makefile
+cd ../../design/makefile
 make gen_report TARGET=hw STEP=baseline
 ```
 

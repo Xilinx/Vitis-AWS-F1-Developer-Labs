@@ -42,6 +42,8 @@ int main(int argc, char **argv) {
     // compute the size of array in bytes
     size_t size_in_bytes = DATA_SIZE * sizeof(int);
 
+    std::string binaryFile = argv[1];
+
     // Creates a vectors for a, b and results
     vector<int,aligned_allocator<int>> source_a;
     vector<int,aligned_allocator<int>> source_b;
@@ -65,14 +67,11 @@ int main(int argc, char **argv) {
     std::string device_name = device.getInfo<CL_DEVICE_NAME>(); 
     std::cout << "Found Device=" << device_name.c_str() << std::endl;
 
-    // import_binary() command will find the OpenCL binary file created using the 
-    // xocc compiler load into OpenCL Binary and return as Binaries
-    // OpenCL and it can contain many functions which can be executed on the
-    // device.
-    std::string binaryFile = xcl::find_binary_file(device_name,"vector_addition");
-    cl::Program::Binaries bins = xcl::import_binary_file(binaryFile);
+    // read_binary_file() is a utility API which will load the binaryFile
+    // and will return the pointer to file buffer.
+    auto fileBuf = xcl::read_binary_file(binaryFile);
+    cl::Program::Binaries bins{{fileBuf.data(), fileBuf.size()}};
     devices.resize(1);
-    cl::Program program(context, devices, bins);
 
     // These commands will allocate memory on the FPGA. The cl::Buffer objects can
     // be used to reference the memory locations on the device. The cl::Buffer
@@ -91,16 +90,14 @@ int main(int argc, char **argv) {
     outBufVec.push_back(buffer_result);
 
 
-    // These commands will load the source_a and source_b vectors from the host
-    // application and into the buffer_a and buffer_b cl::Buffer objects. The data
-    // will be be transferred from system memory over PCIe to the FPGA on-board
-    // DDR memory.
-    q.enqueueMigrateMemObjects(inBufVec,0/* 0 means from host*/);
-
     // This call will extract a kernel out of the program we loaded in the
     // previous line. A kernel is an OpenCL function that is executed on the
     // FPGA. This function is defined in the src/vetor_addition.cl file.
-    cl::Kernel krnl_vector_add(program,"vector_add");
+
+    //cl::Program program(context, {device}, bins, NULL);
+    cl::Program program(context, devices, bins, NULL);
+    cl::Kernel krnl_vector_add(program, "vector_add");
+
 
     //set the kernel Arguments
     int narg=0;
@@ -108,6 +105,13 @@ int main(int argc, char **argv) {
     krnl_vector_add.setArg(narg++,buffer_a);
     krnl_vector_add.setArg(narg++,buffer_b);
     krnl_vector_add.setArg(narg++,DATA_SIZE);
+
+    // These commands will load the source_a and source_b vectors from the host
+    // application and into the buffer_a and buffer_b cl::Buffer objects. The data
+    // will be be transferred from system memory over PCIe to the FPGA on-board
+    // DDR memory.
+    //q.enqueueMigrateMemObjects(inBufVec,0/* 0 means from host*/);
+    q.enqueueMigrateMemObjects({buffer_a,buffer_b},0/* 0 means from host*/);
 
     //Launch the Kernel
     q.enqueueTask(krnl_vector_add);

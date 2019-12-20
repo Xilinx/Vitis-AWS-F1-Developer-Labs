@@ -19,6 +19,8 @@ help::
 ## Or you can add other platfom and set PLATFORM variable to it
 
 PLATFORM := $(AWS_PLATFORM)
+#PLATFORM := xilinx_u200_xdma_201830_2
+#PLATFORM := xilinx_aws-vu9p-f1-04261818_dynamic_5_0
 
 
 ## TARGET can be set as:
@@ -30,8 +32,8 @@ TARGET := sw_emu
 ## Below are the names for host executable and xclbin.
 ## Please keep it unchanged.
 HOST_EXE := IDCT.exe
-XO_NAME := krnl_idct
-XCLBIN := krnl_idct.xclbin
+XO_NAME := krnl_idct.$(TARGET)
+XCLBIN := krnl_idct.$(TARGET).xclbin
 
 SRC_REPO := ./src
 BUILD_DIR := ./build
@@ -69,6 +71,8 @@ XOCCFLAGS += --sp krnl_idct_1.m_axi_gmem:bank0 --sp krnl_idct_1.m_axi_gmem1:bank
 
 ## Host Executable File Generation
 
+compile_host: $(BUILD_DIR)/$(HOST_EXE)
+
 $(BUILD_DIR)/$(HOST_EXE): $(HOST_SRC_CPP)
 	mkdir -p $(BUILD_DIR)
 	xcpp $(CXXFLAGS) $(CXXLDFLAGS) -o $@ $(HOST_SRC_CPP)
@@ -81,6 +85,7 @@ $(BUILD_DIR)/$(XO_NAME).xo: $(KERNEL_SRC_CPP)
 
 $(BUILD_DIR)/$(XCLBIN): $(BUILD_DIR)/$(XO_NAME).xo
 	mkdir -p $(BUILD_DIR)
+	mkdir -p $(BUILD_DIR)/$(TARGET)
 	xocc $(XOCCFLAGS) -l -o $@ $(BUILD_DIR)/$(XO_NAME).xo
 
 ## Emulation Files Generation
@@ -101,14 +106,17 @@ build: $(BUILD_DIR)/$(HOST_EXE) $(BUILD_DIR)/$(XCLBIN) $(BUILD_DIR)/$(EMCONFIG_F
 ## build the design and then run host application
 
 run: build
-	cp sdaccel.ini $(BUILD_DIR);
+	cp xrt.ini $(BUILD_DIR);
 ifeq ($(TARGET), hw)
 	cd $(BUILD_DIR) && unset XCL_EMULATION_MODE;    ./IDCT.exe  ./$(XCLBIN) ;
+
 else
 	cd $(BUILD_DIR) && XCL_EMULATION_MODE=$(TARGET) ./IDCT.exe  ./$(XCLBIN) ;
 endif
-
+	@cd $(BUILD_DIR) && mv ./profile_summary.csv profile_summary_$(TARGET).csv;
+	@cd $(BUILD_DIR) && mv ./timeline_trace.csv timeline_trace_$(TARGET).csv;
+	
 ## Clean generated files
 
 clean:
-	rm -rf $(BUILD_DIR)/$(XCLBIN) $(BUILD_DIR)/$(HOST_EXE) $(BUILD_DIR)/$(EMCONFIG_FILE) $(BUILD_DIR)/$(XO_NAME).xo $(BUILD_DIR)/*.ltx $(BUILD_DIR)/*_$(TARGET).log $(BUILD_DIR)/xocc_*_$(TARGET)_* $(BUILD_DIR)/_x* $(BUILD_DIR)/*.info $(BUILD_DIR)/convolve_fpga_$(TARGET)* $(BUILD_DIR)/link $(BUILD_DIR)/reports/convolve_fpga_$(TARGET)
+	rm -rf $(BUILD_DIR) IDCT*.exe

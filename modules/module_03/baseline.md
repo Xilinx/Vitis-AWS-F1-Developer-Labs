@@ -57,7 +57,7 @@ Use the following instructions to convert the C code into kernel code, and conve
 1. Go to the `makefile` directory, and use the following command to run hardware emulation.
 
     ```
-    cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_03/design/makefile
+    cd design/makefile
     make run TARGET=hw_emu STEP=baseline SOLUTION=1 NUM_FRAMES=1
     ```
 

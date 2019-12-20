@@ -29,9 +29,9 @@ The three functions will use streams to pass data between them. To understand st
 
 ## Kernel Code Modifications
 
->**TIP:** The completed kernel source file is provided under the `~/SDAccel-AWS-F1-Developer-Labs/modules/module_03/design/reference-files/dataflow` folder. You can use it as a reference if needed.
+>**TIP:** The completed kernel source file is provided under the `reference-files/dataflow` folder. You can use it as a reference if needed.
 
-1. Open the `convolve_fpga.cpp` file from `~/SDAccel-AWS-F1-Developer-Labs/modules/module_03/design/src/dataflow`.
+1. Open the `convolve_fpga.cpp` file from `src/dataflow`.
 
 2. First, navigate to the `convolve_fpga` function, which is the top-level function in the kernel. Modify the structure of this function to call the three sub-functions as follows.
 
@@ -171,12 +171,7 @@ The three functions will use streams to pass data between them. To understand st
 
 ## Run Hardware Emulation for Dataflow
 
-1. Go to the `makefile` directory
-
- ```
- cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_03/design/makefile
- ```
-2. Use the following command to run hardware emulation.
+1. Go to the `makefile` directory, and use the following command to run hardware emulation.
 
 ```
 make run TARGET=hw_emu STEP=dataflow SOLUTION=1 NUM_FRAMES=1

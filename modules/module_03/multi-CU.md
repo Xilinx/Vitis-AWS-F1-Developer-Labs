@@ -19,11 +19,11 @@ The host application uses OpenCL™ APIs to communicate with kernels on an FPGA.
 
 Out-of-order queues allow you to launch multiple operations at the same time, including memory transfers and kernel calls. You can add dependencies on tasks using OpenCL API events and wait lists. Events are objects that are associated with a particular task. It is usually passed into a call as the last argument. If an operation depends on another task, you can pass the event into a wait list. The operation will need to wait for all events in the wait list to finish before executing.
 
->**TIP:** The completed host code source file is provided under the `~/SDAccel-AWS-F1-Developer-Labs/modules/module_03/design/reference-files/multicu` folder. You can use it as a reference if needed.
+>**TIP:** The completed host code source file is provided under the `reference-files/multicu` folder. You can use it as a reference if needed.
 
 To take advantage of the out-of-order queues and events, modify the host program.
 
-1. Open the `convolve.cpp` file from `~/SDAccel-AWS-F1-Developer-Labs/modules/module_03/design/src/multicu`, and modify the following line.
+1. Open the `convolve.cpp` file from `src/multicu`, and modify the following line.
 
         cl::CommandQueue q(context, device, cl::QueueProperties::Profiling);
 
@@ -67,9 +67,9 @@ To take advantage of the out-of-order queues and events, modify the host program
 
 In previous labs, only one CU is used for the kernel. In this section, you will modify the design to use multiple CUs, and each CU will process a smaller region of the image. To achieve that, you are going to make further modifications based on the output from the previous step.
 
->**TIP:** The completed kernel source file is provided under the `~/SDAccel-AWS-F1-Developer-Labs/modules/module_03/design/reference-files/multicu` folder. You can use it as a reference if needed.
+>**TIP:** The completed kernel source file is provided under the `reference-files/multicu` folder. You can use it as a reference if needed.
 
-Here you are going to modify the kernel code. Open the `convolve_fpga.cpp` file from `~/SDAccel-AWS-F1-Developer-Labs/modules/module_03/design/src/multicu`, and make following modifications:
+Here you are going to modify the kernel code. Open the `convolve_fpga.cpp` file from `src/multicu`, and make following modifications:
 
 1. Modify the signature of the `convolve_fpga` kernel to accept the offset and number of lines each kernel will process (line 106).
 
@@ -195,10 +195,6 @@ Now you can compile and run the design, and you should see results similar to th
    Here the `xocc --nk` option is used to specify the number of kernel instances, or CUs, generated during the linking step of the build process. For this lab, CU_NUM is defined as 4.
 
 2. Go to the `makefile` directory.
-
-   ```
-   cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_03/design/makefile
-   ```
 3. Use the following command to run hardware emulation.
 
    ```

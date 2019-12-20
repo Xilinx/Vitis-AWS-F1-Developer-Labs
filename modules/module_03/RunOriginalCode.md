@@ -20,7 +20,7 @@ In this step, you will build and run this application to create baseline perform
 2. Execute the following `make` command.
 
    ```
-   cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_03/design/cpu_src
+   cd modules/module_03/design/cpu_src
    make
    ```
 
@@ -33,7 +33,7 @@ The command will compile the C source code, and build the `convolve` executable.
 In this step, run the original C application with a specified input video file in different formats, and generate the corresponding golden output files for comparison purposes using the following commands.
 
 ```
-cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_03/design/cpu_src
+cd modules/module_03/design/cpu_src
 make golden
 ```
 
@@ -53,8 +53,7 @@ As stated in the *SDAccel Methodology Guide* ([UG1346](https://www.xilinx.com/su
 2. Change directory into the `cpu_src` folder, and run `make` to generate the executable file.
 
    ```
-   cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_03/design/cpu_src
-   make
+   cd cpu_src
    ```
 
 3. Run the executable file.
