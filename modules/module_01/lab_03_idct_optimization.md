@@ -72,7 +72,7 @@ These steps would take too long to complete during this lab, therefore a precomp
     cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_01/idct
 
     # List contents of the ./xclbin directory to look for the .awsxclbin FPGA binary
-    ls -la ./xclbin
+    ls -la ./xclbin/*.awsxclbin
     ```
 
 1. Retrieve the Fpga Image Global Id (agfi) from the \<timestamp\>_afi_id.txt file.
