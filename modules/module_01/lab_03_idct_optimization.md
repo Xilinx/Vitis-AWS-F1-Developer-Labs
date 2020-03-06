@@ -182,6 +182,7 @@ For optimal performance both the hardware and software components of the applica
 
 1. Rerun hardware emulation.
     ```bash
+    make clean
     make run TARGET=hw_emu
     ```
     - Since only the **idct.cpp** file was changed, the incremental makefile rebuilds only the host code before running emulation.
