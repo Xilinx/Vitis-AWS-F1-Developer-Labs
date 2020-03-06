@@ -50,7 +50,7 @@ If the state is shown as 'available', it indicates AFI creation is completed.
 
 ```
 
-5. Run application on the hardware. For your convenience, all the awsxclbin are generated and planced under <..>/module03/design/xclbins. If you are planning to use these pregenerated xclbins, then copy these to respecive <...>/module03/design/build/[baseline/localbuf/fixedpoint/dataflow/multicu] directories
+5. Run application on the hardware. For your convenience, all the awsxclbin are generated and planced under <..>/module03/design/xclbins. If you are planning to use these pregenerated xclbins, then copy these to respective <...>/module03/design/build/[baseline/localbuf/fixedpoint/dataflow/multicu] directories
 
 ```
 sudo sh
