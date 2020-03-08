@@ -37,7 +37,7 @@ setup:
 	if ! [ -f temp.txt ]; \
   	then \
 		touch temp.txt; \
-		sudo -E -- bash -c 'source ~/aws-fpga/sdaccel_setup.sh'; \
+		sudo -E -- bash -c 'source /home/centos/aws-fpga/sdaccel_setup.sh'; \
 	fi;
 
 
