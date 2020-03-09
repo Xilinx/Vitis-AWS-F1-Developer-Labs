@@ -208,8 +208,8 @@ else
 	cp sdaccel.ini $(BUILD_DIR);
 	cd $(BUILD_DIR) && XCL_EMULATION_MODE=$(TARGET) ./$(HOST_EXE)  --kernel_name convolve_fpga $(RUN_OPTS) ../../video.mp4 ./$(XCLBIN) ;
 
-	@cd $(BUILD_DIR) && mv ./sdaccel_profile_summary.csv sdaccel_profile_summary_$(TARGET).csv; 
-	@cd $(BUILD_DIR) && mv ./sdaccel_timeline_trace.csv sdaccel_timeline_trace_$(TARGET).csv;
+	@cd $(BUILD_DIR) && mv ./profile_summary.csv sdaccel_profile_summary_$(TARGET).csv; 
+	@cd $(BUILD_DIR) && mv ./timeline_trace.csv sdaccel_timeline_trace_$(TARGET).csv;
 ## compare the output result with golden result
 	@cmp $(BUILD_DIR)/output.mp4 ../$(GOLDEN_OUT); RETVAL=$$?; \
 	if [ $$RETVAL -eq \0 ];  then \

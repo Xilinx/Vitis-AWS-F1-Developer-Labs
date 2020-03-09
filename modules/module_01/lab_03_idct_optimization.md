@@ -72,7 +72,7 @@ These steps would take too long to complete during this lab, therefore a precomp
     cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_01/idct
 
     # List contents of the ./xclbin directory to look for the .awsxclbin FPGA binary
-    ls -la ./xclbin
+    ls -la ./xclbin/*.awsxclbin
     ```
 
 1. Retrieve the Fpga Image Global Id (agfi) from the \<timestamp\>_afi_id.txt file.
@@ -182,6 +182,7 @@ For optimal performance both the hardware and software components of the applica
 
 1. Rerun hardware emulation.
     ```bash
+    make clean
     make run TARGET=hw_emu
     ```
     - Since only the **idct.cpp** file was changed, the incremental makefile rebuilds only the host code before running emulation.
