@@ -16,10 +16,10 @@ help::
 	@echo  "  Command to generate profile summary report and application timeline report for specified target and step"
 	@echo  ""
 	@echo  "  make view_prof_report TARGET=<sw_emu/hw_emu/hw> STEP=<baseline/localbuf/fixedpoint/dataflow/multicu>"
-	@echo  "  Command to view profile summary report in SDAccel GUI"
+	@echo  "  Command to view profile summary report in Vitis_Analzyer GUI"
 	@echo  ""
 	@echo  "  make view_timeline_trace TARGET=<sw_emu/hw_emu/hw> STEP=<baseline/localbuf/fixedpoint/dataflow/multicu>"
-	@echo  "  Command to view application timeline report in SDAccel GUI"
+	@echo  "  Command to view application timeline report in SVitis_Analzyer GUI"
 	@echo  ""
 
 
@@ -146,16 +146,16 @@ CXXLDFLAGS += -lxilinxopencl -lpthread -lrt
 
 ## Kernel Compiler and Linker Flags
 
-XOCCFLAGS := -t $(TARGET)
-XOCCFLAGS += --platform $(PLATFORM) -R 1
-XOCCFLAGS += --nk convolve_fpga:$(CU_NUM)
-XOCCFLAGS += -I$(KERNEL_SRC_H_DIR)
-XOCCFLAGS += --temp_dir $(BUILD_DIR)
-XOCCFLAGS += --log_dir $(BUILD_DIR)
-XOCCFLAGS += --profile_kernel data:all:all:all:all
+VPPFLAGS := -t $(TARGET)
+VPPFLAGS += --platform $(PLATFORM) -R 1
+VPPFLAGS += --nk convolve_fpga:$(CU_NUM)
+VPPFLAGS += -I$(KERNEL_SRC_H_DIR)
+VPPFLAGS += --temp_dir $(BUILD_DIR)
+VPPFLAGS += --log_dir $(BUILD_DIR)
+VPPFLAGS += --profile_kernel data:all:all:all:all
 
 ifeq ($(SOLUTION), 1)
-XOCCFLAGS += -DBASELINE_ADD -DHOST_CODE_OPT -DLOCAL_BUF_OPT -DDF_OPT -DFP_OPT
+VPPFLAGS += -DBASELINE_ADD -DHOST_CODE_OPT -DLOCAL_BUF_OPT -DDF_OPT -DFP_OPT
 endif
 
 
@@ -172,11 +172,11 @@ $(BUILD_DIR)/$(HOST_EXE): $(HOST_SRC_CPP) $(HOST_SRC_H)
 
 $(BUILD_DIR)/$(XO_NAME).xo: $(KERNEL_SRC_CPP) $(KERNEL_SRC_H)
 	mkdir -p $(BUILD_DIR)
-	xocc $(XOCCFLAGS) -c -k convolve_fpga $(KERNEL_SRC_CPP) -o $@
+	v++ $(VPPFLAGS) -c -k convolve_fpga $(KERNEL_SRC_CPP) -o $@
 
 $(BUILD_DIR)/$(XCLBIN): $(BUILD_DIR)/$(XO_NAME).xo
 	mkdir -p $(BUILD_DIR)
-	xocc $(XOCCFLAGS) -l -o $@ $(BUILD_DIR)/$(XO_NAME).xo
+	v++ $(VPPFLAGS) -l -o $@ $(BUILD_DIR)/$(XO_NAME).xo
 
 ## Emulation Files Generation
 
@@ -205,11 +205,11 @@ run: build
 ifeq ($(TARGET), hw)
 	echo "************  Use Command Line to run application!  ************"
 else
-	cp sdaccel.ini $(BUILD_DIR);
+	cp xrt.ini $(BUILD_DIR);
 	cd $(BUILD_DIR) && XCL_EMULATION_MODE=$(TARGET) ./$(HOST_EXE)  --kernel_name convolve_fpga $(RUN_OPTS) ../../video.mp4 ./$(XCLBIN) ;
 
-	@cd $(BUILD_DIR) && mv ./profile_summary.csv sdaccel_profile_summary_$(TARGET).csv; 
-	@cd $(BUILD_DIR) && mv ./timeline_trace.csv sdaccel_timeline_trace_$(TARGET).csv;
+	@cd $(BUILD_DIR) && mv ./profile_summary.csv profile_summary_$(TARGET).csv; 
+	@cd $(BUILD_DIR) && mv ./timeline_trace.csv timeline_trace_$(TARGET).csv;
 ## compare the output result with golden result
 	@cmp $(BUILD_DIR)/output.mp4 ../$(GOLDEN_OUT); RETVAL=$$?; \
 	if [ $$RETVAL -eq \0 ];  then \
@@ -220,26 +220,7 @@ else
 
 endif
 
-
-## generate profile summary and timeline trace reports
-## convert it to html, xprf and wdb formats after generation
-
-gen_report:
-	cd $(BUILD_DIR) && sdx_analyze profile -f html -i sdaccel_profile_summary_$(TARGET).csv; 
-	cd $(BUILD_DIR) && sdx_analyze trace -f wdb -i ./sdaccel_timeline_trace_$(TARGET).csv;
-
-## view html profile summary report in browser
-
-view_prof_report:
-	cd $(BUILD_DIR) && firefox ./sdaccel_profile_summary_$(TARGET).html &
-
-
-## view timeline trace report in SDx GUI
-
-view_timeline_trace:
-	cd $(BUILD_DIR) && sdx --report sdaccel_timeline_trace_$(TARGET).wdb ;
-
 ## Clean generated files
 
 clean:
-	rm -rf $(BUILD_DIR)/$(XCLBIN) $(BUILD_DIR)/$(HOST_EXE) $(BUILD_DIR)/$(EMCONFIG_FILE) $(BUILD_DIR)/$(XO_NAME).xo $(BUILD_DIR)/*.ltx $(BUILD_DIR)/*_$(TARGET).log $(BUILD_DIR)/xocc_*_$(TARGET)_* $(BUILD_DIR)/_x* $(BUILD_DIR)/*.info $(BUILD_DIR)/convolve_fpga_$(TARGET)* $(BUILD_DIR)/link $(BUILD_DIR)/reports/convolve_fpga_$(TARGET)
+	rm -rf $(BUILD_DIR)/$(XCLBIN) $(BUILD_DIR)/$(HOST_EXE) $(BUILD_DIR)/$(EMCONFIG_FILE) $(BUILD_DIR)/$(XO_NAME).xo $(BUILD_DIR)/*.ltx $(BUILD_DIR)/*_$(TARGET).log $(BUILD_DIR)/v++_*_$(TARGET)_* $(BUILD_DIR)/_x* $(BUILD_DIR)/*.info $(BUILD_DIR)/convolve_fpga_$(TARGET)* $(BUILD_DIR)/link $(BUILD_DIR)/reports/convolve_fpga_$(TARGET)

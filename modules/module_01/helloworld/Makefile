@@ -11,9 +11,7 @@ help::
 
 
 ## platform selection
-#PLATFORM := xilinx_u200_xdma_201830_2
-#PLATFORM := $(AWS_PLATFORM)
-PLATFORM := xilinx_aws-vu9p-f1-04261818_dynamic_5_0
+PLATFORM := $(AWS_PLATFORM)
 
 
 ## TARGET can be set as:
@@ -54,8 +52,8 @@ CXXFLAGS += -D__USE_XOPEN2K8
 CXXFLAGS += -I$(XILINX_XRT)/include/
 CXXFLAGS += -I$(XILINX_VIVADO)/include/
 CXXFLAGS += -I$(SRC_REPO)
-#CXXFLAGS += -O0 -g -Wall -fmessage-length=0 -std=c++14
-CXXFLAGS += -O0 -g -Wall -fmessage-length=0
+CXXFLAGS += -O0 -g -Wall -fmessage-length=0 -std=c++11
+#CXXFLAGS += -O0 -g -Wall -fmessage-length=0
 
 
 CXXLDFLAGS := -L$(XILINX_XRT)/lib/
@@ -64,19 +62,19 @@ CXXLDFLAGS += -lxilinxopencl -lpthread -lrt
 
 ## Kernel Compiler and Linker Flags
 
-XOCCFLAGS := -t $(TARGET)
-XOCCFLAGS += --platform $(PLATFORM) -R 1
-XOCCFLAGS += --nk vector_add:1
-XOCCFLAGS += -I$(KERNEL_SRC_H_DIR)
-XOCCFLAGS += --temp_dir $(BUILD_DIR)
-XOCCFLAGS += --log_dir $(BUILD_DIR)
-XOCCFLAGS += --profile_kernel data:all:all:all:all
+VPPFLAGS := -t $(TARGET)
+VPPFLAGS += --platform $(PLATFORM) -R 1
+VPPFLAGS += --nk vector_add:1
+VPPFLAGS += -I$(KERNEL_SRC_H_DIR)
+VPPFLAGS += --temp_dir $(BUILD_DIR)
+VPPFLAGS += --log_dir $(BUILD_DIR)
+VPPFLAGS += --profile_kernel data:all:all:all:all
 
 ## Host Executable File Generation
 
 $(BUILD_DIR)/$(HOST_EXE): $(HOST_SRC_CPP) $(HOST_SRC_H)
 	mkdir -p $(BUILD_DIR)
-	xcpp $(CXXFLAGS) $(HOST_SRC_CPP) $(CXXLDFLAGS) -o $@
+	g++ $(CXXFLAGS) $(HOST_SRC_CPP) $(CXXLDFLAGS) -o $@
 	mv $(BUILD_DIR)/$(HOST_EXE) $(PROJECT_DIR)
 
 
@@ -84,11 +82,11 @@ $(BUILD_DIR)/$(HOST_EXE): $(HOST_SRC_CPP) $(HOST_SRC_H)
 
 $(BUILD_DIR)/$(XO_NAME).xo: $(KERNEL_SRC_CPP) $(KERNEL_SRC_H)
 	mkdir -p $(BUILD_DIR)
-	xocc $(XOCCFLAGS) -c -k vector_add $(KERNEL_SRC_CPP) -o $@
+	v++ $(VPPFLAGS) -c -k vector_add $(KERNEL_SRC_CPP) -o $@
 
 $(BUILD_DIR)/$(XCLBIN): $(BUILD_DIR)/$(XO_NAME).xo
 	mkdir -p $(BUILD_DIR)
-	xocc $(XOCCFLAGS) -l -o $@ $(BUILD_DIR)/$(XO_NAME).xo
+	v++ $(VPPFLAGS) -l -o $@ $(BUILD_DIR)/$(XO_NAME).xo
 
 ## Emulation Files Generation
 
@@ -106,6 +104,7 @@ $(BUILD_DIR)/$(EMCONFIG_FILE):
 
 ## build the design without running host application
 
+build1: $(BUILD_DIR)/$(HOST_EXE) $(BUILD_DIR)/$(XCLBIN) $(BUILD_DIR)/$(EMCONFIG_FILE)
 #build: $(BUILD_DIR)/$(HOST_EXE) $(BUILD_DIR)/$(XCLBIN) $(BUILD_DIR)/$(EMCONFIG_FILE)
 compile_host: $(BUILD_DIR)/$(HOST_EXE) 
 
@@ -113,7 +112,7 @@ compile_host: $(BUILD_DIR)/$(HOST_EXE)
 ## build the design and then run host application
 ## run with 512x10 input video format for emulation and 1280x720 for hardware
 
-run: build
+run: compile_host
 	./$(HOST_EXE)  ./xclbin/$(XCLBIN) ;
 
 

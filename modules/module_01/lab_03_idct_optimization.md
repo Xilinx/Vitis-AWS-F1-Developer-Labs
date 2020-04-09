@@ -1,20 +1,21 @@
 ## Optimizing F1 applications
 
-This lab builds on the previous one ([Using XOCC command line flow to develop and compile F1 accelerator](lab_02_idct.md)) which gave an overview of the SDAccel development environment and explained the various performance analysis capabilities provided by the tool. In this lab you will utilize these analysis capabilities to drive and measure code optimizations. This lab illustrates the DATAFLOW optimization for the kernel and software pipelining for the host application.
+This lab builds on the previous one ([Using v++ command line flow to develop and compile F1 accelerator](lab_02_idct.md)) which gave an overview of the Vitis development environment and explained the various performance analysis capabilities provided by the tool. In this lab you will utilize these analysis capabilities to drive and measure code optimizations. This lab illustrates the DATAFLOW optimization for the kernel and software pipelining for the host application.
 
 Please note that although the entire lab is performed on an F1 instance, only the final step of this lab really needs to be run on F1. All the interactive development, profiling and optimization steps would normally be performed on-premise or on a cost-effective AWS EC2 instance such as C4. However, to avoid switching from C4 to F1 instances during this lab, all the steps are performed on the F1 instance.
 
 If you have closed the terminal window at the end of the previous lab, open a new one and go back to the project folder:
 
 ```bash
-cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_01/idct
+export LAB_WORK_DIR=/home/centos/src/project_data/
+cd $LAB_WORK_DIR/Vitis-AWS-F1-Developer-Labs/modules/module_01/idct
 ```
 
 ### Optimizing the IDCT kernel
 
 Remember when we Looked at the **HLS Report**, we identified that the read, execute and write functions of the **krnl_idct_dataflow** function have roughly the same latency and are executing sequentially. We still start by focusing on this performance aspect.
 
-1. Open **krnl_idct.cpp** file inside src directory.
+1. cd $LAB_WORK_DIR/Vitis-AWS-F1-Developer-Labs/modules/module_01/idct/src and Open **krnl_idct.cpp**
 
 1. Navigate to the **krnl_idct_dataflow** function.
 
@@ -31,12 +32,14 @@ Remember when we Looked at the **HLS Report**, we identified that the read, exec
 1. Save the file.
 
 1. Clean the generated files before launching hardware emulation with updated source file.
-    ```
+    ```bash
+    cd $LAB_WORK_DIR/Vitis-AWS-F1-Developer-Labs/modules/module_01/idct
     make clean
     ```
 
 1. Rerun hardware emulation.
-    ```
+    ```bash
+    cd $LAB_WORK_DIR/Vitis-AWS-F1-Developer-Labs/modules/module_01/idct
     make run TARGET=hw_emu
     ```
 
@@ -53,10 +56,10 @@ Remember when we Looked at the **HLS Report**, we identified that the read, exec
 The next step is to create an FPGA binary to test the optimized kernel on the FPGA attached to the F1 instance.
 
 Creating the FPGA binary is a two-step process:
-* First SDAccel is used to build the Xilinx FPGA binary (.xclbin file).
-* Then the AWS **create_sdaccel_afi.sh** script is used to create the AWS FPGA binary (.awsxclbin file) and register a secured and encrypted Amazon FPGA Image (AFI).
+* First Vitis is used to build the Xilinx FPGA binary (.xclbin file).
+* Then the AWS **create_Vitis_afi.sh** script is used to create the AWS FPGA binary (.awsxclbin file) and register a secured and encrypted Amazon FPGA Image (AFI).
 
-The **create_sdaccel_afi.sh** script does the following:
+The **create_Vitis_afi.sh** script does the following:
 * Starts a background process to create the AFI
 * Generates a \<timestamp\>_afi_id.txt which contains the FPGA Image Identifier (or AFI ID) and Global FPGA Image Identifier (or AGFI ID) of the generated AFI
 * Creates the *.awsxclbin AWS FPGA binary file which is read by the host application to determine which AFI should be loaded in the FPGA.
@@ -69,10 +72,10 @@ These steps would take too long to complete during this lab, therefore a precomp
 
     ```bash
     # Go the lab folder
-    cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_01/idct
+    cd $LAB_WORK_DIR/Vitis-AWS-F1-Developer-Labs/modules/module_01/idct
 
     # List contents of the ./xclbin directory to look for the .awsxclbin FPGA binary
-    ls -la ./xclbin/*.awsxclbin
+    ls -la ./xclbin
     ```
 
 1. Retrieve the Fpga Image Global Id (agfi) from the \<timestamp\>_afi_id.txt file.
@@ -101,10 +104,9 @@ These steps would take too long to complete during this lab, therefore a precomp
 1. Execute the accelerated application on F1 using the precompiled FPGA binary.
 
     ```bash
-    cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_01/idct
-    sudo sh
-    # Source the SDAccel runtime environment
-    source /opt/xilinx/xrt/setup.sh
+    source $AWS_FPGA_REPO_DIR/vitis_runtime_setup.sh 
+    cd $LAB_WORK_DIR/Vitis-AWS-F1-Developer-Labs/modules/module_01/idct
+ 
     # Execute the host application with the .awsxclbin FPGA binary
     ./build/IDCT.exe ./xclbin/krnl_idct.hw.awsxclbin
     exit
@@ -112,10 +114,12 @@ These steps would take too long to complete during this lab, therefore a precomp
 
 1. Here is the output of the above comamnd 
    ```
-   CPU Time:        2.38773 s
-   CPU Throughput:  214.43 MB/s
-   FPGA Time:       0.431608 s
-   FPGA Throughput: 1186.26 MB/s
+    TEST PASSED
+    CPU Time:        2.39771 s
+    CPU Throughput:  213.537 MB/s
+    FPGA Time:       0.464535 s
+    FPGA Throughput: 1102.18 MB/s
+
    ```
 
 Note the performance difference between the IDCT running on the CPU and on the FPGA. FPGA s about 5x faster than running on CPU. 
@@ -126,6 +130,10 @@ Note the performance difference between the IDCT running on the CPU and on the F
 For optimal performance both the hardware and software components of the application need to be optimized. This next sections shows how the **software pipelining** technique can be used to overlap transactions from the host to the kernels and thereby improve overall system throughput.
 
 1. Return to the project folder in terminal window.
+
+   ```bash
+   cd $LAB_WORK_DIR/Vitis-AWS-F1-Developer-Labs/modules/module_01/idct/src
+   ```
 
 1. Open **idct.cpp** file.  
 
@@ -140,10 +148,10 @@ For optimal performance both the hardware and software components of the applica
 	These OpenCL functions use events to signal their completion and synchronize execution.
 
 
-1. Execute the following command to to convert the timeline trace to wdb format and then load timeline trace in SDAccel GUI. You may need to close the previous opened SDAccel GUI.
-   ```
-   sdx_analyze trace -f wdb -i ./timeline_trace.csv
-   sdx -workspace tmp --report timeline_trace.wdb
+1. Execute the following command to to convert the timeline trace to wdb format and then load timeline trace in Vitis GUI. You may need to close the previous opened Vitis GUI.
+   ```bash
+   cd build;
+   vitis_analyzer timeline_trace_hw_emu.csv 
    ```
 
 1. Zoom in by performing a **Left mouse drag** to get a more detailed view.  
@@ -173,8 +181,8 @@ For optimal performance both the hardware and software components of the applica
 	- By increasing the value of the **NUM_SCHED** macro, we increase the depth of the event queue and enable more blocks to be enqueued for processing. This will result in the write, run and read tasks to overlap and allow the kernel to execute continuously.
 	- This technique is called **software pipelining**.
 
-1. Modify line 153 to increase the value of **NUM_SCHED** to 6 as follows:
-    ```C
+1. Modify line 217 to increase the value of **NUM_SCHED** to 6 as follows:
+    ```
     #define NUM_SCHED 6
     ```
 
@@ -182,7 +190,6 @@ For optimal performance both the hardware and software components of the applica
 
 1. Rerun hardware emulation.
     ```bash
-    make clean
     make run TARGET=hw_emu
     ```
     - Since only the **idct.cpp** file was changed, the incremental makefile rebuilds only the host code before running emulation.
@@ -190,12 +197,10 @@ For optimal performance both the hardware and software components of the applica
 
 1. Convert the newly generated application timeline report
 
-    ```bash
-    cd build;
-    sdx_analyze trace -i timeline_trace_hw_emu.csv -f wdb
-    sdx -workspace tmp --report timeline_trace_hw_emu.wdb
-
-    ```
+   ```bash
+   cd build;
+   vitis_analyzer timeline_trace_hw_emu.csv 
+   ```
 
 1. Open the timeline_trace_hw_emu.wdb file in the GUI. Observe how **software pipelining** enables overlapping of data transfers and kernel execution.
 
@@ -210,20 +215,21 @@ The next step is to confirm these results by running on the FPGA attached to the
 1. Execute the accelerated application on F1 using the precompiled FPGA binary.
     
     ```bash
-    cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_01/idct
-    sudo sh
-    # Source the SDAccel runtime environment
-    source /opt/xilinx/xrt/setup.sh
+    source $AWS_FPGA_REPO_DIR/vitis_runtime_setup.sh 
+    cd $LAB_WORK_DIR/Vitis-AWS-F1-Developer-Labs/modules/module_01/idct
     # Execute the host application with the .awsxclbin FPGA binary
     ./build/IDCT.exe ./xclbin/krnl_idct.hw.awsxclbin
-    exit
+
     ```
+
 1. Here is the output of the above comamnd 
    ```
-   CPU Time:        2.38849 s
-   CPU Throughput:  214.361 MB/s
-   FPGA Time:       0.23884 s
-   FPGA Throughput: 2143.7 MB/s
+    TEST PASSED
+    CPU Time:        2.4055 s
+    CPU Throughput:  212.846 MB/s
+    FPGA Time:       0.269234 s
+    FPGA Throughput: 1901.69 MB/s
+
    ```
    Note the performance difference between the IDCT running on the CPU and on the FPGA. FPGA s about 10x faster than running on CPU. Note as well the performance difference with the previous run on F1. Using exactly the same FPGA binary but an optimized host application, the overall performance is significantly improved.
 
@@ -231,7 +237,7 @@ The next step is to confirm these results by running on the FPGA attached to the
 ### Summary  
 
 In this lab, you learned:
-* How to use the various reports generated by SDAccel to drive optimization decisions
+* How to use the various reports generated by Vitis to drive optimization decisions
 * How to use pragmas to increase kernel performance
 * How to use software pipelining to increase system performance
  

@@ -103,21 +103,22 @@ Open the `convolve_fpga.cpp` file from `src/fixedpoint`, and make the following 
    convolve_fpga_1:m_axi_gmem2-DDR[0]          RD = 0.035 KB               WR = 0.000 KB  
    ```
 
-## Generate Hardware Emulation Reports
+## Visualize Hardware Emulation Reports
 
 1. Use the following command to generate the Profile Summary report and Timeline Trace.
 
-```
-make gen_report TARGET=hw_emu STEP=fixedpoint
-```
+    ```
+    cd ../build/fixedpoint
+    vitis_analyzer profile_summary_hw_emu.csv
+    ```
 
-## View the Profile Summary Report for Hardware Emulation
+## View Profile Summary for Hardware Emulation
 
 1. Use the following command to view the Profile Summary report.
 
-```
-make view_prof_report TARGET=hw_emu STEP=fixedpoint
-```
+    ```
+    vitis_analyzer timeline_trace_hw_emu.csv
+    ```
 
 Here is the Profile Summary report for hardware emulation. The kernel execution time is now reduced to 0.46 ms. The reason for this significant speedup is that the computation for-loop is pipelined when using fixed point operations. Therefore, the total latency is improved significantly.
 

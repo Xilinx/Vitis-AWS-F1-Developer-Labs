@@ -1,26 +1,27 @@
-## Using the SDAccel xocc compiler to develop F1 accelerated applications
+## Using the Vitis v++ compiler to develop F1 accelerated applications
 
-This lab is designed to teach the fundamentals of the SDAccel development environment and programming model. This includes: familiarizing with OpenCL, understanding software and hardware emulation flows, profiling performance and identifying how to optimize host and kernel code.
+This lab is designed to teach the fundamentals of the Vitis development environment and programming model. This includes: familiarizing with OpenCL, understanding software and hardware emulation flows, profiling performance and identifying how to optimize host and kernel code.
 
 The kernel used in this lab is an Inverse Discrete Cosine Transform (IDCT), a function widely used in audio/image codecs such as HEVC.
 
 
-### Setting Up SDAccel Environment
+### Setting Up Vitis Environment
 
 1.  Open a new terminal by right-clicking anywhere in the Desktop area and selecting **Open Terminal**.
 
-1.  Set up the SDAccel environment.  
+1.  Set up the Vitis environment.  
 
     ```bash
-    cd ~/src/project_data/aws-fpga
-    source sdaccel_setup.sh
+    cd $AWS_FPGA_REPO_DIR
+    source vitis_setup.sh
     ```
-	*Note: the sdaccel_setup.sh script might generate warning messages, but these can be safely ignored.*
+	*Note: the Vitis_setup.sh script might generate warning messages, but these can be safely ignored.*
 
 1.  Go to design folder and investigate the files.
     ```bash
     # Go to the lab directory
-    cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_01/idct/
+    export LAB_WORK_DIR=/home/centos/src/project_data/
+    cd $LAB_WORK_DIR/Vitis-AWS-F1-Developer-Labs/modules/module_01/idct/
     ls
     ```
 	  The `src` folder contains the kernel source file and host code. The `Makefile` is provided for design compilation and execution. Let's open up the make file and take a look at its contents.
@@ -28,7 +29,7 @@ The kernel used in this lab is an Inverse Discrete Cosine Transform (IDCT), a fu
     vi Makefile
     ```
 
-    In 'platform selection' section, the default target platform is set as `xilinx_aws-vu9p-f1-04261818_dynamic_5_0` which is the AWS F1 platform.
+    In 'platform selection' section, the default target platform is set as `xilinx_aws-vu9p-f1_shell-v04261818_201920_1` which is the AWS F1 platform.
 
     The next couple of lines define the design files location and filenames. Following that is the host compiler settings and kernel compiler and linker settings. Notice that in the last line of kernel linker setting, DDR banks are assigned to each port. You don't need to modify any of the options here but you may want to play with them after finishing this tutorial.
 
@@ -59,7 +60,7 @@ The kernel used in this lab is an Inverse Discrete Cosine Transform (IDCT), a fu
 
 1. Go to line 520 of the **idct.cpp** file.
 
-	This section of code is where the OpenCL environment is setup in the host application. This section is typical of most SDAccel application and will look very familiar to developers with prior OpenCL experience. This body of code can often be reused as-is from project to project.
+	This section of code is where the OpenCL environment is setup in the host application. This section is typical of most Vitis application and will look very familiar to developers with prior OpenCL experience. This body of code can often be reused as-is from project to project.
 
 	To setup the OpenCL environment, the following API calls are made:
 
@@ -78,12 +79,13 @@ The kernel used in this lab is an Inverse Discrete Cosine Transform (IDCT), a fu
 
 ### Running the Emulation Flows
 
-  SDAccel provides two emulation flows which allow testing the application before deploying it on the F1 instance. The flows are referred to as software emulation and hardware emulation, respectively.
+  Vitis provides two emulation flows which allow testing the application before deploying it on the F1 instance. The flows are referred to as software emulation and hardware emulation, respectively.
   * Software emulation is used to identify syntax issues and verify the behavior of application.
   * Hardware emulation is used to get performance estimates for the accelerated application.
 
 1. Run below commands in the terminal window.
     ```bash
+    cd $LAB_WORK_DIR/Vitis-AWS-F1-Developer-Labs/modules/module_01/idct/
     make run TARGET=sw_emu
     ```
     This will run through software emulation and print out messages as shown in below to indicate the process finishes successfully.
@@ -97,6 +99,7 @@ The kernel used in this lab is an Inverse Discrete Cosine Transform (IDCT), a fu
 
 1. After software emulation finishes successfully, you can move forward to run the design in hardware emulation. The corresponding command is:
     ```bash
+    cd $LAB_WORK_DIR/Vitis-AWS-F1-Developer-Labs/modules/module_01/idct/
     make run TARGET=hw_emu
     ```
 
@@ -117,21 +120,16 @@ The kernel used in this lab is an Inverse Discrete Cosine Transform (IDCT), a fu
 
 ### Analyzing the Reports  
 
-This section covers how to locate and read the various reports generated by the emulation runs. The goal of the section is to understand the analysis reports of SDAccel before utilizing them in the next section.  
+This section covers how to locate and read the various reports generated by the emulation runs. The goal of the section is to understand the analysis reports of Vitis before utilizing them in the next section.  
 
 #### Profile Summary report
 
-After the emulation run completes, an profile_summary_hw_emu.csv file is generated in the `build` folder. Before viewing it in SDAccel GUI, it must be converted into an appropriate format.
+After the emulation run completes, an profile_summary_hw_emu.csv file is generated in the `build` folder. Before viewing it in Vitis GUI, it must be converted into an appropriate format.
 
-1. Convert the .csv file to the .xprf format
+Open the generated profile summary report generated
 ```
-cd build; 
-sdx_analyze profile -i profile_summary_hw_emu.csv -f protobuf
-```
-
-2. Open the converted profile summary .xprf file in the SDAccel GUI
-```
-sdx -workspace tmp -report profile_summary_hw_emu.xprf
+cd ./build/
+vitis_analyzer profile_summary_hw_emu.csv
 ```
 
   ![](../../images/module_01/lab_02_idct/HWProfile.PNG)
@@ -156,14 +154,15 @@ This number will serve as reference point to compare against after optimization.
 
 #### HLS reports
 
-The SDAccel xocc compiler also generates **HLS Reports** for each kernel. **HLS Reports** explain the results of compiling the kernel into hardware. It contains many details (including clocking, resources or device utilization) about the performance and logic usage of the custom-generated hardware logic. These details provide many insights to guide the kernel optimization process.    
+The Vitis v++ compiler also generates **HLS Reports** for each kernel. **HLS Reports** explain the results of compiling the kernel into hardware. It contains many details (including clocking, resources or device utilization) about the performance and logic usage of the custom-generated hardware logic. These details provide many insights to guide the kernel optimization process.    
 
 1. Locate the HLS reports:
 ```
+cd $LAB_WORK_DIR/Vitis-AWS-F1-Developer-Labs/modules/module_01/idct/
 find . -name "*_csynth.rpt"
 ```
 
-2. Open the **krnl_idct_dataflow_csynth.rpt** file, scroll to the **Performance Estimates** section, locate the **Latency (clock cycles)**  summary table and note the following performance numbers:
+2. Open the **./build/reports/krnl_idct.hw_emu/hls_reports/krnl_idct_csynth.rpt** file, scroll to the **Performance Estimates** section, locate the **Latency (clock cycles)**  summary table and note the following performance numbers:
 
   - Latency (min/max):
   - Interval (min/max):
@@ -177,18 +176,12 @@ find . -name "*_csynth.rpt"
 
 #### Application Timeline report
 
-In addition to the profile_summary_hw_emu.csv file, the emulation run also generates an timeline_trace_hw_emu.csv file in yhe `build` folder. Before viewing it in SDAccel GUI, it must be converted into an appropriate format.
+In addition to the profile_summary_hw_emu.csv file, the emulation run also generates an timeline_trace_hw_emu.csv file in yhe `build` folder. Before viewing it in Vitis GUI, it must be converted into an appropriate format.
 
-1. Convert the .csv file to the .wdb format
-    ```
-    cd build; 
-    sdx_analyze trace -i timeline_trace_hw_emu.csv -f wdb
-    ```
-
-1. Execute the following command to load timeline trace in SDAccel GUI
-   ```
-   sdx -workspace tmp --report timeline_trace_hw_emu.wdb
-   ```
+Open the generated profile summary report generated
+```
+vitis_analyzer timeline_trace_hw_emu.csv 
+```
 
 ![](../../images/module_01/lab_02_idct/SWTimeline.PNG)
 
@@ -200,7 +193,7 @@ The **Application Timeline** collects and displays host and device events on a c
 In this lab, you learned:
 * Important OpenCL API calls to communicate between the host and the FPGA
 * The differences between the software and hardware emulation flows and how to run them
-* How to read the various reports generated by SDAccel
+* How to read the various reports generated by Vitis
 
 
 In the next lab you utilize these analysis capabilities to drive and measure code optimizations.

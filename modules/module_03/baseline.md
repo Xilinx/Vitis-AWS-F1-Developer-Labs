@@ -5,7 +5,7 @@
  </tr>
 </table>
 
-# 2. Creating an SDAccel Application from the C Application
+# 2. Creating an Vitis Application from the C Application
 
 In the last lab, you determined that the `convolve_cpu` function is where the bulk of time is spent in the application. To accelerate performance, you are going to move that function into a kernel to run on the FPGA accelerator card.
 
@@ -57,7 +57,7 @@ Use the following instructions to convert the C code into kernel code, and conve
 1. Go to the `makefile` directory, and use the following command to run hardware emulation.
 
     ```
-    cd design/makefile
+    cd $LAB_WORK_DIR/Vitis-AWS-F1-Developer-Labs/modules/module_03/design/makefile
     make run TARGET=hw_emu STEP=baseline SOLUTION=1 NUM_FRAMES=1
     ```
 
@@ -75,12 +75,13 @@ Use the following instructions to convert the C code into kernel code, and conve
 
     The first line prints the clock time and the emulation time of the previous run. The clock time is the current system time, and the emulation time is the time the emulator simulated for this run. The subsequent lines display the data size that was transferred between the FPGA device and on-board FPGA RAM.
 
-## Generate Reports for Hardware Emulation
+## Visualize Reports for Hardware Emulation
 
 1. Use the following command to generate the Profile Summary report and Timeline Trace.
 
     ```
-    make gen_report TARGET=hw_emu STEP=baseline
+    cd ../build/baseline
+    vitis_analyzer profile_summary_hw_emu.csv
     ```
 
 ## View Profile Summary for Hardware Emulation
@@ -88,7 +89,7 @@ Use the following instructions to convert the C code into kernel code, and conve
 1. Use the following command to view the Profile Summary report.
 
     ```
-    make view_prof_report TARGET=hw_emu STEP=baseline
+    vitis_analyzer timeline_trace_hw_emu.csv
     ```
 
 1. Now, look at the Profile Summary report. In the *Kernel Execution* section, you can see that the kernel execution time is 10.807 ms. This number will be used to measure the performance boost after each optimization step.
