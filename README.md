@@ -14,7 +14,7 @@ If you need help with any of the above, follow the [**setup instructions**](./se
 
 ### Supported Versions
 
-These labs are based on Vitis 2019.2 available with the FPGA Developer AMI v1.8.1. Please make sure to select this version when you launch your instance. To find this AMI, search for "FPGA Developer AMI - 1.8.1" in the Community AMIs.
+These labs are based on Vitis 2019.2 available with the FPGA Developer AMI 1.8.1. Please make sure to select this version when you launch your instance. To find this AMI, search for "FPGA Developer AMI - 1.8.1" in the Community AMIs.
 
 ### Developer Lab Modules
 
