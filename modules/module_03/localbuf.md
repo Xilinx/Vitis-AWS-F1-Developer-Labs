@@ -173,21 +173,23 @@ convolve_fpga_1:m_axi_gmem1-DDR[0]          RD = 20.000 KB              WR = 20.
 convolve_fpga_1:m_axi_gmem2-DDR[0]          RD = 0.035 KB               WR = 0.000 KB
 ```
 
-## Generate Reports for Hardware Emulation
+## Visualize Reports for Hardware Emulation
 
 1. Use the following command to generate the Profile Summary report and Timeline Trace.
 
     ```
-    make gen_report TARGET=hw_emu STEP=localbuf
+    cd ../build/localbuf
+    vitis_analyzer profile_summary_hw_emu.csv
     ```
 
 ## View Profile Summary for Hardware Emulation
 
 1. Use the following command to view the Profile Summary report.
 
-   ```
-   make view_prof_report TARGET=hw_emu STEP=localbuf
-   ```
+    ```
+    vitis_analyzer timeline_trace_hw_emu.csv
+    ```
+
 
 The following figure shows the generated Profile Summary report. The kernel execution time is now 1.969 ms rather than the baseline performance of 10.807 ms (see the following table). This is because you removed all global memory accesses for the calculation and stored image data and coefficients in the local memory.
 

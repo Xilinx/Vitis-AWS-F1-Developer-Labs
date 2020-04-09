@@ -17,57 +17,21 @@ Note the following data:
 * **Total Time**: Measured in hardware Timeline Trace report. For a fair comparison, this will include the data transfer and kernel execution time.
 * **Throughput**: Calculated by Total Data Processed(MB)/Total Time(s)
 
->**IMPORTANT**: Each of the steps in this lab compiles the hardware kernel and can take significant time to complete. To save your time, pre-built xclbin files are provided under /design/xclbin folder.
+>**IMPORTANT**: Generating of xclbin on hardware can take significant time to complete. For your convenience, pre-built xclbin files are provided under /design/xclbin folder.
 
 To run the labs on F1 hardware, you need to follow the steps listed below. The same steps are applied to all five labs, so we will not repeat it in every section.
 
-1. Build xclbin file for hardware run.
 
-```
-make build TARGET=hw STEP=[baseline/localbuf/fixedpoint/dataflow/multicu] SOLUTION=1
-```
+```bash
+export LAB_WORK_DIR=/home/centos/src/project_data
+cd $LAB_WORK_DIR/Vitis-AWS-F1-Developer-Labs/modules/module_03/design/build/baseline
 
-2. Create awsxclbin file for F1 configuration.
+# Source the Vitis runtime environment
+source $AWS_FPGA_REPO_DIR/vitis_runtime_setup.sh
 
-```
-$SDACCEL_DIR/tools/create_sdaccel_afi.sh -xclbin=<input_xilinx_fpga_binary_xclbin_filename>
-		-o=<output_aws_fpga_binary_awsxclbin_filename_root> -s3_bucket=<bucket-name> -s3_dcp_key=<dcp-folder-name> -s3_logs_key=<logs-folder-name>
-```
+# Execute the host application with the .awsxclbin FPGA binary for Step "baseline"
+./convolution.exe  --kernel_name convolve_fpga ../../video.mp4 ../../xclbin/baseline/fpga_container_hw.awsxclbin
 
-3. Step2 will create a *_afi_id.txt file, open this file and record the AFI Id.
-
-4. Check the AFI creation state using AFI ID as shown below.
-```
-aws ec2 describe-fpga-images --fpga-image-ids <AFI ID>
-```
-
-If the state is shown as 'available', it indicates AFI creation is completed.
-
-```
-"State": {
-              "Code": "available"
-        },
-
-```
-
-5. Run application on the hardware. For your convenience, all the awsxclbin are generated and planced under <..>/module03/design/xclbins. If you are planning to use these pregenerated xclbins, then copy these to respective <...>/module03/design/build/[baseline/localbuf/fixedpoint/dataflow/multicu] directories
-
-```
-sudo sh
-# Source the SDAccel runtime environment
-source /opt/xilinx/xrt/setup.sh
-# Execute the host application with the .awsxclbin FPGA binary
-cd build/baseline
-./convolution.exe  --kernel_name convolve_fpga ../../video.mp4 ./fpga_container_hw.awsxclbin
-```
-
-6. Generate reports.
-
-```
-mv ./sdaccel_profile_summary.csv sdaccel_profile_summary_hw.csv
-mv ./sdaccel_profile_summary.csv sdaccel_profile_summary_hw.csv
-cd ../../design/makefile
-make gen_report TARGET=hw STEP=baseline
 ```
 
 
@@ -143,7 +107,7 @@ The final performance benchmarking table displays as follows.
 
 Congratulations! You have successfully completed all the modules of this lab to convert a standard CPU-based application into an FPGA accelerated application, running with nearly 300X the throughput when running on the AWS F1 VU9P card. You set performance objectives, and then you employed a series of optimizations to achieve your objectives.
 
-1. You created an SDAccel application from a basic C application.
+1. You created an Vitis application from a basic C application.
 1. You familiarized yourself with the reports generated during software and hardware emulation.
 1. You explored various methods of optimizing your HLS kernel.
 1. You learned how to set an OpenCL API command queue to execute out-of-order for improved performance.

@@ -31,19 +31,22 @@ The accelerator is architected to process 8 words in parallel at 250Mhz. In the 
 1. Go to the `makefile` directory and run the make command.
 
     ```bash
-    cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_02/makefile
+    export LAB_WORK_DIR=/home/centos/src/project_data/
+
+    cd $LAB_WORK_DIR/Vitis-AWS-F1-Developer-Labs/modules/module_02/makefile
     make run STEP=single_buffer SOLUTION=1
     ```
 
 2. The output is as follows.
 
-    ```
-    --------------------------------------------------------------------
-     Executed FPGA accelerated version  |  1030.6703 ms   ( FPGA 616.349 ms )
-     Executed Software-Only version     |  3694.6240 ms
-    --------------------------------------------------------------------
-     Verification: PASS
-    ```
+  ```
+  Running with a single buffer of 1398.903 MBytes for FPGA processing
+  --------------------------------------------------------------------
+  Executed FPGA accelerated version  |  1025.9631 ms   ( FPGA 616.350 ms )
+  Executed Software-Only version     |  3924.9605 ms
+  --------------------------------------------------------------------
+  Verification: PASS
+  ```
     
     While this initial version is already 3.5x faster than the software-only version, you can see that is noticeably slower than the optimized version which you ran at then of the previous lab. 
     
@@ -53,14 +56,13 @@ The accelerator is architected to process 8 words in parallel at 250Mhz. In the 
 1. Change your working directory to `modules/module_02/build/single_buffer`.
 
     ```bash
-    cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_02/build/single_buffer
+    cd $LAB_WORK_DIR/Vitis-AWS-F1-Developer-Labs/modules/module_02/build/single_buffer
     ```
    
 2. Run the following command to look at the Profile Summary Report.
 
     ```bash
-    sdx_analyze  profile  -f html -i ./profile_summary.csv
-    firefox profile_summary.html
+    vitis_analyzer profile_summary.csv
     ```
 
 *  Looking at the *Kernel Execution* section in the report, we see the kernel execution time as 175.173 ms.
@@ -75,8 +77,7 @@ The accelerator is architected to process 8 words in parallel at 250Mhz. In the 
 1. Run the following commands to view the Timeline Trace report.
 
     ```bash
-    sdx_analyze trace -f wdb -i ./timeline_trace.csv
-    sdx -workspace workspace -report timeline_trace.wdb
+    vitis_analyzer timeline_trace.csv
     ```
 
 2. Zoom in to display the timeline trace report as follows:
@@ -85,7 +86,7 @@ The accelerator is architected to process 8 words in parallel at 250Mhz. In the 
 
 As expected, there is a sequential execution of operations starting from the data transferred from the host to the FPGA, followed by compute in the FPGA and transferring back the results from the FPGA to host.
 
-3. Exit the SDAccel application to return to the terminal.
+3. Exit the Vitis application to return to the terminal.
 
 ### Conclusion
 
@@ -107,7 +108,7 @@ To improve performance, you can split and send the input buffer in multiple iter
 
 1. Change your working directory to `modules/module_02/reference_files`.
     ```bash
-    cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_02/reference_files
+    cd $LAB_WORK_DIR/Vitis-AWS-F1-Developer-Labs/modules/module_02/reference_files
     ```
 2. Open `run_split_buffer.cpp` file with a file editor.
 
@@ -228,17 +229,19 @@ f. The host waits until the output is read back from the FPGA.
 1. Go to the `makefile` directory and run the `make` command.
 
     ```bash
-    cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_02/makefile
+    cd $LAB_WORK_DIR/Vitis-AWS-F1-Developer-Labs/modules/module_02/makefile
     make run STEP=split_buffer SOLUTION=1
     ```
 
 2. The output is as follows:
 
     ```
+    Splitting data in 2 sub-buffers of 699.452 MBytes for FPGA processing
     --------------------------------------------------------------------
-     Executed FPGA accelerated version  |   942.3678 ms   ( FPGA 564.939 ms )
-     Executed Software-Only version     |   3640.0865 ms
+    Executed FPGA accelerated version  |   955.0497 ms   ( FPGA 565.163 ms )
+    Executed Software-Only version     |   3921.1652 ms
     --------------------------------------------------------------------
+
      Verification: PASS
     ```
 
@@ -246,14 +249,13 @@ f. The host waits until the output is read back from the FPGA.
 1. Change your working directory to `modules/module_02/build/split_buffer`.
 
    ```bash
-   cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_02/build/split_buffer
+   cd $LAB_WORK_DIR/Vitis-AWS-F1-Developer-Labs/modules/module_02/build/split_buffer
    ```
    
 2. Run the following commands to view the Timeline Trace report.
 
     ```bash
-    sdx_analyze trace -f wdb -i ./timeline_trace.csv
-    sdx -workspace workspace -report timeline_trace.wdb
+    vitis_analyzer timeline_trace.csv
     ```
 
 3. Zoom in to display the timeline trace report as follows:
@@ -262,7 +264,7 @@ f. The host waits until the output is read back from the FPGA.
 
 The Timeline Trace confirms that we have achieved the execution schedule that we aspired to obtain: there is an overlap of the read, compute, and write operations between the first and second iterations. The execution time of the first kernel run and the first data read are effectively "hidden" behind the data write time. This results in a faster overall run.
 
-4. Exit the SDAccel application to return to the terminal.
+4. Exit the Vitis application to return to the terminal.
 
 ### Conclusion
 
@@ -279,7 +281,7 @@ In the previous step, you split the input buffer into two sub-buffers and overla
 1. Change your working directory to `modules/module_02/reference_files`.
 
    ```bash
-   cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_02/reference_files
+   cd $LAB_WORK_DIR/Vitis-AWS-F1-Developer-Labs/modules/module_02/reference_files
    ```
 
 2. Open `run_generic_buffer.cpp` file with a file editor.
@@ -389,7 +391,7 @@ e. The host waits until the output of each iteration is read back to the host.
 1. Go to the `makefile` directory and run the `make` command.
  
     ```bash
-    cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_02/makefile
+    cd $LAB_WORK_DIR/Vitis-AWS-F1-Developer-Labs/modules/module_02/makefile
     make run STEP=generic_buffer ITER=16 SOLUTION=1
     ```
    The argument `ITER` represents the number of iterations of data transfer from host to FPGA.
@@ -406,9 +408,9 @@ e. The host waits until the output of each iteration is read back to the host.
 
     ```
     --------------------------------------------------------------------
-     Executed FPGA accelerated version  |   899.2955 ms   ( FPGA 515.489 ms )
-     Executed Software-Only version     |   3639.3084 ms
-    --------------------------------------------------------------------
+    Executed FPGA accelerated version  |   920.6189 ms   ( FPGA 516.435 ms )
+    Executed Software-Only version     |   3931.2579 ms
+    -------------------------------------------------------------------
      Verification: PASS
     ```
 
@@ -416,14 +418,13 @@ e. The host waits until the output of each iteration is read back to the host.
 1. Change your working directory to `modules/module_02/build/generic_buffer`.
 
     ```bash
-    cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_02/build/generic_buffer
+    cd $LAB_WORK_DIR/Vitis-AWS-F1-Developer-Labs/modules/module_02/build/generic_buffer
     ```
    
 2. Run the following commands to look at Timeline Trace report.
 
     ```bash
-    sdx_analyze trace -f wdb -i ./timeline_trace.csv
-    sdx -workspace workspace -report timeline_trace.wdb
+    vitis_analyzer timeline_trace.csv
     ```
 
 3. Zoom in to display the timeline trace report as follows.
@@ -432,7 +433,7 @@ e. The host waits until the output of each iteration is read back to the host.
 
 As you can see from the report, the input buffer is split into 16 sub buffers, and there are overlaps between read, compute, and write for all iterations. The total computation is divided in 16 iterations, but 15 of them are happening simultaneously with data transfers and therefore only the last compute counts towards total FPGA execution time.
 
-4. Exit the SDAccel application to return to the terminal.
+4. Exit the Vitis application to return to the terminal.
 
 ### Conclusion
 
@@ -453,7 +454,7 @@ Because the total compute is split into multiple iterations, you can start post-
 1. Change your working directory to `modules/module_02/reference_files`.
 
     ```bash
-    cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_02/reference_files
+    cd $LAB_WORK_DIR/Vitis-AWS-F1-Developer-Labs/modules/module_02/reference_files
     ```
 
 2. Open `run_sw_overlap.cpp` file with a file editor.
@@ -514,17 +515,17 @@ b. Block the host only if the hash function of the words are still not computed 
 1. Go to the `modules/module_02/makefile` directory and run the `make` command.
 
     ```bash
-    cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_02/makefile
+    cd $LAB_WORK_DIR/Vitis-AWS-F1-Developer-Labs/modules/module_02/makefile
     make run STEP=sw_overlap ITER=16 SOLUTION=1
     ```
 
 2. The output is as follows.
 
     ```
-    --------------------------------------------------------------------
-    Executed FPGA accelerated version  |   552.5344 ms   ( FPGA 528.744 ms )
-    Executed Software-Only version     |   3864.4070 ms
-    --------------------------------------------------------------------
+    ------------------------------------------------------------------------
+    Executed FPGA accelerated version  |   540.5635 ms   ( FPGA 515.169 ms )
+    Executed Software-Only version     |   3936.5408 ms
+    ------------------------------------------------------------------------
     Verification: PASS
     ```
 
@@ -532,14 +533,13 @@ b. Block the host only if the hash function of the words are still not computed 
 1. Change your working directory to `modules/module_02/build/sw_overlap`.
 
     ```bash
-    cd ~/SDAccel-AWS-F1-Developer-Labs/modules/module_02/build/sw_overlap
+    cd $LAB_WORK_DIR/Vitis-AWS-F1-Developer-Labs/modules/module_02/build/sw_overlap
     ```
    
 2. Run the following commands to view the Timeline Trace report.
 
     ```bash
-    sdx_analyze trace -f wdb -i ./timeline_trace.csv
-    sdx -workspace workspace -report timeline_trace.wdb
+    vitis_analyzer timeline_trace.csv
     ```
 
 3. Zoom in to display the timeline trace report as follows.
@@ -548,7 +548,7 @@ b. Block the host only if the hash function of the words are still not computed 
 
 As seen above in *OpenCL API Calls* of the *Host* section with the yellow marking, the red segments are shorter in width indicating that the processing time of the host CPU is now overlapping with FPGA processing, which improved the overall application execution time. In the previous steps, the host remained completely idle until the FPGA finished all its processing.
 
-4. Exit the SDAccel application to return to the terminal.
+4. Exit the Vitis application to return to the terminal.
 
 ### Conclusion
 
@@ -561,5 +561,5 @@ In the next module, you will create and optimize a two-dimensional convolution a
 ---------------------------------------
 
 <p align="center"><b>
-Start the second module: <a href="../module_03/README.md">Methodology for Optimizing Accelerated FPGA Applications</a>
+Start the Next module: <a href="../module_03/README.md">Methodology for Optimizing Accelerated FPGA Applications</a>
 </b></p>

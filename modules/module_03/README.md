@@ -20,7 +20,7 @@ You begin this tutorial with a baseline application, and profile it to examine t
 * Dataflow and streams
 * Optimization of Loops
 
-This tutorial follows the *SDAccel Methodology Guide* ([UG1346](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2019_1/ug1346-sdaccel-methodology-guide.pdf)) about how to migrate a CPU-based application to an optimized FPGA-accelerated design. For a deeper understanding, you should review that material as you are working through this tutorial.
+This tutorial follows the Chapter 4 of  *Methodology for Accelerating Applications with the Vitis Software Platform* ([UG1393](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2019_2/ug1393-vitis-application-acceleration.pdf)) on how to migrate a CPU-based application to an optimized FPGA-accelerated design. For a deeper understanding, you should review that material as you are working through this tutorial.
 
 # Before You Begin
 
@@ -30,17 +30,15 @@ Before starting this lab, perform a fresh reinstall of the AWS EC2 FPGA Developm
 
 ```bash  
 # Install the AWS EC2 FPGA Development Kit
-cd ~
-git clone https://github.com/aws/aws-fpga.git
-cd aws-fpga                                   
-source sdaccel_setup.sh
+cd $AWS_FPGA_REPO_DIR
+git clone https://github.com/aws/aws-fpga.git  
+source vitis_setup.sh
 
-# Download the SDAccel F1 Developer Labs
-cd ~
-rm -rf SDAccel-AWS-F1-Developer-Labs
-git clone https://github.com/Xilinx/SDAccel-AWS-F1-Developer-Labs
+# Download the Vitis F1 Developer Labs
+cd $AWS_FPGA_REPO_DIR/
+rm -rf Vitis-AWS-F1-Developer-Labs
+git clone https://github.com/Xilinx/Vitis-AWS-F1-Developer-Labs.git Vitis-AWS-F1-Developer-Labs
 ```
-
 
 
 ## ffmpeg plugin setup
@@ -66,7 +64,7 @@ The labs in this tutorial use:
 The following labs walk through the best practices for taking an existing application and optimizing it as an FPGA-accelerated application. This tutorial is divided into several different labs that show the methodology. It is recommended to complete each lab before proceeding to the next.
 
 1. [Evaluating the Original Application](RunOriginalCode.md): In this lab, the original C-based application processes an input video to generate the convolution output video. This lab also discusses setting realistic performance goals for an accelerated application.
-2. [Creating an SDAccel Application from the C Application](baseline.md): Convert the original C code into a host program and hardware kernel that is called by the host using the OpenCL™ API.
+2. [Creating an Vitis Application from the C Application](baseline.md): Convert the original C code into a host program and hardware kernel that is called by the host using the OpenCL™ API.
 3. [Optimizing Memory Transfers](localbuf.md): Learn methods for optimizing the hardware kernel for improved memory access. You will learn how to use local cache to make efficient use of the FPGA bandwidth.
 4. [Optimizing Using Fixed Point Data Types](fixedtype.md): Discusses how data types affect design performance.
 5. [Optimizing with Dataflow](dataflow.md): Improve the compute efficiency of your kernel, applying dataflow and streaming to improve the data-path in your kernel.
