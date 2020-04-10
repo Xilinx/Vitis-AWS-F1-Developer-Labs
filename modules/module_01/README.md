@@ -1,4 +1,4 @@
-## Module 1: Introduction to the SDAccel Flow
+## Module 1: Introduction to the Vitis Flow
 
 
 ### Preparing to run the labs
@@ -7,15 +7,15 @@ Before starting this module, perform a fresh reinstall of the AWS EC2 FPGA Devel
 
 ```bash  
 # Install the AWS EC2 FPGA Development Kit
-cd ~
-git clone https://github.com/aws/aws-fpga.git  
-cd aws-fpga                                         
-source sdaccel_setup.sh
+git clone https://github.com/aws/aws-fpga.git $AWS_FPGA_REPO_DIR
+cd $AWS_FPGA_REPO_DIR                                     
+source vitis_setup.sh
 
-# Download the SDAccel F1 Developer Labs
-cd ~
-rm -rf SDAccel-AWS-F1-Developer-Labs
-git clone https://github.com/Xilinx/SDAccel-AWS-F1-Developer-Labs.git SDAccel-AWS-F1-Developer-Labs
+# Download the Vitis F1 Developer Labs
+export LAB_WORK_DIR=/home/centos/src/project_data/
+cd $LAB_WORK_DIR
+rm -rf Vitis-AWS-F1-Developer-Labs
+git clone https://github.com/Xilinx/Vitis-AWS-F1-Developer-Labs.git Vitis-AWS-F1-Developer-Labs
 ```
 
 ### Module overview
@@ -25,13 +25,13 @@ This module is divided in 3 labs. Since building FPGA binaries is not instantane
 1. **Running the "Hello World" example** \
 You will get familiar with the steps involved in running a simple application on the F1 instance.
 
-1. **Using the SDAccel xocc compiler to develop F1 accelerated applications** \
-You will use the XOCC command line flow to create and profile an F1 accelerator. The lab focuses on the Inverse Discrete Cosine Transform (IDCT), a compute intensive function used at the heart of all video codecs.
+1. **Using the Vitis v++ compiler to develop F1 accelerated applications** \
+You will use the v++ command line flow to create and profile an F1 accelerator. The lab focuses on the Inverse Discrete Cosine Transform (IDCT), a compute intensive function used at the heart of all video codecs.
 
 1. **Optimizing F1 applications** \
-You will continue the IDCT project started in the previous lab and learn how you can use the various reports provided by SDAccel to guide the performance optimization process of your application.
+You will continue the IDCT project started in the previous lab and learn how you can use the various reports provided by Vitis to guide the performance optimization process of your application.
 
-After you complete the last lab, you will be guided to close your RDP session, stop your F1 instance and explore next steps to continue your experience with SDAccel on AWS.
+After you complete the last lab, you will be guided to close your RDP session, stop your F1 instance and explore next steps to continue your experience with Vitis on AWS.
 
 ---------------------------------------
 

@@ -189,10 +189,10 @@ Now you can compile and run the design, and you should see results similar to th
 1. Before running emulation, look at the Makefile again, and pay attention to line 150.
 
    ```
-   XOCCFLAGS += --nk convolve_fpga:$(CU_NUM)
+   VPPFLAGS += --nk convolve_fpga:$(CU_NUM)
    ```
 
-   Here the `xocc --nk` option is used to specify the number of kernel instances, or CUs, generated during the linking step of the build process. For this lab, CU_NUM is defined as 4.
+   Here the `v++ --nk` option is used to specify the number of kernel instances, or CUs, generated during the linking step of the build process. For this lab, CU_NUM is defined as 4.
 
 2. Go to the `makefile` directory.
 3. Use the following command to run hardware emulation.
@@ -223,21 +223,22 @@ convolve_fpga_4:m_axi_gmem3-DDR[0]          RD = 0.035 KB               WR = 0.0
 
 You can now perform four times more work in about the same amount of time. You transfer more data from global memory, but that is because each CU needs to read the surrounding padding lines.
 
-### Generate Reports for Multiple Compute Units
+## Visualize Reports for Hardware Emulation
 
-1. Use the following command to generate the Profile Summary report and Timeline Trace report.
+1. Use the following command to generate the Profile Summary report and Timeline Trace.
 
-```
-make gen_report TARGET=hw_emu STEP=multicu
-```
+    ```
+    cd ../build/multicu
+    vitis_analyzer profile_summary_hw_emu.csv
+    ```
 
-### View Profile Summary Report for Hardware Emulation
+## View Profile Summary for Hardware Emulation
 
 1. Use the following command to view the Profile Summary report.
 
-```
-make view_prof_report TARGET=hw_emu STEP=multicu
-```
+    ```
+    vitis_analyzer timeline_trace_hw_emu.csv
+    ```
 
 The following figure shows the Profile Summary report. The kernel execution time for four CUs is around 0.067 ms each.
 

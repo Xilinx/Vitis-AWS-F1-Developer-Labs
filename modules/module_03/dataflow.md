@@ -9,7 +9,7 @@
 
 In the last lab, you improved the efficiency of the kernel by using fixed point data types. In this lab, you will look at the structure of your code to increase task and instruction level parallelism. Pipelining is a common technique used by most processors to parallelize at the instruction level. Pipelining allows the processor to simultaneously process multiple instructions at the same time by executing them on hardware that has finished the previous instruction.
 
-The SDAccel™ compiler automatically pipelines most operations. You do not need to add anything to enable pipelining in your code. You can look at how each of the loops have been pipelined in the HLS report.
+The v++ compiler automatically pipelines most operations. You do not need to add anything to enable pipelining in your code. You can look at how each of the loops have been pipelined in the HLS report.
 
 While pipelining usually works at the instruction level, the SDx tool can also pipeline at the function level using a transformation called "dataflow". Dataflow allows you to pipeline multiple functions so that you can execute their instructions simultaneously on different sets of iterations. The following figure shows an example.
 
@@ -17,7 +17,8 @@ While pipelining usually works at the instruction level, the SDx tool can also p
 
 Without using dataflow, `func_A`, `func_B`, and `func_C` are executed sequentially. With dataflow enabled, the three functions can overlap, which will reduce the total execution time.
 
->**TIP**: This lab relates to "Step 1: Partition the Code into a Load-Compute-Store Pattern" in the *SDAccel Methodology Guide* ([UG1346](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2019_1/ug1346-sdaccel-methodology-guide.pdf)).
+>**TIP**: Refer to "Step 2" of Section *Methodology for Developing C/C++ Kernels* in the *Vitis Unified Software
+Platform Documentation* ([UG1393](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2019_2/ug1393-vitis-application-acceleration.pdf))*
 
 In this lab, in order to implement the functions in dataflow, you will first divide the original convolution function into three separate functions:
 
@@ -151,7 +152,10 @@ The three functions will use streams to pass data between them. To understand st
 
    A local buffer `window_mem` is defined to store the necessary lines of data for computing. `>>` operator is used to extract elements from stream. The first few lines of the `window_mem` array should be zeroed out because these represent the padding of the image. This will only be done on the first iteration.
 
-   The computation is implemented in the main loop, and the loop is pipelined because the COEFFICIENT_SIZE variable is predefined at the compile time. For more details about optimizing loops, refer to "Step 4: Improve Loop Latencies" in the *SDAccel Methodology Guide* ([UG1346](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2019_1/ug1346-sdaccel-methodology-guide.pdf)).
+   The computation is implemented in the main loop, and the loop is pipelined because the COEFFICIENT_SIZE variable is predefined at the compile time. 
+   
+   For more details about optimizing loops, refer to Step 2 of Section "Methodology for Developing C/C++ Kernels" in the *Vitis Unified Software
+Platform Documentation* ([UG1393](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2019_2/ug1393-vitis-application-acceleration.pdf)).
 
    After computation, the `out` value is pushed to a `write_stream` for the downstream function to process.
 
@@ -188,21 +192,23 @@ convolve_fpga_1:m_axi_gmem2-DDR[0]          RD = 0.000 KB               WR = 20.
 convolve_fpga_1:m_axi_gmem3-DDR[0]          RD = 0.035 KB               WR = 0.000 KB     
 ```
 
-### Generate Hardware Emulation Reports for Dataflow
+### Visualize Hardware Emulation Reports for Dataflow
 
 1. Use the following command to generate the Profile Summary report and Timeline Trace.
 
-```
-make gen_report TARGET=hw_emu STEP=dataflow
-```
+    ```
+    cd ../build/dataflow
+    vitis_analyzer profile_summary_hw_emu.csv
+    ```
 
-### View the Profile Summary Report for Hardware Emulation
+## View Profile Summary for Hardware Emulation
 
 1. Use the following command to view the Profile Summary report.
 
-```
-make view_prof_report TARGET=hw_emu STEP=dataflow
-```
+    ```
+    vitis_analyzer timeline_trace_hw_emu.csv
+    ```
+
 
 The following figure shows the Profile Summary report for hardware emulation. The kernel execution time is now reduced to 0.057 ms.
 

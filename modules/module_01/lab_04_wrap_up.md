@@ -15,24 +15,24 @@ It is now time to wrap-up this module. These steps will show you how to close yo
 
 ### Congratulations!
 
-You have successfully completed the first module of SDAccel AWS F1 Developer Labs.
+You have successfully completed the first module of Vitis AWS F1 Developer Labs.
 
 
 ### Next steps
 
-More modules will be added to the SDAccel AWS F1 Developer Labs over time. In the meantime, you can continue learning about AWS F1 and SDAccel by exploring the following resources:
+More modules will be added to the Vitis AWS F1 Developer Labs over time. In the meantime, you can continue learning about AWS F1 and Vitis by exploring the following resources:
 
 | Resource | Title                       | Description  |
 | -------- |---------------------------- | ----- |
-| Video  | **Learn more about the SDAccel OpenCL application structure** | This video introduces the host code and kernel elements of an OpenCL application and explains how they map to Xilinx FPGAs. [**Click here**](https://www.xilinx.com/video/hardware/opencl-application-structure.html). |
-| Tutorial | **Get started on F1 with the SDAccel C/OpenCL flow** | This guide takes new users through all the steps required to build a first working application on F1. [**Click here**](https://github.com/Xilinx/SDAccel_Examples/wiki/Getting-Started-on-AWS-F1-with-SDAccel-and-C-OpenCL-Kernels). |
-| Tutorial | **Get started on F1 with the SDAccel RTL flow** | This guide is targeted to developers with prior hardware design experience and legacy RTL designs. [**Click here**](https://github.com/Xilinx/SDAccel_Examples/wiki/Getting-Started-on-AWS-F1-with-SDAccel-and-RTL-Kernels). |
-| Documentation | **SDAccel HTML Documentation** | Learn how to get the most out of the SDAccel development environment. [**Click here**](https://www.xilinx.com/html_docs/xilinx2018_3/sdaccel_doc/). |
-| F1 App | **SDAccel Apps and Libraries** | Check-out the growing list of accelerated application and libraries available today. [**Click here**](https://www.xilinx.com/products/design-tools/acceleration-zone.html#libraries). |
+| Video  | **Learn more about the Vitis OpenCL application structure** | This video introduces the host code and kernel elements of an OpenCL application and explains how they map to Xilinx FPGAs. [**Click here**](https://www.xilinx.com/video/hardware/opencl-application-structure.html). |
+| Tutorial | **Get started on F1 with the Vitis C/OpenCL flow** | This guide takes new users through all the steps required to build a first working application on F1. [**Click here**](https://github.com/Xilinx/SDAccel-Tutorials/blob/master/docs/aws-getting-started/CPP/README.md). |
+| Tutorial | **Get started on F1 with the Vitis RTL flow** | This guide is targeted to developers with prior hardware design experience and legacy RTL designs. [**Click here**](https://github.com/Xilinx/SDAccel-Tutorials/blob/master/docs/aws-getting-started/RTL/README.md). |
+| Documentation | **Vitis HTML Documentation** | Learn how to get the most out of the Vitis development environment. [**Click here**](https://www.xilinx.com/html_docs/xilinx2018_3/Vitis_doc/). |
+| F1 App | **Vitis Apps and Libraries** | Check-out the growing list of accelerated application and libraries available today. [**Click here**](https://www.xilinx.com/products/design-tools/acceleration-zone.html#libraries). |
 | F1 App | **Test-drive Xilinx GoogLeNet / ResNet on AWS F1** | See for yourself how Xilinx can accelerate machine learning image classification on AWS F1. [**Click here**](https://aws.amazon.com/marketplace/pp/B077FM2JNS). |
 
 ---------------------------------------
 
 <p align="center"><b>
-Return to the beginning: <a href="../../README.md">SDAccel AWS F1 Developer Labs</a>
+Return to the beginning: <a href="../../README.md">Vitis AWS F1 Developer Labs</a>
 </b></p>

@@ -34,7 +34,7 @@ The following steps explain how to launch an EC2 F1 instance starting from the F
 1. Navigate to the [AWS Marketplace](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ?qid=1585105385966&sr=0-1&ref_=srh_res_product_title)
 1. Click on **Continue to Subscribe**
 1. Accept the EULA and click **Continue to Configuration**
-1. Select version v1.7.0 and a region with F1 instances: US East (N.Virginia), US West (Oregon) or EU (Ireland)
+1. Select version v1.8.x and a region with F1 instances: US East (N.Virginia), US West (Oregon) or EU (Ireland)
 1. Click on **Continue to Launch**
 1. Select **Launch through EC2** in the **Choose Action** drop-down and click **Launch**
 1. Select **f1.2xlarge** Instance type

@@ -13,7 +13,7 @@ Under the `src` folder, there are six sub-folders, which contain the source file
 
 | Tutorial Step                                             | Associated Directory  |
 |-------------------------------------------------------------|------------------------ |
-| Creating an SDAccel application from C application          |     [src/baseline](./design/src/baseline)        |
+| Creating an Vitis application from C application          |     [src/baseline](./design/src/baseline)        |
 | Optimizing memory transfers                                  |     [src/localbuf](./design/src/localbuf)        |
 | Optimizing by using fixed point data types:                 |     [src/fixedpoint](./design/src/fixedpoint)      |
 | Optimizing with dataflow                                    |     [src/dataflow](./design/src/dataflow)        |
@@ -53,47 +53,6 @@ For example, to run hardware emulation for baseline step, use the following comm
 make run TARGET=hw_emu STEP=baseline SOLUTION=1 NUM_FRAMES=1
 ```
 
-## Makefile Targets for Generating Profile and Timeline Trace Reports
-
-To analyze the performance of the design, you need to look at the reports. For details about the reports, refer to the [Generate Profile and Trace Reports](../Pathway3/ProfileAndTraceReports.md) lab in the Essential Concepts for Building and Running the Accelerated Application tutorial.
-
-Use the following command to generate the Profile Summary report and Timeline Trace report.
-
-```
-make gen_report TARGET=hw_emu STEP=multicu
-```
-
-This command will generate the Profile Summary and Timeline Trace reports. The following reports will be generated for above command.
-
- - `sdaccel_profile_summary_hw_emu.html`
- - `sdaccel_timeline_trace_hw_emu.wdb`
-
-## Makefile Targets for Viewing Profile and Timeline Trace
-
-1. Use the following command to view the Profile Summary report.
-
-   ```
-   make view_prof_report TARGET=hw_emu STEP=multicu
-   ```
-
-   The makefile uses the following command to open the Profile Summary report.
-
-   ```
-   firefox sdaccel_profile_summary_hw_emu.html
-   ```
-
-2. Use the following command to view the Timeline Trace report.
-
-   ```
-   make view_timeline_trace TARGET=hw STEP=multicu
-   ```
-
-   The makefile uses the following command to launch the SDx IDE, and display the Timeline Trace report.
-
-   ```
-   sdx -report sdaccel_timeline_trace_multicu.wdb
-   ```
-
 ## Makefile Targets for Clean Up
 
 To clean the previously generated build, use the following command.
@@ -106,6 +65,6 @@ This will clean the hardware emulation-generated files for the baseline version 
 
 </br>
 <hr/>
-<p align="center"><b><a href="/docs/sdaccel-getting-started/">Return to Getting Started Pathway</a> — <a href="./README.md">Return to Start of Tutorial</a></b></p>
+<p align="center"><b><a href="../../README.md">Return to Start of Tutorial</a> — <a href="./README.md">Return to Start of Tutorial</a></b></p>
 
 <p align="center"><sup>Copyright&copy; 2019 Xilinx</sup></p>
