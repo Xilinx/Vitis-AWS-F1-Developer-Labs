@@ -7,8 +7,7 @@ Before starting this module, perform a fresh reinstall of the AWS EC2 FPGA Devel
 
 ```bash  
 # Install the AWS EC2 FPGA Development Kit
-cd $AWS_FPGA_REPO_DIR
-git clone https://github.com/aws/aws-fpga.git  
+git clone https://github.com/aws/aws-fpga.git $AWS_FPGA_REPO_DIR
 cd $AWS_FPGA_REPO_DIR                                     
 source vitis_setup.sh
 
