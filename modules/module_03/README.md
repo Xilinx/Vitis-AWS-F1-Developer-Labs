@@ -64,7 +64,7 @@ The labs in this tutorial use:
 The following labs walk through the best practices for taking an existing application and optimizing it as an FPGA-accelerated application. This tutorial is divided into several different labs that show the methodology. It is recommended to complete each lab before proceeding to the next.
 
 1. [Evaluating the Original Application](RunOriginalCode.md): In this lab, the original C-based application processes an input video to generate the convolution output video. This lab also discusses setting realistic performance goals for an accelerated application.
-2. [Creating an Vitis Application from the C Application](baseline.md): Convert the original C code into a host program and hardware kernel that is called by the host using the OpenCL™ API.
+2. [Creating a Vitis Application from the C Application](baseline.md): Convert the original C code into a host program and hardware kernel that is called by the host using the OpenCL™ API.
 3. [Optimizing Memory Transfers](localbuf.md): Learn methods for optimizing the hardware kernel for improved memory access. You will learn how to use local cache to make efficient use of the FPGA bandwidth.
 4. [Optimizing Using Fixed Point Data Types](fixedtype.md): Discusses how data types affect design performance.
 5. [Optimizing with Dataflow](dataflow.md): Improve the compute efficiency of your kernel, applying dataflow and streaming to improve the data-path in your kernel.
