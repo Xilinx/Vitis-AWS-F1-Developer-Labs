@@ -5,7 +5,7 @@
  </tr>
 </table>
 
-# 2. Creating an Vitis Application from the C Application
+# 2. Creating a Vitis Application from the C Application
 
 In the last lab, you determined that the `convolve_cpu` function is where the bulk of time is spent in the application. To accelerate performance, you are going to move that function into a kernel to run on the FPGA accelerator card.
 
