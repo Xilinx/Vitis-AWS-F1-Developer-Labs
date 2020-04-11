@@ -13,7 +13,7 @@ Under the `src` folder, there are six sub-folders, which contain the source file
 
 | Tutorial Step                                             | Associated Directory  |
 |-------------------------------------------------------------|------------------------ |
-| Creating an Vitis application from C application          |     [src/baseline](./design/src/baseline)        |
+| Creating a Vitis application from C application          |     [src/baseline](./design/src/baseline)        |
 | Optimizing memory transfers                                  |     [src/localbuf](./design/src/localbuf)        |
 | Optimizing by using fixed point data types:                 |     [src/fixedpoint](./design/src/fixedpoint)      |
 | Optimizing with dataflow                                    |     [src/dataflow](./design/src/dataflow)        |
