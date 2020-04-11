@@ -96,7 +96,7 @@ This throughput goal is well within the bounds of maximum achievable throughput 
 
 ## Next Step
 
-You have identified the functions from the original application that are targets for acceleration, and established the performance goals. In the following labs, you will create a baseline of the original `convolve` function running in hardware, and perform a series of host and kernel code optimizations to meet your performance goals. You will begin by [creating an Vitis application](./baseline.md) from the original application.
+You have identified the functions from the original application that are targets for acceleration, and established the performance goals. In the following labs, you will create a baseline of the original `convolve` function running in hardware, and perform a series of host and kernel code optimizations to meet your performance goals. You will begin by [creating a Vitis application](./baseline.md) from the original application.
 
 You will be using Hardware Emulation runs for measuring performance in each step. As part of the final step, you can run all these steps in hardware to demonstrate how the performance was improved at each step.
 
