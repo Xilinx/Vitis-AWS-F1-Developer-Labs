@@ -107,7 +107,7 @@ The final performance benchmarking table displays as follows.
 
 Congratulations! You have successfully completed all the modules of this lab to convert a standard CPU-based application into an FPGA accelerated application, running with nearly 300X the throughput when running on the AWS F1 VU9P card. You set performance objectives, and then you employed a series of optimizations to achieve your objectives.
 
-1. You created an Vitis application from a basic C application.
+1. You created a Vitis application from a basic C application.
 1. You familiarized yourself with the reports generated during software and hardware emulation.
 1. You explored various methods of optimizing your HLS kernel.
 1. You learned how to set an OpenCL API command queue to execute out-of-order for improved performance.
