@@ -41,7 +41,7 @@ The following steps explain how to launch an EC2 F1 instance starting from the F
 1. At the top of the console, click on **4. Add Storage** 
 1. Set size of the Root Device to `100GiB`
 1. At the top of the console, click on **6. Configure Security Groups** 
-1. Click **Add Rule**
+1. Click **Add Rule** ( Note : Add a new rule dont modify existing rule )
     1. Select **Custom TCP Rule** from the **Type** pull-down menu
     1. Type `8443` in the **Port Range** field
     1. Select **Anywhere** from the **Source** pull-down
@@ -59,12 +59,16 @@ The following steps explain how to launch an EC2 F1 instance starting from the F
 1. Copy or write down the **IPv4 Public IP** address of the instance.
 1. Using that IP address, connect to your instance using SSH (Linux) or PuTTY (Windows)
     ```sh
-    ssh -i <AWS key pairs.pem> -ssh centos@<IPv4 Public IP of EC2 instance> 22 
+    ssh -i <AWS key pairs.pem> centos@<IPv4 Public IP of EC2 instance> 22 
     ```
     ```sh
     putty -i <AWS key pairs.ppk> -ssh centos@<IPv4 Public IP of EC2 instance> 22 
     ```
 1. An ASCII art message welcomes you to your instance
+
+##### Connect to your EC2 F1 from Windows Using PuTTy
+If you are working from windows and getting error in the while doing ssh from a terminal using .pem file. Follow the steps in last section untilyou get **IPv4 Public IP** address of the instance. After this please follow the instruction provided on the following page to convert .pem file to .ppk and connect using PuTTY
+https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/putty.h
 
 #### Installing a GUI Desktop
 
