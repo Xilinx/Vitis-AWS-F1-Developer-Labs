@@ -1,4 +1,4 @@
-## Module 1: Introduction to the Vitis Flow
+## Module 1: Introduction to the Vitis Acceleration Flow
 
 
 ### Preparing to run the labs
@@ -19,22 +19,24 @@ git clone https://github.com/Xilinx/Vitis-AWS-F1-Developer-Labs.git Vitis-AWS-F1
 ```
 
 ### Module overview
-
-This module is divided in 3 labs. Since building FPGA binaries is not instantaneous, all the labs will use precompiled FPGA binaries. It is recommended to complete each lab before proceeding to the next.
-
-1. **Running the "Hello World" example** \
-You will get familiar with the steps involved in running a simple application on the F1 instance.
-
-1. **Using the Vitis v++ compiler to develop F1 accelerated applications** \
-You will use the v++ command line flow to create and profile an F1 accelerator. The lab focuses on the Inverse Discrete Cosine Transform (IDCT), a compute intensive function used at the heart of all video codecs.
-
-1. **Optimizing F1 applications** \
-You will continue the IDCT project started in the previous lab and learn how you can use the various reports provided by Vitis to guide the performance optimization process of your application.
+The module is divided into multiple labs. The main goals of these module are:
+1. **Vitis Acceleration Environment** \
+You will get familiar with the steps involved in setting up the environment, building simple Hello World host application and running it on the AWS F1 instance using FPGA card.
+1. **Becoming Familiar With IDCT Application** \
+You will have a look at the application structure, the use of OpenCL APIs for host side and accelerated function(kernel) modeling style.
+1. **Verifying Application using Different Emulation Modes**\
+You will build and launch application in different emulation modes to generate different type of traces and performance reports and also verify FPGA output results against software reference model
+1. **Using Vitis Analyzer to Review Application Timeline Traces and Tune Performance**\
+In this part you will analyze application performance using Vitis Analyzer tool to visualize different application timeline traces and Performance Summaries.
+1. **Optimizing FPGA Accelerated Function Implementation using Dataflow**\
+In this part you will use learn about Dataflow hardware optimization that will enable significant acceleration. 
+1. **Host Code Optimizations for Performance Improvement**\
+You will modify host code to improve performance
 
 After you complete the last lab, you will be guided to close your RDP session, stop your F1 instance and explore next steps to continue your experience with Vitis on AWS.
 
 ---------------------------------------
 
 <p align="center"><b>
-Start the first lab: <a href="lab_01_helloworld.md">Running the "Hello World" example</a>
+Start the first lab: <a href="lab_01_helloworld.md">Vitis Acceleration Environment</a>
 </b></p>

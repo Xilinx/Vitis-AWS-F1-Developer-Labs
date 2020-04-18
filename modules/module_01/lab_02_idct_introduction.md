@@ -2,7 +2,7 @@
 
 This lab is designed to teach the fundamentals of the Vitis development environment and programming model. This includes: familiarizing with OpenCL, understanding software and hardware emulation flows, profiling performance and identifying how to optimize host and kernel code.
 
-The kernel used in this lab is an Inverse Discrete Cosine Transform (IDCT), a function widely used in audio/image codecs such as HEVC.
+The kernel or the function ( it can be a set of function also) used for acceleration in this lab is an Inverse Discrete Cosine Transform (IDCT), a function widely used for transform coding in applications like audio/image codecs such as HEVC.
 
 
 ### Setting Up Vitis Environment
@@ -37,45 +37,53 @@ The kernel used in this lab is an Inverse Discrete Cosine Transform (IDCT), a fu
 
 ### Overview of the source code used in this example
 
-1.  The project is comprised of two files under src directory:
-	* **idct.cpp** contains the code for the host application running on the CPU.
-	* **krnl_idct.cpp** contains the code for the kernel (custom accelerator) running on the FPGA.
+1.  The project is comprised of multiple files under src directory:
+	* **idct.cpp** contains the software implementation of IDCT that will run as a separate thread on CPU or host side.
+	* **krnl_idct.cpp** contains the code for IDCT kernel (custom accelerator) running on the FPGA.
+	
+	
+	
+	
 
-1.  Open the **krnl_idct.cpp** file.
+1.  Open the **krnl_idct.cpp** file to see the code structure used for IDCT kernel.
 	* The **idct** function is the core algorithm implemented in the custom hardware accelerator.
-	* This computationally heavy function can be highly parallelized on the FPGA, providing significant acceleration over a CPU-based implementation.
-	* The **krnl_idct** function is the top-level for the custom hardware accelerator. Interface properties for the accelerator are specified in this function.
+	* This computationally heavy function can be highly parallelized on the FPGA using a parallel datapath providing significant acceleration over a CPU-based implementation.
+	* The **krnl_idct** function is the top-level for the custom hardware accelerator. Memory interface properties for the accelerator are specified in this function allowing us to utilize the maximum potential bandwidth of on-chip DRAM
 	* The **krnl_idct_dataflow** function is called by the top-level function and encapsulates the main functions of the accelerator.
 	* The **read_blocks** function reads from global memory values sent by the host application and streams them to the **execute** function.
-	* The **execute** function receives the streaming data and, for each 8x8 block received, calls the **idct** function to perform the actual computation. Streams the results back out.
+	* The **execute** function receives the streaming data and, for each 8x8 block received, calls the **idct** function to perform the actual computation and streams the results back out.
 	* The **write_blocks** function receives the streaming results from the **execute** function and writes them back to global memory for the host application.
 
-1. Open the **idct.cpp** file.  
-	* The **main** function of the C++ program initializes the test vectors, sets-up OpenCL, runs the reference model, runs the hardware accelerator, releases the OpenCL resources, and compares the results of the reference IDCT model with the accelerator implementation.
-	* The **runFPGA** function takes in a vector of inputs and, for each 8x8 block, calls the hardware accelerated IDCT using the **write**, **run**, **read**, and **finish** helper functions. These function use OpenCL API calls to communicate with the FPGA and are covered in greater detail later in this lab.
-	* The **runCPU** function takes in a vector of inputs and, for each 8x8 block, calls **idctSoft**, a reference implementation of the IDCT .
-	* The **idctSoft** function is the reference software implementation of the IDCT algorithm, used in this example to check the results coming back from the FPGA. 	
-	* The **oclDct** class is used to encapsulate the OpenCL runtime calls to interact with the kernel in the FPGA.
-	* The **aligned_allocator**, **smalloc**, **load_file_to_memory**, and **getBinaryName** functions are small helper functions used during test vector generation and OpenCL setup.
 
-1. Go to line 520 of the **idct.cpp** file.
 
-	This section of code is where the OpenCL environment is setup in the host application. This section is typical of most Vitis application and will look very familiar to developers with prior OpenCL experience. This body of code can often be reused as-is from project to project.
 
-	To setup the OpenCL environment, the following API calls are made:
 
-	* **clGetPlatformIDs**: This function queries the system to identify the different OpenCL platforms. It is called twice as it first extracts the number of platforms before extracting the actual supported platforms.
-	* **clGetPlatformInfo**: Get specific information about the OpenCL platform, such as vendor name and platform name.
-	* **clGetDeviceIDs**: Obtain list of devices available on a platform.
-	* **clCreateContext**: Creates an OpenCL context, which manages the runtime objects.
-	* **clGetDeviceInfo**: Get information about an OpenCL device like the device name.
-	* **clCreateProgramWithBinary**: Creates a program object for a context, and loads specified binary data into the program object. The actual program is obtained before this call through the load_file_to memory function.
-	* **clCreateKernel**: Creates a kernel object.
-	* **clCreateCommandQueue**: Create a command-queue on a specific device.
 
-	Note: all objects accessed through a **clCreate...** function call are to be released before terminating the program by calling **clRelease...**. This avoids memory leakage and clears the locks on the device.
 
-	All of the above API functions are documented by the [Khronos Group](https://www.khronos.org), the maintainers of OpenCL, the open standard for parallel programming of heterogeneous systems.
+1. Open the **host.cpp** file.  
+	* The **main** function of the C++ program first parses the command line arguments. These command line arguments can be used to control total number of IDCT blocks to be processed and how many IDCT blocks kernel processes in one go (call) also called batch size. After this test vectors are allocated and initialized, a Xilinx device search is performed and found device is programmed with user provided xclbin (FPGA Image) and an associated OpenCL Context and Command Queue are created. Once the device is programmed with FPGA Image a kernel is created which allows to process data. After that host launches two separate threads **runCPU** and **runFPGA** for CPU run and FPGA accelerated run respectively. Once these two threads are forked the main thread calls **measureExecTimes** function which waits on these threads to finish and also samples the time when threads finish to measure execution times. Once threads finish execution results are validated and performance comparison is printed out.
+	
+	
+1. Open the **krnl_idct_wrapper.hpp** file.
+    * This file defines a wrapper function for host side to use, it has all the host side code that interacts with the FPGA accelerator using OpenCL C++ APIs just like any other acceleration like device GPUs will do. 
+    * The **runFPGA** wrapper function takes as input information about data size and batching, OpenCL objects like Command Queue, Context and Kernel followed by input for data to be transformed arranged in a contiguous fashion in a vector, a vector for IDCT coefficients and an output vector.
+ 1. Open the file **idct.cpp**        	
+	* The **runCPU** function is defined here it takes a vector of inputs and, for each 8x8 block, calls **idctSoft**, a reference implementation of the IDCT.
+	* The **idctSoft** function is the reference software implementation of the IDCT algorithm, used in this example to check the results coming back from the FPGA.
+1. Go to line 188 of the **host.cpp** file:
+This section of the code sets up OpenCL environment for **runFPGA**. Here Xilinx provided APIs are used to look for the Xilinx devices connected to Host and also to read binary file compiled binary for FPGA platform. his section of code is where the OpenCL environment is setup in the host application. This section is typical of most Vitis application and will look very familiar to developers with prior OpenCL experience. This body of code can often be reused as-is from project to project. Following section provides the briefs of used APIs. Many function calls and object construction call use a macro called **OCL_CHECHK** this macro is used to parse the return status cl_int and error out of any OpenCL call that doesnt complete as expected.
+   * **xcl::get_xil_devices**: Xilinx provided API, returns a list of Xilinx devices connected to the host
+   * **xcl::read_binary_file**: Xilinx provided API, reads a compiled binary file for FPGA
+   * **cl::Program::Binaries**: Creates a binary file object from raw binary file which can be used to create a OpenCL program  associated with a device, essentially programming FPGA device here.
+   * **cl::Program**: Creates a cl::Program objects and also programs FPGA device. The programmed device may have multiple kernels inside single programs so created object also provides a handle that can be used to create handle to individual kernels.
+   * **cl::Kernel**: Creates a kernel object given the cl::Program handle and kernel name, in this case we have only one kernel namely "krnl_idct".
+   Once the OpenCL device context is setup, device is programmed and a kernel handle is available, a call to **runFPGA** is made in an separate **std::thread**
+1. Open "krnl_idct_wrapper.hpp" To see how runFPGA performs IDCT compute using FPGA kernel which is very similar to any other device such as GPU used for compute using OpenCL APIs. The basic logic behind this pieces of code is as follows: It creates vector of events that will define the dependencies between different task such host to device data transfer completion that should trigger computation and so. The **cl::Buffers** objects for **input**,**ouput** and **coefficients** are created that will be used to transfer data from host to device(FPGA) and back. The main loop runs over number of batches to be processed and inside this loop **cl::Buffer** objects are initialized with proper attributes and host pointers, since the input data is a contiguous so host pointer is provided by calculating the offset based on current batch number and batch size over the input data.
+    * **setArg**: is used to set different kernel arguments.
+    * **enqueueMigrateMemObjects**: is used to enqueue data transfer request between host and FPGA device.
+    * **enqueueTask**: is used to enqueue kernel on command queue for execution. equeueTask takes as input list of events that should be completed and also produces an event to signal completion. 
+ 
+ All of the above API functions are documented by the [Khronos Group](https://www.khronos.org), the maintainers of OpenCL, the open standard for parallel programming of heterogeneous systems.
 
 ### Running the Emulation Flows
 
@@ -88,11 +96,23 @@ The kernel used in this lab is an Inverse Discrete Cosine Transform (IDCT), a fu
     cd $LAB_WORK_DIR/Vitis-AWS-F1-Developer-Labs/modules/module_01/idct/
     make run TARGET=sw_emu
     ```
-    This will run through software emulation and print out messages as shown in below to indicate the process finishes successfully.
+    This will run through software emulation and print out messages as shown in below to indicate the process finishes successfully. Output log will signal the execution mode such as sw_emu/hw_emu or system hw. The emulation mode is set by environment variable **XCL_EMULATION_MODE** which read by host executable to identify run mode.
 
     ```bash
-    TEST PASSED
-    RUN COMPLETE
+    ------ Identified Run mode : sw_emu
+    .
+    .
+    .
+	=====================================================================
+    ------ Launched CPU and FPGA Thread and Monitoring Execution.
+    =====================================================================
+    [FPGA Time(     1s ) : ]  [CPU Time(    1s ) : ]
+    Execution Finished
+    =====================================================================
+    ------ All Task finished !
+    ------ Done with CPU and FPGA based IDCTs
+    ------ Runs complete validating results
+    ------ TEST PASSED ------
     ```
 
     The generated files are put into `build` folder under `design` directory. You can use `ls` command to investigate the generated files.
