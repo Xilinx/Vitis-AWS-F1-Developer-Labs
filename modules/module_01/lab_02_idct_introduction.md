@@ -124,12 +124,20 @@ This section of the code sets up OpenCL environment for **runFPGA**. Here Xilinx
 	* The hardware emulation is complete when the following messages are displayed:
 
     ```bash
-    TEST PASSED
-    RUN COMPLETE
-    INFO: [SDx-EM 22] [Wall clock time: 02:43, Emulation time: 0.0298064 ms] Data transfer between kernel(s) and global memory(s)
-    krnl_idct_1:m_axi_gmem0-DDR          RD = 128.000 KB             WR = 0.000 KB        
-    krnl_idct_1:m_axi_gmem1-DDR          RD = 0.500 KB               WR = 0.000 KB        
-    krnl_idct_1:m_axi_gmem2-DDR          RD = 0.000 KB               WR = 128.000 KB    
+	Execution Finished
+	=====================================================================
+	------ All Task finished !
+	------ Done with CPU and FPGA based IDCTs
+	------ Runs complete validating results
+	------ TEST PASSED ------
+	INFO::[ Vitis-EM 22 ] [Time elapsed: 0 minute(s) 21 seconds, Emulation time: 0.0886795 ms]
+	Data transfer between kernel(s) and global memory(s)
+	krnl_idct_1:m_axi_gmem0-DDR[0]          RD = 32.000 KB              WR = 0.000 KB        
+	krnl_idct_1:m_axi_gmem1-DDR[1]          RD = 1.000 KB               WR = 0.000 KB        
+	krnl_idct_1:m_axi_gmem2-DDR[2]          RD = 0.000 KB               WR = 32.000 KB       
+
+	INFO: [HW-EM 06-0] Waiting for the simulator process to exit
+	INFO: [HW-EM 06-1] All the simulator processes exited successfully
     ```
 
 ### Analyzing the Reports  
