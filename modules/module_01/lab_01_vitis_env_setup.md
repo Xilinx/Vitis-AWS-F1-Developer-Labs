@@ -94,5 +94,5 @@ This concludes this first lab.
 ---------------------------------------
 
 <p align="center"><b>
-Start the next lab: <a href="lab_02_idct_introduction.md">Using the Vitis v++ compiler to develop F1 accelerated applications</a>
+Start the next lab: <a href="lab_02_idct_introduction.md">Becoming Familiar With IDCT Application</a>
 </b></p>

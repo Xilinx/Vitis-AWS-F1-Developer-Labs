@@ -38,5 +38,5 @@ After you complete the last lab, you will be guided to close your RDP session, s
 ---------------------------------------
 
 <p align="center"><b>
-Start the first lab: <a href="lab_01_helloworld.md">Vitis Acceleration Environment</a>
+Start the first lab: <a href="lab_01_vitis_env_setup.md">Vitis Acceleration Environment</a>
 </b></p>

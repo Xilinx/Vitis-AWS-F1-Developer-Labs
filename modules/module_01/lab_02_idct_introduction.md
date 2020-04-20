@@ -1,4 +1,4 @@
-## Using the Vitis v++ compiler to develop F1 accelerated applications
+## Becoming Familiar With IDCT Application
 
 This lab is designed to teach the fundamentals of the Vitis development environment and programming model. This includes: familiarizing with OpenCL, understanding software and hardware emulation flows, profiling performance and identifying how to optimize host and kernel code.
 
@@ -53,12 +53,6 @@ The kernel or the function ( it can be a set of function also) used for accelera
 	* The **read_blocks** function reads from global memory values sent by the host application and streams them to the **execute** function.
 	* The **execute** function receives the streaming data and, for each 8x8 block received, calls the **idct** function to perform the actual computation and streams the results back out.
 	* The **write_blocks** function receives the streaming results from the **execute** function and writes them back to global memory for the host application.
-
-
-
-
-
-
 
 1. Open the **host.cpp** file.  
 	* The **main** function of the C++ program first parses the command line arguments. These command line arguments can be used to control total number of IDCT blocks to be processed and how many IDCT blocks kernel processes in one go (call) also called batch size. After this test vectors are allocated and initialized, a Xilinx device search is performed and found device is programmed with user provided xclbin (FPGA Image) and an associated OpenCL Context and Command Queue are created. Once the device is programmed with FPGA Image a kernel is created which allows to process data. After that host launches two separate threads **runCPU** and **runFPGA** for CPU run and FPGA accelerated run respectively. Once these two threads are forked the main thread calls **measureExecTimes** function which waits on these threads to finish and also samples the time when threads finish to measure execution times. Once threads finish execution results are validated and performance comparison is printed out.
