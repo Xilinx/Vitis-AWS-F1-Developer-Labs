@@ -158,12 +158,30 @@ Since we have ran hw_emulation in previous experiment you can go to build folder
    ```    
 1. Now we will run host application on Amazon F1 instance, please perform the Xilinx runtime setup and launch the application as follows:
 
-    ```bash
-   source $AWS_FPGA_REPO_DIR/vitis_runtime_setup.sh
-   cd build
-   ./host.exe ./xclbin/krnl_idct.hw.awsxclbin $((1024*128)) 32 1
-    ```
-   You will see an output like this:
+	```bash
+	source $AWS_FPGA_REPO_DIR/vitis_runtime_setup.sh
+	cd build
+	./host.exe ./xclbin/krnl_idct.hw.awsxclbin $((1024*128)) 32 1
+	```
+	
+	You will see an output like this:
+   
+   ```
+   Execution Finished
+	=====================================================================
+	------ All Task finished !
+	------ Done with CPU and FPGA based IDCTs
+	------ Runs complete validating results
+	CPU Time:        1.89434 s ( 1894.34ms )
+	CPU Throughput:  270.279 MB/s
+	FPGA Time:       0.166936 s (166.936 ms )
+	FPGA Throughput: 3067.04 MB/s
+	------ TEST PASSED ------
+	=====================================================================
+	FPGA accelerations ( CPU Exec. Time / FPGA Exec. Time): 11.3477
+	=====================================================================
+	```
+
    
 1. Navigate to the **krnl_idct_dataflow** function.
 
