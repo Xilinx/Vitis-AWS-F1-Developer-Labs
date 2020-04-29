@@ -80,7 +80,7 @@ We will carry out a simple experiment that illustrates the effect and power of d
    
    ```bash
     vitis_analyzer build/timeline_trace_hw_emu.csv
-    ```  
+   ```  
    
    and zoom close to first transaction happening on device time line on read/write interfaces, snapshot is shown in the figure below and focus on the part marked by yellow box:
    
@@ -106,7 +106,7 @@ We will carry out a simple experiment that illustrates the effect and power of d
 
    ```bash
     vitis_analyzer build/timeline_trace_hw_emu.csv
-    ```  
+   ```  
    
     ![](../../images/module_01/lab_04_idct/hwEmuComputMemTxNoOverLap.PNG)
     
