@@ -1,21 +1,96 @@
-## Optimizing F1 applications
+## IDCT Kernel Hardware Optimizations and Performance Analysis
 
-This lab builds on the previous one ([Using v++ command line flow to develop and compile F1 accelerator](lab_02_idct.md)) which gave an overview of the Vitis development environment and explained the various performance analysis capabilities provided by the tool. In this lab you will utilize these analysis capabilities to drive and measure code optimizations. This lab illustrates the DATAFLOW optimization for the kernel and software pipelining for the host application.
+This lab builds on top of previous labs which gave an overview of the Vitis development environment and explained the various performance analysis capabilities provided by the tool. In this lab you will utilize these analysis capabilities to drive and measure code optimizations. This lab illustrates the DATAFLOW optimization and loop pipelining variations and their effect on overall performance. 
 
-Please note that although the entire lab is performed on an F1 instance, only the final step of this lab really needs to be run on F1. All the interactive development, profiling and optimization steps would normally be performed on-premise or on a cost-effective AWS EC2 instance such as C4. However, to avoid switching from C4 to F1 instances during this lab, all the steps are performed on the F1 instance.
+Please note that although the entire lab is performed on an F1 instance, only the steps that involve hardware runs need to be to be run on F1 instance. All the interactive development, profiling and optimization steps would normally be performed on-premise or on a cost-effective AWS EC2 instance such as C4. However, to avoid switching from C4 to F1 instances during this lab, all the steps are performed on the F1 instance.
 
-If you have closed the terminal window at the end of the previous lab, open a new one and go back to the project folder:
+If you have closed the terminal window at the end of the previous lab, open a new one, run setup script and go back to the project folder:
+1.  Source the Vitis environment  
 
+    ```bash
+    cd $AWS_FPGA_REPO_DIR/
+    source vitis_setup.sh
+    ```
+1. Go to project folder    
 ```bash
 export LAB_WORK_DIR=/home/centos/src/project_data/
 cd $LAB_WORK_DIR/Vitis-AWS-F1-Developer-Labs/modules/module_01/idct
 ```
 
-### Optimizing the IDCT kernel
+### Optimizing the IDCT kernel using Dataflow
+We will carry out a simple experiment that illustrates the effect and power of dataflow optimization. The FPGA binary that will be built for experiment is built to have 4 different kernel, there are minor difference between them and they are created to illustrate different performance optimizations. In this experiment we will focus on two kernels namely **krnl_idct** and **krnl_idct_noflow** and compare them. 
 
-Remember when we Looked at the **HLS Report**, we identified that the read, execute and write functions of the **krnl_idct_dataflow** function have roughly the same latency and are executing sequentially. We still start by focusing on this performance aspect.
+1. Open kernel source files and compare
 
-1. cd $LAB_WORK_DIR/Vitis-AWS-F1-Developer-Labs/modules/module_01/idct/src and Open **krnl_idct.cpp**
+    ```bash
+    cd $LAB_WORK_DIR/Vitis-AWS-F1-Developer-Labs/modules/module_01/idct/src 
+   open krnl_idct.cpp
+   open krnl_idct_noflow.cpp
+    ``` 
+   these files contain description for both of these kernels, they are exactly identical kernel with different names and one major difference. Dataflow optimization is enabled for **krnl_idct** in **krnl_idct.cpp** whereas it is not used for other kernel **krnl_idct_noflow** in **knrl_idct_noflow.cpp**. You can see this by going to a label called "DATAFLOW_PRAGMA" which is placed as marker near line 354 in both the files. The application of this pragma makes functions in the region execute concurrently and create a function pipeline which overlap calculations in different functions as compared to full sequential execution. The functions in this region are connected through FIFOs generally called hls::streams, it is one of the recommended style for the functions used in Dataflow region, given that the data is produced or consumed in order at every function boundary.
+      
+1. Now we will look at the synthesis report for latency and II to compare expected performance, proceed as follows:
+
+    ```bash
+    cd $LAB_WORK_DIR/Vitis-AWS-F1-Developer-Labs/modules/module_01/src
+   vim host.cpp
+    ```
+    go to label **CREATE_KERNEL** near line no.229 and make sure the kernel name string is "krnl_idct" and not anything else. Now run hardware emulation as follows:
+    ```bash
+   make run TARGET=hw_emu
+    ```
+   The hardware emulation will build all the kernels and use **krnl_idct** for emulation. Now open Vitis_hls reports as follows and see different metrics as follows:
+    ```bash
+    cd $LAB_WORK_DIR/Vitis-AWS-F1-Developer-Labs/modules/module_01/
+   vim ./build/reports/krnl_idct.hw_emu/hls_reports/krnl_idct_csynth.rpt
+    ```
+   From performance estimate section under Latency, note down :
+   - Latency 
+   - Interval
+   - Pipeline 
+   
+   Under Utilization section note different resources utilized:
+   - BRAMs
+   - FFs
+   - DSPs
+   - LUTs
+   For the second kernel note the same metrics by opening the following report:
+   ```bash
+   vim ./build/reports/krnl_idct_noflow.hw_emu/hls_reports/krnl_idct_noflow_csynth.rpt 
+   ```
+   By comparison you should notice that the performance of the kernel with Dataflow optimization is almost 3 times better in terms of Latency and II and the resource utilization is pretty much still the same.
+   
+1. The next thing we can see is the compute unit execution time by looking at the profile summary reports. We have already ran hardware emulation for kernel "kernel_idct" which uses Dataflow optimization, now open the profile summary report using vitis_analyzer as follows:
+    ```bash
+   vitis_analyzer build/profile_summary_hw_emu.csv 
+    ```  
+   Once vitis_analyzer is open select Profile Summary from left side and then select "Kernel and Compute Units" section. It gives execution estimates for kernel and compute unit. Compute Unit Utilization section reports min/max/avg estimated execution times note it down. Now open the application time line as follows:
+   
+   ```bash
+    vitis_analyzer build/timeline_trace_hw_emu.csv
+    ```  
+   and zoom close to first transaction happening on device time line on read/write interfaces, snapshot is shown in the figure below and focus on the part marked by yellow box:
+       ![](../../images/module_01/lab_04_idct/hwEmuComputMemTxOverLap.PNG)
+  What we can observe from this timeline is that there is overlapping activity at the read and write interfaces for compute unit essentially meaning things are happening concurrently. The amount of overlap seems marginal because we have intentionally chosen very small data size for emulation, the situation will be much better when we go to actual hardware or system run when we can use large data size. In next section we will compare this waveform with non-dataflow kernel.
+       
+   Now open host.cpp and make changes so that hardware emulation will use second kernel namely "krnl_idct_noflow" and then run the emulation:
+   ```bash
+   vim src/host.cpp
+   ```  
+   Go to label "CREATE_KERNEL" near line no.228 and change the kernel name string to "krnl_idct_noflow" and run hardware emulation
+   ```bash
+   make run TARGET=hw_emu
+   ```
+    Now again open the profile summary and note down compute unit execution time and compare it with kernel with no Dataflow optimization it will be 2-3x worse. Idealy it should be 3x since the II was 3 times more but due to memory bandwidth effects it can come down.
+    
+1.  Now open application time line trace and check the compute unit activity it will show something similar to the figure below, look at the section highlighted by yellow box and compare it to kernel execution with Dataflow optimization, you will easily find out that all activity happened sequentially here there is no overlap at all, essentially the time line can be interpreted as, sequential read, process and write activity:
+
+   ```bash
+    vitis_analyzer build/timeline_trace_hw_emu.csv
+    ```  
+    ![](../../images/module_01/lab_04_idct/hwEmuComputMemTxNoOverLap.PNG)
+
+   
 
 1. Navigate to the **krnl_idct_dataflow** function.
 

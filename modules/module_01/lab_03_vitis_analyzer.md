@@ -74,13 +74,13 @@ The Vitis v++ compiler also generates **HLS Reports** for each kernel. **HLS Rep
         ```bash
         $LAB_WORK_DIR/Vitis-AWS-F1-Developer-Labs/modules/module_01/idct/src/krnl_idct.cpp
         ```
-       and go near line no.296 which places a HLS pragma for loop pipelining and note down II constraint, which states that the loop body in which this pragma is placed should have an initiation interval of 2 which means back to back loop iteration should start within 2 cycle only.
+       and go near line no.296 which places a HLS pragma for loop pipelining and note down II constraint, which states that the loop body in which this pragma is placed should have an initiation interval of 2 which means back to back loop iteration should start within 2 cycles only.
        
    - now open file for seconds kernel:
         ```bash
         $LAB_WORK_DIR/Vitis-AWS-F1-Developer-Labs/modules/module_01/idct/src/krnl_idct_slow.cpp
         ```
-     and go near line no.296 you will notice here the II constrains is 8, which mean back to back loop iterations within the body of which this constraint is placed should in 8 cycles. This room of 8 cycles allows Vitis HLS tool to share resource if possible and hence better resource utilization. Similarly you can have a look at third kernel namely **krnl_idct_med** which has II=4 constraint and compare resources. Generally increasing II can reduce resources but it may not be a linear relation depending on the design.
+     and go near line no.296 you will notice here the II constrains is 8, which mean back to back loop iterations within the body of which this constraint is placed, should start in 8 cycles. This room of 8 cycles allows Vitis HLS tool to share resources if possible and hence better resource utilization. Similarly you can have a look at third kernel namely **krnl_idct_med** which has II=4 constraint and compare resources. Generally increasing II can reduce resources but it may not be a linear relation depending the availability of such resources in design itself.
        
 #### Application Timeline report
 
