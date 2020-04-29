@@ -21,8 +21,7 @@ The "hello world" example is an OpenCL application with a simple vector-addition
 1.  Source the Vitis environment  
 
     ```bash
-    cd $AWS_FPGA_REPO_DIR/
-    source vitis_setup.sh
+    source $AWS_FPGA_REPO_DIR/vitis_setup.sh
     ```
 	*Note: the vitis_setup.sh script might generate warning messages, but these can be safely ignored.*
 

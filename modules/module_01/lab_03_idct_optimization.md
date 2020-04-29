@@ -84,8 +84,7 @@ We will carry out a simple experiment that illustrates the effect and power of d
    
    and zoom close to first transaction happening on device time line on read/write interfaces, snapshot is shown in the figure below and focus on the part marked by yellow box:
    
-   ![](../../images/module_01/lab_04_idct/hwEmuComputMemTxOverLap.
-   ) 
+   ![](../../images/module_01/lab_04_idct/hwEmuComputMemTxOverLap.PNG) 
    
     What we can observe from this timeline is that there is overlapping activity at the read and write interfaces for compute unit essentially meaning things are happening concurrently. The amount of overlap seems marginal because we have intentionally chosen very small data size for emulation, the situation will be much better when we go to actual hardware or system run when we can use large data size. In next section we will compare this waveform with non-dataflow kernel.
        
@@ -110,7 +109,62 @@ We will carry out a simple experiment that illustrates the effect and power of d
    ```  
    
    ![](../../images/module_01/lab_04_idct/hwEmuComputMemTxNoOverLap.PNG)
-    
+
+### Kernel Loop Pipelining using various Initiation Intervals(IIs)  
+We will experiment with Initiation Interval for loop pipelining. To this experiment easier we have included different kernels that are identical except with different names and IIs. To understand the kernel code structure open: 
+```bash
+vim src/krnl_idct.cpp
+```  
+Go to label "FUNCTION_PIPELINE" near line no.364 here you will see four different function calls within the Dataflow optimization region:
+
+- read_blocks
+- read_blocks
+- execute
+- write_blocks 
+
+read and write blocks simply reads data and write data from memory interfaces and streams it to execute which calls IDCT function to perform the core compute. The read and write functions can be pipelined with desired II with overall performance defined by "execute" function II. It is a functional pipeline where all of these function will be constructed as independent hardware modules so the overall performance will be defined by any block that has the lowest performance which essentially mean largest II. Since execute block carries out almost all compute so II variation on this block will show significant overall performance and resource utilization variations. 
+During this experiment we will do actual system runs instead of any emulation modes. For these experiments a pre-built FPGA binary file is provided. The user can also build a binary, procedure for building this file will described in a latter section.
+
+To see how pipeline pragmas with different II are applied to different kernels, open different kernel source files and compare II constraints placed near label "COMPUTE_PIPELINE_PRAGMA:" in each file around line no.296, you will see II as follows:
+
+- krnl_idct      : II=2
+- krnl_idct_med  : II=4
+- krnl_idct_slow : II=8 
+
+```bash
+    vim src/krnl_idct.cpp
+    vim src/krnl_idct_med.cpp
+    vim src/krnl_idct_slow.cpp     
+```
+Since we have ran hw_emulation in previous experiment you can go to build folder and have a look at Vitis_hls reports to find out Initiation Interval and Latency for these kernels as well as resource utilization. The resource utilization will have a trend showing decrease in utilization with increase in II.
+
+1. Open and compare synthesis report to note down IIs/Latencies and resource utilization:
+ 
+    ```bash
+    vim ./build/reports/krnl_idct_med.hw_emu/hls_reports/krnl_idct_med_csynth.rpt
+    vim ./build/reports/krnl_idct.hw_emu/hls_reports/krnl_idct_csynth.rpt
+    vim ./build/reports/krnl_idct_slow.hw_emu/hls_reports/krnl_idct_slow_csynth.rpt
+    ```
+1. Open and modify host code to run "krnl_idct" as follows:
+
+    ```bash
+   vim src/host.cpp
+    ```
+   
+   Go to label "CREATE_KERNEL" near line no.228 and make sure the kernel name string is "krnl_idct". and build host application as follows:
+   
+   ```bash
+   make compile_host
+   ```    
+1. Now we will run host application on Amazon F1 instance, please perform the Xilinx runtime setup and launch the application as follows:
+
+    ```bash
+   source $AWS_FPGA_REPO_DIR/vitis_runtime_setup.sh
+   cd build
+   ./host.exe ./xclbin/krnl_idct.hw.awsxclbin $((1024*128)) 32 1
+    ```
+   You will see an output like this:
+   
 1. Navigate to the **krnl_idct_dataflow** function.
 
 1. Observe that the three functions are communicating using `hls::streams` objects. These objects model a FIFO-based communication scheme. This is the recommended coding style which should be used whenever possible to exhibit streaming behavior and allow DATAFLOW optimization.
