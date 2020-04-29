@@ -124,6 +124,6 @@ In the next labs you will utilize these analysis capabilities to drive and measu
 ---------------------------------------
 
 <p align="center"><b>
-Start the next lab: <a href="lab_03_idct_optimization.md">Optimizing F1 applications</a>
+Start the next lab: <a href="lab_04_idct_optimization.md">Optimizing F1 applications</a>
 </b></p>  
  

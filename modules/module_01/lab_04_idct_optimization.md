@@ -256,9 +256,9 @@ Since we have ran hw_emulation in previous experiment you can go to build folder
 
 In this lab, you learned:
 * How to use dataflow optimization to improve performance
-* How II variation during loop pipelining effect performance and resource utilization on FPGA 
+* How II variation during loop pipelining effect performance and resource utilization on FPGA
 ---------------------------------------
 
 <p align="center"><b>
-Finish this module: <a href="lab_04_wrap_up.md">Wrap-up and Next Steps</a>
+Finish this module: <a href="lab_05_sw_pipelining_wrapUp.md">Software Optimizations and Wrap Up</a>
 </b></p>  
