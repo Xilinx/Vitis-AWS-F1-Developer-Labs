@@ -164,7 +164,7 @@ Since we have ran hw_emulation in previous experiment you can go to build folder
 	./host.exe ./xclbin/krnl_idct.hw.awsxclbin $((1024*128)) 32 1
 	```
 	
-	You will see an output like this:
+	You will see an output like this, which shows FGPA acceleration by a factor of 11x:
    
    ```
    Execution Finished
@@ -181,232 +181,82 @@ Since we have ran hw_emulation in previous experiment you can go to build folder
 	FPGA accelerations ( CPU Exec. Time / FPGA Exec. Time): 11.3477
 	=====================================================================
 	```
+1. Open and modify host code to run "krnl_idct_med" as follows:
 
+    ```bash
+   cd $LAB_WORK_DIR/Vitis-AWS-F1-Developer-Labs/modules/module_01/
+   vim src/host.cpp
+    ```
    
-1. Navigate to the **krnl_idct_dataflow** function.
+   Go to label "CREATE_KERNEL" near line no.228 and make sure the kernel name string is "krnl_idct_med". and build host application again as follows:
+   
+   ```bash
+   make compile_host
+   ```    
+1. Now we will run host application as follows:
 
-1. Observe that the three functions are communicating using `hls::streams` objects. These objects model a FIFO-based communication scheme. This is the recommended coding style which should be used whenever possible to exhibit streaming behavior and allow DATAFLOW optimization.
-
-1. Enable the DATAFLOW optimization by uncommenting the **#pragma DATAFLOW** present in the **krnl_idct_dataflow** function (line 322).
-
-    - The DATAFLOW optimization allows each of the subsequent functions to execute as independent processes.
-    - This results in overlapping and pipelined execution of the read, execute and write functions instead of sequential execution.
-    - The FIFO channels between the different processes do not need to buffer the complete dataset anymore but can directly stream the data to the next block.
-
-1. Comment out the three **#pragma HLS stream** statements on lines 327, 328 and 329.
-
-1. Save the file.
-
-1. Clean the generated files before launching hardware emulation with updated source file.
-    ```bash
-    cd $LAB_WORK_DIR/Vitis-AWS-F1-Developer-Labs/modules/module_01/idct
-    make clean
-    ```
-
-1. Rerun hardware emulation.
-    ```bash
-    cd $LAB_WORK_DIR/Vitis-AWS-F1-Developer-Labs/modules/module_01/idct
-    make run TARGET=hw_emu
-    ```
-
-1. Open the new **krnl_idct_dataflow_csynth.rpt** and compare the new latency numbers reported in the **Performance Estimates** section with the previous numbers and you will note considerable improvement based on the DATAFLOW optimization.  
-    - Latency (min/max):
-    - Interval (min/max):
-
-1. Open the new profile summary report for the hardware emulation and select the **Kernels & Compute Units** tab. If you forget how to view the report, you can go back to previous lab for detailed steps.
-
-1. Compare the **Kernel Total Time (ms)** with the results from the unoptimized run.
-
-### Building the FPGA binary to execute on F1
-
-The next step is to create an FPGA binary to test the optimized kernel on the FPGA attached to the F1 instance.
-
-Creating the FPGA binary is a two-step process:
-* First Vitis is used to build the Xilinx FPGA binary (.xclbin file).
-* Then the AWS **create_Vitis_afi.sh** script is used to create the AWS FPGA binary (.awsxclbin file) and register a secured and encrypted Amazon FPGA Image (AFI).
-
-The **create_Vitis_afi.sh** script does the following:
-* Starts a background process to create the AFI
-* Generates a \<timestamp\>_afi_id.txt which contains the FPGA Image Identifier (or AFI ID) and Global FPGA Image Identifier (or AGFI ID) of the generated AFI
-* Creates the *.awsxclbin AWS FPGA binary file which is read by the host application to determine which AFI should be loaded in the FPGA.
-
-These steps would take too long to complete during this lab, therefore a precompiled FPGA binary is used to continue this lab and execute on F1.
-
-1. Bring-up the terminal from which you started the tool.
-
-1. Confirm that the precompiled FPGA binary (.awsxclbin file) is indeed present.
-
-    ```bash
-    # Go the lab folder
-    cd $LAB_WORK_DIR/Vitis-AWS-F1-Developer-Labs/modules/module_01/idct
-
-    # List contents of the ./xclbin directory to look for the .awsxclbin FPGA binary
-    ls -la ./xclbin
-    ```
-
-1. Retrieve the Fpga Image Global Id (agfi) from the \<timestamp\>_afi_id.txt file.
-
-    ```bash
-    more ./xclbin/19_12_18-170118_afi_id.txt
-    ```
-
-1. Confirm that the AFI is ready and available using the retrieved global AFI Id.
-
-    ``` bash
-    aws ec2 describe-fpga-images --fpga-image-ids afi-014f8e35d6d00344c
-    ```
-
-   The output of this command should contain:
-
-    ```json
-    ...
-    "State": {
-        "Code": "available"
-    },
-    ...
-    ```
-
-### Executing on F1
-1. Execute the accelerated application on F1 using the precompiled FPGA binary.
-
-    ```bash
-    source $AWS_FPGA_REPO_DIR/vitis_runtime_setup.sh 
-    cd $LAB_WORK_DIR/Vitis-AWS-F1-Developer-Labs/modules/module_01/idct
+	```bash
+	./build/host.exe ./xclbin/krnl_idct.hw.awsxclbin $((1024*128)) 32 1
+	```
  
-    # Execute the host application with the .awsxclbin FPGA binary
-    ./build/IDCT.exe ./xclbin/krnl_idct.hw.awsxclbin
-    exit
-    ```
+	You will see an output like this, which shows FGPA acceleration by a factor of 9x:
+      ```
+   Execution Finished
+	=====================================================================
+	------ All Task finished !
+	------ Done with CPU and FPGA based IDCTs
+	------ Runs complete validating results
+	CPU Time:        1.9116 s ( 1894.34ms )
+	CPU Throughput:  267.838 MB/s
+	FPGA Time:       0.199102 s (166.936 ms )
+	FPGA Throughput: 2571.55 MB/s
+	------ TEST PASSED ------
+	=====================================================================
+	FPGA accelerations ( CPU Exec. Time / FPGA Exec. Time): 9.60113
+	=====================================================================
+	``` 
+ 1. Open and modify host code to run "krnl_idct_med" as follows:
 
-1. Here is the output of the above comamnd 
-   ```
-    TEST PASSED
-    CPU Time:        2.39771 s
-    CPU Throughput:  213.537 MB/s
-    FPGA Time:       0.464535 s
-    FPGA Throughput: 1102.18 MB/s
-
-   ```
-
-Note the performance difference between the IDCT running on the CPU and on the FPGA. FPGA s about 5x faster than running on CPU. 
-
-
-### Optimizing the host code
-
-For optimal performance both the hardware and software components of the application need to be optimized. This next sections shows how the **software pipelining** technique can be used to overlap transactions from the host to the kernels and thereby improve overall system throughput.
-
-1. Return to the project folder in terminal window.
-
-   ```bash
-   cd $LAB_WORK_DIR/Vitis-AWS-F1-Developer-Labs/modules/module_01/idct/src
-   ```
-
-1. Open **idct.cpp** file.  
-
-1. Navigate to the **runFPGA** function.
-
-	For each block of 8x8 values, the **runFPGA** function writes data to the FPGA, runs the kernel, and reads results back.
-
-	Communication with the FPGA is handled by OpenCL API calls made within the cu.write, cu.run and cu.read functions.
-	- **clEnqueueMigrateMemObjects** schedules the transfer of data to or from the FPGA.
-	- **clEnqueueTask** schedules the executing of the kernel.
-
-	These OpenCL functions use events to signal their completion and synchronize execution.
-
-
-1. Execute the following command to to convert the timeline trace to wdb format and then load timeline trace in Vitis GUI. You may need to close the previous opened Vitis GUI.
-   ```bash
-   cd build;
-   vitis_analyzer timeline_trace_hw_emu.csv 
-   ```
-
-1. Zoom in by performing a **Left mouse drag** to get a more detailed view.  
-
-    - The two green segments correspond to two consecutive invocations of the IDCT kernel.
-    - The gap between the two segments is indicative of idle time between these two invocations.
-    - The **Data Transfer** section of the timeline shows that **Read** and **Write** operations are happening when the kernel is idle.
-    - The **Read** operation is to retrieve the results from the execution which just finished and the **Write** operation is to send inputs for the next execution.
-    - This represents a sequential execution flow of each iteration.  
-
-    ![](../../images/module_01/lab_02_idct/ZoomApplicationTimeline.PNG)
-
-
-1. Close the application timeline report.    
-
-1. In the **idct.cpp** file, go to the **oclDct::write** function.
-
-	- Observe that on line 293, the function synchronizes on the **outEvVec** event through a call to **clWaitForEvents**.
-	- This event is generated by the completion of the **clEnqueueMigrateMemObjects** call in the **oclDct::read** function (line 369).
-	- Effectively the next execution of the **oclDct::write** function is gated by the completion of the previous **oclDct::read** function, resulting in the sequential behavior observed in the **Application Timeline**.
-
-
-1. Navigate to the definition of the **NUM_SCHED** macro in the **idct.cpp** file.
-
-	- This macro defines the depth of the event queue.
-	- The value of **1** explains the observed behavior: new tasks (write, run, read) are only enqueued when the previous has completed effectively synchronizing each loop iteration.
-	- By increasing the value of the **NUM_SCHED** macro, we increase the depth of the event queue and enable more blocks to be enqueued for processing. This will result in the write, run and read tasks to overlap and allow the kernel to execute continuously.
-	- This technique is called **software pipelining**.
-
-1. Modify line 217 to increase the value of **NUM_SCHED** to 6 as follows:
-    ```
-    #define NUM_SCHED 6
-    ```
-
-1. Save the file.
-
-1. Rerun hardware emulation.
     ```bash
-    make run TARGET=hw_emu
+   cd $LAB_WORK_DIR/Vitis-AWS-F1-Developer-Labs/modules/module_01/
+   vim src/host.cpp
     ```
-    - Since only the **idct.cpp** file was changed, the incremental makefile rebuilds only the host code before running emulation.
-    - This results in a much faster iteration loop since it is usually the compilation of the kernel to hardware which takes the most time.
-
-1. Convert the newly generated application timeline report
-
+   
+   Go to label "CREATE_KERNEL" near line no.228 and make sure the kernel name string is "krnl_idct_slow". and build host application again as follows:
+   
    ```bash
-   cd build;
-   vitis_analyzer timeline_trace_hw_emu.csv 
-   ```
+   make compile_host
+   ```    
+1. Now we will run host application as follows:
 
-1. Open the timeline_trace_hw_emu.wdb file in the GUI. Observe how **software pipelining** enables overlapping of data transfers and kernel execution.
-
-    ![](../../images/module_01/lab_02_idct/ZoomApplicationTimelineEnd.PNG)
-
-    Note: system tasks might slow down communication between the application and the hardware simulation, impacting on the measured performance results. The effect of software pipelining is considerably higher when running on the actual hardware.
-
-### Executing on F1
-
-The next step is to confirm these results by running on the FPGA attached to the F1 instance. Since only the host application was modified, the same precompiled FPGA binary can used.
-
-1. Execute the accelerated application on F1 using the precompiled FPGA binary.
-    
-    ```bash
-    source $AWS_FPGA_REPO_DIR/vitis_runtime_setup.sh 
-    cd $LAB_WORK_DIR/Vitis-AWS-F1-Developer-Labs/modules/module_01/idct
-    # Execute the host application with the .awsxclbin FPGA binary
-    ./build/IDCT.exe ./xclbin/krnl_idct.hw.awsxclbin
-
-    ```
-
-1. Here is the output of the above comamnd 
-   ```
-    TEST PASSED
-    CPU Time:        2.4055 s
-    CPU Throughput:  212.846 MB/s
-    FPGA Time:       0.269234 s
-    FPGA Throughput: 1901.69 MB/s
-
-   ```
-   Note the performance difference between the IDCT running on the CPU and on the FPGA. FPGA s about 10x faster than running on CPU. Note as well the performance difference with the previous run on F1. Using exactly the same FPGA binary but an optimized host application, the overall performance is significantly improved.
+	```bash
+	./build/host.exe ./xclbin/krnl_idct.hw.awsxclbin $((1024*128)) 32 1
+	```
+ 
+	You will see an output like this, which shows FGPA acceleration by a factor of 7x:
+      ```
+   Execution Finished
+	=====================================================================
+	------ All Task finished !
+	------ Done with CPU and FPGA based IDCTs
+	------ Runs complete validating results
+	CPU Time:        1.89137 s ( 1894.34ms )
+	CPU Throughput:  270.704 MB/s
+	FPGA Time:       0.266215 s (166.936 ms )
+	FPGA Throughput: 1923.26 MB/s
+	------ TEST PASSED ------
+	=====================================================================
+	FPGA accelerations ( CPU Exec. Time / FPGA Exec. Time): 7.10467
+	=====================================================================
+	```   
+**NOTE**: in the last three experiments, with II going from 2 to , 4 and then 8, we should be performance going down by 2x every time but it was not the case, reason for this is that performance is not only defined by kernel or compute performance but it also depends on memory bandwidth available to CU and host at different times and sometime dictates performance. But one thing should be clear from the last experiment that II variations have significant effect on performance and hardware resource consumption.   
 
 
 ### Summary  
 
 In this lab, you learned:
-* How to use the various reports generated by Vitis to drive optimization decisions
-* How to use pragmas to increase kernel performance
-* How to use software pipelining to increase system performance
- 
+* How to use dataflow optimization to improve performance
+* How II variation during loop pipelining effect performance and resource utilization on FPGA 
 ---------------------------------------
 
 <p align="center"><b>
