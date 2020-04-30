@@ -1,9 +1,9 @@
 ## Host Host Code Performance Optimizations and Wrap Up
 In this lab we will experiment with one host code optimization that will bring us a big performance improvement and then we will wrap up this module by showing different steps on how to close your RDP session and stop your instance. It is important to always stop or terminate AWS EC2 instances when you are done using them. This is a recommended best practice to avoid unwanted charges.
+ 
+In the following sections will launch the application on F1 instance and analyze application execution using timeline and figure out a potential for significant performance improvement, to do this please proceed as follows.
 
-### Application System Run
-In this section will launch the application on F1 instance and analyze application execution using timeline and figure out a potential for significant performance improvement, to do this please proceed as follows.
-#### Select Right Kernel for Execution
+### Select Right Kernel for Execution
 1. Modify host code to make sure it runs appropriate hardware kernel. Open terminal if you don't have it already open from last lab and do:
 
     ```bash
@@ -23,7 +23,7 @@ In this section will launch the application on F1 instance and analyze applicati
     ```bash
     make compile_host
     ```
-#### Launch Application and generate Reports
+### Launch Application and generate Reports
 1. Run application and as follows by first sourcing runtime setup script if you have not done so before:
 
     ```bash
@@ -60,9 +60,9 @@ In this section will launch the application on F1 instance and analyze applicati
       
   In next section will try to comprehend this waveform and will perform host side code optimization to gain in performance.
 
-#### Application Performance Analysis
+### Application Performance Analysis
 
-##### Profile Summary : Compute Unit Utilization
+#### Profile Summary : Compute Unit Utilization
 We will open application profile summary and by looking at the profile summary and application timeline we can find a potential for application performance improvement. To open the profile summary proceed as follows:
 
 1. In the run directory (idct) open profile summary
@@ -75,10 +75,10 @@ We will open application profile summary and by looking at the profile summary a
       ![](../../images/module_01/lab_05_idct/hwRunCuUtil.PNG) 
       
   It shows that compute unit utilization is around 23%. Meaning compute unit is busy crunching numbers only for 23% of the time and remaining 77% of time it is stalled/idling. This can be confirmed from the application timeline and it also provides insights why it is so. 
- ##### Application Timeline Analysis 
+ #### Application Timeline Analysis 
  By looking at the waveform we can observe that host sends data on write interface for processing and only once the data transfer completes kernel enqueu and kick starts compute unit. Once the compute unit finishes host enqueues read back to read output data produced by kernel from device memory. Whole of this cycle then repeats. One very important thing to note is that host does all of these transactions sequentially, only initiating new transaction (task getting enqueued on command queue) after previous one is finished. Given that most of the PCI and DDR interfaces have support for full duplex transports we can do number of optimizations by doing the dependency analysis.
  
- ##### Task Dependency Analysis 
+ #### Task Dependency Analysis 
   
   - The host side writes to device memory can  continue in background back to back since it is input data coming from host to device for processing and has no dependencies
   - Kernel can be enqueued with dependency on corresponding input data and can kick start as soon as this data is transferred
@@ -91,9 +91,9 @@ We will open application profile summary and by looking at the profile summary a
   
 Once we have identified these facts we can capture relevant and required dependencies on host side and improve the performance considerably.
 
-#### Optimizing Host Application Code for Performance
+### Optimizing Host Application Code for Performance
 In this section we will try to dissect the application host code and understand how it is structured and which kind of objects are used to capture the behavior and dependencies as we discussed in last section.
-##### Capturing Task Dependencies 
+#### Capturing Task Dependencies 
 This section we will explore how host code captures dependencies to do this please proceed as follows:
 1. Open application source code in file "idct/krnl_idct_wrapper.cpp"
 
@@ -111,7 +111,7 @@ This section we will explore how host code captures dependencies to do this plea
      
     - **readFromDeviceEvent** represents events generated when host finishes reading output data from device memory. 
        
-##### Batching and Pool of Buffers
+#### Batching and Pool of Buffers
 For using IDCT kernel we essentially needs three buffers for:
 
 - input data
@@ -145,7 +145,7 @@ Since we want to design host side such that we can overlap different operations 
   
   After all these details it should be clear that host code is designed to mimic full sequential host side execution by using **maxScheduledBatches=1** and overlapping pipelined transactional behavior by using **maxScheduledBatches > 1** 
  
- ##### Running Application with Software Pipeline   
+ #### Running Application with Software Pipeline   
 Now that we have explained in the previous in detail how we can create a software pipeline behavior on host side using pool of buffers and multiple command queues lets experiment with it and see how performance changes to do this please proceed as follows:
 
 1. Run application again, note that the final commandline argument is **4** instead of **1** as was the case in previous run which enable host side write/execute/read overlapping (software pipeline). 
@@ -184,6 +184,8 @@ Now that we have explained in the previous in detail how we can create a softwar
     ![](../../images/module_01/lab_05_idct/hwRunCuUtilOpt.PNG) 
 
 
+\
+\
 NOTE: If the compute unit utilization in this case was still less than 50% we could have used a compute unit which has II twice that II of this kernel which is 2 for the kernel we are using and could have ended up saving some hardware resources on FPGA.
 ### Summary  
 

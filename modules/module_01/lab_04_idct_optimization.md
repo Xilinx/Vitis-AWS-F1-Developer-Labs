@@ -217,8 +217,8 @@ Since we have ran hw_emulation in previous experiment you can go to build folder
  1. Open and modify host code to run "krnl_idct_med" as follows:
 
     ```bash
-   cd $LAB_WORK_DIR/Vitis-AWS-F1-Developer-Labs/modules/module_01/
-   vim src/host.cpp
+    cd $LAB_WORK_DIR/Vitis-AWS-F1-Developer-Labs/modules/module_01/
+    vim src/host.cpp
     ```
    
    Go to label "CREATE_KERNEL" near line no.228 and make sure the kernel name string is "krnl_idct_slow". and build host application again as follows:

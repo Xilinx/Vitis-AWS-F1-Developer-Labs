@@ -58,11 +58,13 @@ The Vitis v++ compiler also generates **HLS Reports** for each kernel. **HLS Rep
     - Latency (min/max):
     - Interval (min/max):
     
-    These numbers reported in the table give performance expectation from the kernel in terms of clock cycles and also in time unites.
-  ![](../../images/module_01/lab_03_idct/synthReportHwEmu.png)
+    These numbers reported in the table give performance expectation from the kernel in terms of clock cycles and also in time units.
+    
+    ![](../../images/module_01/lab_03_idct/synthReportHwEmu.png)
 
 1. The next thing to look for in the same report is estimate for hardware resources used by this kernel on FPGA. Look for Utilization Estimates section, it should look similar to the following table:
-     ![](../../images/module_01/lab_03_idct/utilHwEmuIDCT.png)  
+
+    ![](../../images/module_01/lab_03_idct/utilHwEmuIDCT.png)  
     
     From this table we can see resource usage for this kernel in absolute numbers and percentage. The main resources on the FPGA are Digital Signal Processing modules (DSPs), block RAM memory modules (BRAMs), Flip Flops (FFs) and Look up tables. You can note down these resources to compare with implementation of other hardware kernels.
 1. Next open the following report for kernel **kernel_idct_slow**:
@@ -108,8 +110,11 @@ For IDCT application host side essentially manages data allocation, data movemen
   All the **stated dependencies** can also be checked by clicking on any enqueue call it will **display arrow connections** which show dependencies as specified by application programmer on host side using **OpenCL APIs** while enqueuing different operations.
 
 ##### Device Execution Timeline    
-Device side timeline trace gives details of activity happening on the FPGA device or acceleration card. Here you can find actual hardware activity happening for different CUs, for IDCT we are using has only one instance of IDCT kernel so a single CU. All its interfaces to device global memory are traced out. In the case of IDCT it uses three separate interfaces two for co-efficient and input data and one interface for output data. You can zoom into one of the read/write transactions happening ond device master AXI interfaces as shown in the figure below and see how fast these data transfers are happening and in which sort of bursts. You can also note that since IDCT coefficients and input data use same DDR memory bank/interface and happen in non-overlapping fashion where as output write operation has some overlap with device read operation because it uses a separate DDR memory bank. In next labs we will see maximizing this kind of overlap considerably improve application performance
+Device side timeline trace gives details of activity happening on the FPGA device or acceleration card. Here you can find actual hardware activity happening for different CUs, for IDCT we are using has only one instance of IDCT kernel so a single CU. All its interfaces to device global memory are traced out. In the case of IDCT it uses three separate interfaces two for co-efficient and input data and one interface for output data. You can zoom into one of the read/write transactions happening on device master AXI interfaces as shown in the figure below and see how fast these data transfers are happening and in which sort of bursts. You can also note that since IDCT coefficients and input data use same DDR memory bank/interface and happen in non-overlapping fashion where as output write operation has some overlap with device read operation because it uses a separate DDR memory bank. In next labs we will see maximizing this kind of overlap considerably improve application performance
+
+
 ![](../../images/module_01/lab_03_idct/memTxHwEmuDevice.png) 
+
 
 ### Summary  
 
