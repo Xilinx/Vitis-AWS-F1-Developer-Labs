@@ -185,7 +185,15 @@ Now that we have explained in the previous in detail how we can create a softwar
 
 
 NOTE: If the compute unit utilization in this case was still less than 50% we could have used a compute unit which has II twice that II of this kernel which is 2 for the kernel we are using and could have ended up saving some hardware resources on FPGA.
+### Summary  
 
+In this lab, you learned:
+* How to critically look at application timeline and profile summary
+* Identify potential for performance improvements from application timeline
+* Identify task dependencies and exploit them  
+* Optimize host code to enable software pipelining for performance improvements
+
+---------------------------------------
 
 ### Stopping your instance
 

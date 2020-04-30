@@ -23,15 +23,13 @@ The module is divided into multiple labs. The main goals of these module are:
 1. **Vitis Acceleration Environment** \
 You will get familiar with the steps involved in setting up the environment, building simple Hello World host application and running it on the AWS F1 instance using FPGA card.
 1. **Becoming Familiar With IDCT Application** \
-You will have a look at the application structure, the use of OpenCL APIs for host side and accelerated function(kernel) modeling style.
+You will have a look at the application structure, the use of OpenCL APIs for host side and accelerated function (kernel) modeling style.
 1. **Application Performance Analysis**\
 You will build and launch application in different emulation modes to generate different type of traces and performance reports and also verify FPGA output results against software reference model
-1. **Using Vitis Analyzer to Review Application Timeline Traces and Tune Performance**\
-In this part you will analyze application performance using Vitis Analyzer tool to visualize different application timeline traces and Performance Summaries.
-1. **Optimizing FPGA Accelerated Function Implementation using Dataflow**\
-In this part you will use learn about Dataflow hardware optimization that will enable significant acceleration. 
-1. **Host Code Optimizations for Performance Improvement**\
-You will modify host code to improve performance
+1. **IDCT Kernel Hardware Optimizations and Performance Analysis**\
+In this part you will use learn about Dataflow hardware optimization that will enable significant acceleration and also we will look into some micro-architecture variations by using different loop pipelining contraints. 
+1. **Host Host Code Performance Optimizations and Wrap Up**\
+This lab will illustrate application how Vitis analysis tools and reports can be used to optimally structure host code for significant performance improvements
 
 After you complete the last lab, you will be guided to close your RDP session, stop your F1 instance and explore next steps to continue your experience with Vitis on AWS.
 
