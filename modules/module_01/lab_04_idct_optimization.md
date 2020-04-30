@@ -160,8 +160,7 @@ Since we have ran hw_emulation in previous experiment you can go to build folder
 
 	```bash
 	source $AWS_FPGA_REPO_DIR/vitis_runtime_setup.sh
-	cd build
-	./host.exe ./xclbin/krnl_idct.hw.awsxclbin $((1024*128)) 32 1
+	./build/host.exe ./xclbin/krnl_idct.hw.awsxclbin $((1024*128)) 32 1
 	```
 	
 	You will see an output like this, which shows FGPA acceleration by a factor of 11x:
