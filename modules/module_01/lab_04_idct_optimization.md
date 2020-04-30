@@ -84,8 +84,8 @@ We will carry out a simple experiment that illustrates the effect and power of d
    
    and zoom close to first transaction happening on device time line on read/write interfaces, snapshot is shown in the figure below and focus on the part marked by yellow box:
    
-   ![](../../images/module_01/lab_04_idct/hwEmuComputMemTxOverLap.PNG) 
-   
+    ![](../../images/module_01/lab_04_idct/hwEmuComputMemTxOverLap.PNG) 
+    
     What we can observe from this timeline is that there is overlapping activity at the read and write interfaces for compute unit essentially meaning things are happening concurrently. The amount of overlap seems marginal because we have intentionally chosen very small data size for emulation, the situation will be much better when we go to actual hardware or system run when we can use large data size. In next section we will compare this waveform with non-dataflow kernel.
        
     Now open host.cpp and make changes so that hardware emulation will use second kernel namely "krnl_idct_noflow" and then run the emulation:
@@ -104,17 +104,19 @@ We will carry out a simple experiment that illustrates the effect and power of d
     
 1.  Now open application time line trace and check the compute unit activity it will show something similar to the figure below, look at the section highlighted by yellow box and compare it to kernel execution with Dataflow optimization, you will easily find out that all activity happened sequentially here there is no overlap at all, essentially the time line can be interpreted as, sequential read, process and write activity:
 
-   ```bash
+    ```bash
     vitis_analyzer build/timeline_trace_hw_emu.csv
-   ```  
-   
-   ![](../../images/module_01/lab_04_idct/hwEmuComputMemTxNoOverLap.PNG)
-
+    ```  
+    
+    ![](../../images/module_01/lab_04_idct/hwEmuComputMemTxNoOverLap.PNG)
+    
 ### Kernel Loop Pipelining using various Initiation Intervals(IIs)  
 We will experiment with Initiation Interval for loop pipelining. To this experiment easier we have included different kernels that are identical except with different names and IIs. To understand the kernel code structure open: 
+
 ```bash
 vim src/krnl_idct.cpp
-```  
+```
+  
 Go to label "FUNCTION_PIPELINE" near line no.364 here you will see four different function calls within the Dataflow optimization region:
 
 - read_blocks
@@ -136,6 +138,7 @@ To see how pipeline pragmas with different II are applied to different kernels, 
     vim src/krnl_idct_med.cpp
     vim src/krnl_idct_slow.cpp     
 ```
+
 Since we have ran hw_emulation in previous experiment you can go to build folder and have a look at Vitis_hls reports to find out Initiation Interval and Latency for these kernels as well as resource utilization. The resource utilization will have a trend showing decrease in utilization with increase in II.
 
 1. Open and compare synthesis report to note down IIs/Latencies and resource utilization:
@@ -158,28 +161,28 @@ Since we have ran hw_emulation in previous experiment you can go to build folder
    ```    
 1. Now we will run host application on Amazon F1 instance, please perform the Xilinx runtime setup and launch the application as follows:
 
-	```bash
-	source $AWS_FPGA_REPO_DIR/vitis_runtime_setup.sh
-	./build/host.exe ./xclbin/krnl_idct.hw.awsxclbin $((1024*128)) 32 1
-	```
+    ```bash
+    source $AWS_FPGA_REPO_DIR/vitis_runtime_setup.sh
+    ./build/host.exe ./xclbin/krnl_idct.hw.awsxclbin $((1024*128)) 32 1
+    ```
 	
-	You will see an output like this, which shows FGPA acceleration by a factor of 11x:
+    You will see an output like this, which shows FGPA acceleration by a factor of 11x:
    
-   ```
-   Execution Finished
-	=====================================================================
-	------ All Task finished !
-	------ Done with CPU and FPGA based IDCTs
-	------ Runs complete validating results
-	CPU Time:        1.89434 s ( 1894.34ms )
-	CPU Throughput:  270.279 MB/s
-	FPGA Time:       0.166936 s (166.936 ms )
-	FPGA Throughput: 3067.04 MB/s
-	------ TEST PASSED ------
-	=====================================================================
-	FPGA accelerations ( CPU Exec. Time / FPGA Exec. Time): 11.3477
-	=====================================================================
-	```
+    ```
+    Execution Finished
+    =====================================================================
+    ------ All Task finished !
+    ------ Done with CPU and FPGA based IDCTs
+    ------ Runs complete validating results
+    CPU Time:        1.89434 s ( 1894.34ms )
+    CPU Throughput:  270.279 MB/s
+    FPGA Time:       0.166936 s (166.936 ms )
+    FPGA Throughput: 3067.04 MB/s
+    ------ TEST PASSED ------
+    =====================================================================
+    FPGA accelerations ( CPU Exec. Time / FPGA Exec. Time): 11.3477
+    =====================================================================
+    ```
 1. Open and modify host code to run "krnl_idct_med" as follows:
 
     ```bash
@@ -199,21 +202,22 @@ Since we have ran hw_emulation in previous experiment you can go to build folder
 	```
  
 	You will see an output like this, which shows FGPA acceleration by a factor of 9x:
-      ```
-   Execution Finished
-	=====================================================================
-	------ All Task finished !
-	------ Done with CPU and FPGA based IDCTs
-	------ Runs complete validating results
-	CPU Time:        1.9116 s ( 1894.34ms )
-	CPU Throughput:  267.838 MB/s
-	FPGA Time:       0.199102 s (166.936 ms )
-	FPGA Throughput: 2571.55 MB/s
-	------ TEST PASSED ------
-	=====================================================================
-	FPGA accelerations ( CPU Exec. Time / FPGA Exec. Time): 9.60113
-	=====================================================================
-	``` 
+	
+    ```
+    Execution Finished
+    =====================================================================
+    ------ All Task finished !
+    ------ Done with CPU and FPGA based IDCTs
+    ------ Runs complete validating results
+    CPU Time:        1.9116 s ( 1894.34ms )
+    CPU Throughput:  267.838 MB/s
+    FPGA Time:       0.199102 s (166.936 ms )
+    FPGA Throughput: 2571.55 MB/s
+    ------ TEST PASSED ------
+    =====================================================================
+    FPGA accelerations ( CPU Exec. Time / FPGA Exec. Time): 9.60113
+    =====================================================================
+    ``` 
  1. Open and modify host code to run "krnl_idct_med" as follows:
 
     ```bash
@@ -223,9 +227,10 @@ Since we have ran hw_emulation in previous experiment you can go to build folder
    
    Go to label "CREATE_KERNEL" near line no.228 and make sure the kernel name string is "krnl_idct_slow". and build host application again as follows:
    
-   ```bash
-   make compile_host
-   ```    
+    ```bash
+    make compile_host
+    ```    
+   
 1. Now we will run host application as follows:
 
 	```bash
@@ -233,21 +238,23 @@ Since we have ran hw_emulation in previous experiment you can go to build folder
 	```
  
 	You will see an output like this, which shows FGPA acceleration by a factor of 7x:
-      ```
-   Execution Finished
-	=====================================================================
-	------ All Task finished !
-	------ Done with CPU and FPGA based IDCTs
-	------ Runs complete validating results
-	CPU Time:        1.89137 s ( 1894.34ms )
-	CPU Throughput:  270.704 MB/s
-	FPGA Time:       0.266215 s (166.936 ms )
-	FPGA Throughput: 1923.26 MB/s
-	------ TEST PASSED ------
-	=====================================================================
-	FPGA accelerations ( CPU Exec. Time / FPGA Exec. Time): 7.10467
-	=====================================================================
-	```   
+	
+    ```
+    Execution Finished
+    =====================================================================
+    ------ All Task finished !
+    ------ Done with CPU and FPGA based IDCTs
+    ------ Runs complete validating results
+    CPU Time:        1.89137 s ( 1894.34ms )
+    CPU Throughput:  270.704 MB/s
+    FPGA Time:       0.266215 s (166.936 ms )
+    FPGA Throughput: 1923.26 MB/s
+    ------ TEST PASSED ------
+    =====================================================================
+    FPGA accelerations ( CPU Exec. Time / FPGA Exec. Time): 7.10467
+    =====================================================================
+    ```   
+   
 **NOTE**: in the last three experiments, with II going from 2 to , 4 and then 8, we should be performance going down by 2x every time but it was not the case, reason for this is that performance is not only defined by kernel or compute performance but it also depends on memory bandwidth available to CU and host at different times and sometime dictates performance. But one thing should be clear from the last experiment that II variations have significant effect on performance and hardware resource consumption.   
 
 
