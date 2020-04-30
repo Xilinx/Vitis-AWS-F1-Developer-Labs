@@ -84,7 +84,7 @@ We will carry out a simple experiment that illustrates the effect and power of d
    
    and zoom close to first transaction happening on device time line on read/write interfaces, snapshot is shown in the figure below and focus on the part marked by yellow box:
    
-    ![](../../images/module_01/lab_04_idct/hwEmuComputMemTxOverLap.PNG) 
+	![](../../images/module_01/lab_04_idct/hwEmuComputMemTxOverLap.PNG) 
     
     What we can observe from this timeline is that there is overlapping activity at the read and write interfaces for compute unit essentially meaning things are happening concurrently. The amount of overlap seems marginal because we have intentionally chosen very small data size for emulation, the situation will be much better when we go to actual hardware or system run when we can use large data size. In next section we will compare this waveform with non-dataflow kernel.
        
