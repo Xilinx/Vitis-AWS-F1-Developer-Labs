@@ -266,5 +266,5 @@ In this lab, you learned:
 ---------------------------------------
 
 <p align="center"><b>
-Finish this module: <a href="lab_05_sw_pipelining_wrapUp.md">Software Optimizations and Wrap Up</a>
+Finish this module: <a href="lab_05_sw_pipelining_wrapUp.md">Host Host Code Performance Optimizations and Wrap Up</a>
 </b></p>  
