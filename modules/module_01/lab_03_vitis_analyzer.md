@@ -58,7 +58,7 @@ The Vitis v++ compiler also generates **HLS Reports** for each kernel. **HLS Rep
     - Latency (min/max):
     - Interval (min/max):
     
-    These numbers reported in the table give performance expectation from the kernel in terms of clock cycles and also in time units.
+    These numbers reported in the table give performance expectation from the kernel in terms of clock cycles and also in time units. 
     
     ![](../../images/module_01/lab_03_idct/synthReportHwEmu.png)
 
