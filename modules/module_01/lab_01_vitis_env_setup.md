@@ -5,7 +5,7 @@ In this lab you will have a look at Vitis acceleration environment. You also wil
 
 The architecture of the AWS F1 platform and the Vitis development flow are presented in a figure below:
 
-![](../../images/module_01/overview/f1_platform_vitis.png)
+![](../../images/module_01/overview/f1_platform_vitis.PNG)
 
 1. Amazon EC2 F1 is a compute instance combining x86 CPUs with Xilinx FPGAs. The FPGAs are programmed with custom hardware accelerators which can accelerate complex workloads up to 30x when compared with servers that use CPUs alone.
 2. An F1 application consists of an x86 executable for the host application and an FPGA binary (also referred to as Amazon FPGA Image or AFI) for the custom hardware accelerators. Communication between the host application and the accelerators is automatically managed by the OpenCL runtime.
