@@ -56,7 +56,7 @@ In the following sections we will launch the application on F1 instance and anal
    
    Now in the host side application timeline part go to first write transaction and zoom in appropriately and you will see a timeline similar to the one shown below:
    
-      ![](../../images/module_01/lab_05_idct/hwRunNoSwPipeLine.png) 
+      ![](../../images/module_01/lab_05_idct/hwRunNoSwPipeLine.PNG) 
       
   In next section we will try to comprehend this waveform and will perform host side code optimization to gain in performance.
 
@@ -72,7 +72,7 @@ We will open application profile summary and by looking at the profile summary a
     ```
    Now from left hand side panel select "Profile Summary" and from the profile summary view go to "Kernels and Compute Units" and you will see numbers about kernels and compute unit as shown in the figure below:
    
-      ![](../../images/module_01/lab_05_idct/hwRunCuUtil.png) 
+      ![](../../images/module_01/lab_05_idct/hwRunCuUtil.PNG) 
       
   It shows that compute unit utilization is around 23%. Meaning compute unit is busy crunching numbers only for 23% of the time and remaining 77% of time it is stalled/idling. This can be confirmed from the application timeline and which also provides insights why it is so. 
   
@@ -186,11 +186,11 @@ Now that we have explained in the previous section in detail how we can create a
     ```bash
     vitis_analyzer timeline_trace.csv
     ```
-   ![](../../images/module_01/lab_05_idct/hwRunSwPipeLine.png)
+   ![](../../images/module_01/lab_05_idct/hwRunSwPipeLine.PNG)
     
 1. Another interesting thing to look for is compute unit utilization. Please open the profile summary and have a look at compute unit utilization, it should have gone up from 23% to something more than 70%, which means it is now idling considerably less than what it was before we created this software pipeline on host side.
      
-    ![](../../images/module_01/lab_05_idct/hwRunCuUtilOpt.png) 
+    ![](../../images/module_01/lab_05_idct/hwRunCuUtilOpt.PNG) 
 
 
 \
