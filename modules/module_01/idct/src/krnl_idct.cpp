@@ -294,7 +294,7 @@ void execute(hls::stream<int512_t> &iblock,
      * save resources */
     #pragma HLS loop_tripcount min=1024 max=1024
 
-PIPELINE_PRAGMA:
+//PIPELINE_PRAGMA:
 
     #pragma HLS PIPELINE II=2
  
@@ -355,7 +355,7 @@ void krnl_idct_dataflow(const ap_int<512> *inBlocks,
 			unsigned int blocks) 
 {
 
-DATAFLOW_PRAGMA:
+//DATAFLOW_PRAGMA:
 
 	#pragma HLS DATAFLOW
 
@@ -367,7 +367,7 @@ DATAFLOW_PRAGMA:
 	//#pragma  HLS stream variable=icoeffs     depth=2
 	//#pragma  HLS stream variable=ioutBlocks depth=512
 
-FUNCTION_PIPELINE:
+//FUNCTION_PIPELINE:
 
 	read_blocks<uint512_t>(coeffs, icoeffs, 1);
 	read_blocks<int512_t>(inBlocks, iblock, blocks);
