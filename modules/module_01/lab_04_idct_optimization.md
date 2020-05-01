@@ -84,7 +84,7 @@ We will carry out a simple experiment that will illustrate the effect and power 
    
    and zoom in close to first transaction happening on device time line on read/write interfaces, snapshot for this is shown in the figure below and focus on the part marked by yellow box:
    
-    ![](../../images/module_01/lab_04_idct/hwEmuComputMemTxOverLap.png) 
+    ![](../../images/module_01/lab_04_idct/hwEmuComputMemTxOverLap.PNG) 
     
     What we can observe from this timeline is that there is overlapping activity at the read and write interfaces for compute unit essentially meaning things are happening concurrently. The amount of overlap seems marginal because we have intentionally chosen very small data size for emulation, the situation will be much better when we go to actual hardware or system run when we can use large data size. In next section we will compare this waveform with non-dataflow kernel.
        
@@ -108,7 +108,7 @@ We will carry out a simple experiment that will illustrate the effect and power 
     vitis_analyzer build/timeline_trace_hw_emu.csv
     ```  
     
-    ![](../../images/module_01/lab_04_idct/hwEmuComputMemTxNoOverLap.png)
+    ![](../../images/module_01/lab_04_idct/hwEmuComputMemTxNoOverLap.PNG)
     
 ### Kernel Loop Pipelining using various Initiation Intervals(IIs)  
 In this section we will experiment with Initiation Interval for loop pipelining. To make this experiment easier we have included different kernels that are almost identical except with different names and IIs. To understand the kernel code structure open: 
