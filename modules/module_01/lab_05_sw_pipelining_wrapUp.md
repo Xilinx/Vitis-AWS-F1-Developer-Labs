@@ -1,7 +1,7 @@
 ## Host Host Code Performance Optimizations and Wrap Up
-In this lab we will experiment with one host code optimization that will bring us a big performance improvement and then we will wrap up this module by showing different steps on how to close your RDP session and stop your instance. It is important to always stop or terminate AWS EC2 instances when you are done using them. This is a recommended best practice to avoid unwanted charges.
+In this lab we will experiment with host code optimization that will bring us a big performance improvement and then we will wrap up this module by showing different steps on how to close your RDP session and stop your instance. It is important to always stop or terminate AWS EC2 instances when you are done using them. This is a recommended best practice to avoid unwanted charges.
  
-In the following sections will launch the application on F1 instance and analyze application execution using timeline and figure out a potential for significant performance improvement, to do this please proceed as follows.
+In the following sections we will launch the application on F1 instance and analyze application execution using timeline and figure out potential for significant performance improvement, to do this please proceed as follows.
 
 ### Select Right Kernel for Execution
 1. Modify host code to make sure it runs appropriate hardware kernel. Open terminal if you don't have it already open from last lab and do:
@@ -18,20 +18,20 @@ In the following sections will launch the application on F1 instance and analyze
     vim src/host.cpp
     ```  
 
-    Go to label "CREATE_KERNEL" near line no.228 and make sure the kernel name string is **"krnl_idct"** and not anything else and compile host application again:
+    Go to label "CREATE_KERNEL" near line no.226 and make sure the kernel name string is **"krnl_idct"** and not anything else and compile host application again:
 
     ```bash
     make compile_host
     ```
 ### Launch Application and generate Reports
-1. Run application and as follows by first sourcing runtime setup script if you have not done so before:
+1. Run application as follows by first sourcing runtime setup script if you have not done so before:
 
     ```bash
     source $AWS_FPGA_REPO_DIR/vitis_runtime_setup.sh 
     cd $LAB_WORK_DIR/Vitis-AWS-F1-Developer-Labs/modules/module_01/idct
     ./build/host.exe ./xclbin/krnl_idct.hw.awsxclbin $((1024*128)) 32 1
     ```
-   You will see an output similar to given below with an acceleration about 11x faster than CPU
+   You will see an output similar to the one given below with an acceleration about 11x faster than CPU
    
    ```
     Execution Finished
@@ -58,7 +58,7 @@ In the following sections will launch the application on F1 instance and analyze
    
       ![](../../images/module_01/lab_05_idct/hwRunNoSwPipeLine.PNG) 
       
-  In next section will try to comprehend this waveform and will perform host side code optimization to gain in performance.
+  In next section we will try to comprehend this waveform and will perform host side code optimization to gain in performance.
 
 ### Application Performance Analysis
 
@@ -70,19 +70,23 @@ We will open application profile summary and by looking at the profile summary a
     ```bash
    vitis_analyzer profile_summary.csv
     ```
-   Now from left hand sand panel select "Profile Summary" and from the profile summary view go to "Kernels and Compute Units" and you will see numbers about kernels and compute unit as shown in the figure below:
+   Now from left hand side panel select "Profile Summary" and from the profile summary view go to "Kernels and Compute Units" and you will see numbers about kernels and compute unit as shown in the figure below:
    
       ![](../../images/module_01/lab_05_idct/hwRunCuUtil.PNG) 
       
-  It shows that compute unit utilization is around 23%. Meaning compute unit is busy crunching numbers only for 23% of the time and remaining 77% of time it is stalled/idling. This can be confirmed from the application timeline and it also provides insights why it is so. 
+  It shows that compute unit utilization is around 23%. Meaning compute unit is busy crunching numbers only for 23% of the time and remaining 77% of time it is stalled/idling. This can be confirmed from the application timeline and which also provides insights why it is so. 
+  
  #### Application Timeline Analysis 
- By looking at the waveform we can observe that host sends data on write interface for processing and only once the data transfer completes kernel enqueu and kick starts compute unit. Once the compute unit finishes host enqueues read back to read output data produced by kernel from device memory. Whole of this cycle then repeats. One very important thing to note is that host does all of these transactions sequentially, only initiating new transaction (task getting enqueued on command queue) after previous one is finished. Given that most of the PCI and DDR interfaces have support for full duplex transports we can do number of optimizations by doing the dependency analysis.
+ 
+ By looking at the waveform we can observe that host sends data through PCI on write interface for processing and only once the data transfer completes the kernel enqueued which kick starts compute unit. Once the compute unit finishes host enqueues read back to read output data produced by kernel from device memory. Whole of this cycle then repeats. One very important thing to note is that host does all of these transactions sequentially, only initiating new transaction (task getting enqueued on command queue) after previous one is finished. Given that most of the PCI and DDR interfaces have support for full duplex transports we can do number of optimizations by doing the dependency analysis.
  
  #### Task Dependency Analysis 
   
-  - The host side writes to device memory can  continue in background back to back since it is input data coming from host to device for processing and has no dependencies
-  - Kernel can be enqueued with dependency on corresponding input data and can kick start as soon as this data is transferred
-  - Next Kernels Compute has no dependency on output data calculated by current kernel call and transferred back to host. The output data transfer for current compute can continue in background while next kernel compute can start.
+  - **Input Data:** The host side writes to device memory can  continue in background back to back since it is input data coming from host to device for processing and has no dependencies
+  
+  - **Kernel Compute:** Kernel can be enqueued with dependency on corresponding input data and can kick start as soon as this data is transferred to device
+  
+  - **Output Data Transfer to Host:** Next Kernels Compute has no dependency on output data calculated by current kernel call and transferred back to host. The output data transfer for current compute can continue in background while next kernel compute can start.
  
  In nutshell this dependency analysis clarifies and reveals that:
   - while kernel is processing current data block host can start sending next input data block for next kernel compute
@@ -92,63 +96,68 @@ We will open application profile summary and by looking at the profile summary a
 Once we have identified these facts we can capture relevant and required dependencies on host side and improve the performance considerably.
 
 ### Optimizing Host Application Code for Performance
-In this section we will try to dissect the application host code and understand how it is structured and which kind of objects are used to capture the behavior and dependencies as we discussed in last section.
-#### Capturing Task Dependencies 
-This section we will explore how host code captures dependencies to do this please proceed as follows:
+
+In this section we will try to dissect the application host code and understand how it is structured and which kind of objects are used to capture the behavior and dependencies as we discussed in last section to gain maximum performance.
+
+#### Capturing Task Dependencies
+ 
+This section we will explore how host code captures dependencies. Please proceed as follows:
+
 1. Open application source code in file "idct/krnl_idct_wrapper.cpp"
 
     ```bash
     vim idct/src/krnl_idct_wrapper.cpp
     ```
-    The host code that deals with FPGA accelerator and coordinates most of its activity is organized in two different files as explained in one the previous labs also, namely "host.cpp" and "krnl_idct_wrapper.cpp". The code in "host.cpp" deals with the creation of objects such as command queue, context, kernel and loading FPGA with binary that contains compiled kernels. The piece of host code inside "krnl_idct_wrapper.cpp" is organized in a function body to make it callable inside a std::thread.
+    The host code that deals with FPGA accelerator and coordinates most of its activity is organized in two different files as explained in one the previous labs also, namely "host.cpp" and "krnl_idct_wrapper.cpp". The code in "host.cpp" deals with the creation of objects such as command queue, context, kernel and loads FPGA with binary that contains compiled kernels. The piece of host code inside "krnl_idct_wrapper.cpp" is organized in a function body to make it callable inside a std::thread.
      
 1.  After opening "krnl_idct_wrapper.cpp" go to label "EVENTS_AND_WAIT_LISTS" near line no.48: 
 
-    Here event vectors are defined that will hold events generated by different tasks (read/write/kernel execute) when they complete, how the lengths of vectors is chosen will be clarified in next section. These events help link different tasks by letting us define one event as dependency or blocking condition for another. 
-    - **writeToDeviceEvent** is a vector which holds events which are generated once the host finishes transfer of input data from host to device and it can trigger an enqueued kernel to start compute unit.
+    Here event vectors are defined that will hold events generated by different tasks (read/write/kernel execute) when they complete. How the lengths of vectors is chosen will be explained in next section. These events help link different tasks by letting us define one event generated by completion of on task as dependency or blocking condition for another task. 
+    - **writeToDeviceEvent** is a vector which holds events which are generated once the host finishes transfer of input data from host to device. These events can trigger enqueued kernel and hence start compute unit.
     
     - **kernelExecEvent** is vector of events which indicates kernel compute has finished.
      
     - **readFromDeviceEvent** represents events generated when host finishes reading output data from device memory. 
        
 #### Batching and Pool of Buffers
-For using IDCT kernel we essentially needs three buffers for:
+
+For using IDCT kernel we need three buffers for:
 
 - input data
 - input IDCT co-efficients
 - output data
 
-Since we want to design host side such that we can overlap different operations so we need to have duplicate buffers for all inputs and outputs. Host application has a parameter called **maxScheduledBatches** which is used to define the level of duplicity, essentially how many buffers for each input or output. This parameter can be passed to host application at command line.
+Since we want to design host side such that we can overlap different operations so we need to have duplicate buffers for all inputs and outputs. Host application has a parameter called **maxScheduledBatches** which is used to define the level of duplicity, essentially how many buffers for storing different inputs or outputs for multiple kernel calls. The host application is written such that this parameter can be passed to host application at command line as argument.
  
- - **maxScheduledBatches = 1:**  *Setting its value to 1 essentially means we have one buffer for each input and output and hence no overlapping of transactions can happen from host side so write to device, kernel execution and read back from device all happen sequentially*
+ - **maxScheduledBatches = 1:**  Setting its value to 1 essentially means we have one buffer for storing only one input and output block. Because of this we cannot issue multiple kernel enqueues at the same time hence no overlapping of transactions can happen from host side. So write to device, kernel execution and read back from device all happen sequentially
  
-  - **maxScheduledBatches > 1**  *Setting it to a value greater than 1 means we have duplicates resources and we can potentially enable overlapping transactions from host side*
+  - **maxScheduledBatches > 1:**  Setting it to a value greater than 1 means we have duplicate resources and we can potentially enable overlapping transactions from host side
    
-  You can also observe that **maxScheduledBatches** is the parameter which sizes all other vectors such as event vectors and wait list. To understand how **maxScheduledBatches > 1** lets define a "full transaction" as set of following enqueue ops from host: **{_write input data to device, execute kernel, read output data from device_}** with multiple (maxScheduledBatches > 1) buffers available for input/output data we can conceptually enqueue multiple full transactions on command queue in parallel which will potentially enable overlapping simple transactions.
+  You can also observe that **maxScheduledBatches** is the parameter which sizes all other vectors such as event vectors and wait list. To understand how **maxScheduledBatches > 1** enable overlapping of different operations, lets define a "full transaction" as set of following enqueue ops from host: **{_write input data to device, execute kernel, read output data from device_}** . With multiple buffers available for input/output  data(maxScheduledBatches > 1) we can conceptually enqueue multiple full transactions on command queue in at a time which will potentially set stage for overlapping simple transactions.
   
-  To achieve the overlapping transactions host uses three different in order command queues :
+  Given the potential created by maxScheduledBatches > 1, To achieve the overlapping transactions host uses three different in order command queues :
   - first is used to enqueue all the tasks that move input data to device
   - seconds is used to enqueue all kernel executions
   - third is used to enqueue all device to host output data movements
   
-  The in order queues are used to make sure that data dependencies between multiple similar tasks ( like moving input data for 2nd kernel compute should not happen before input data for 1st kernel compute) are defined implicitly.
+  The in order queues are used to make sure that data dependencies between multiple similar tasks ( like moving input data for 2nd kernel compute should not happen before input data for 1st kernel compute has finished since it may create contention of memory interface and lower performance) are defined implicitly.
   
-  Now to understand main loop that does all task enqueueing and resource management please go to label "BATCH_PROCESSING_LOOP" near line no.66 and observe the following:
-  - This loop has total number of iterations equals to maximum number of batches to be processed (it is also a commandline argument)
+  Now to understand main loop that does all task enqueueing and resource management please go to label "BATCH_PROCESSING_LOOP" near line no.68 and observe the following:
+  - This loop has total number of iterations equal to maximum number of batches to be processed (passed as application commandline argument)
   - One batch is processed by a single kernel call
-  - Initially when this loop starts it will schedule full transactions  equals to ***maxScheduledBatches*
+  - Initially when this loop starts it will schedule full transactions  equals to ***maxScheduledBatches* essentially starts using all the Buffer resources allocated and defined by maxScheduledBatches > 1
   - After this it will wait for very first "full transaction" to complete by using a **earlyKernelEnqueue** pointer which always points to earliest enqueued "full transaction" still not finished ( meaning write to device, kernel execute and output data read back not complete).
-  - Once the earliest enqueued "full transaction" is finished it will re-uses these buffers for enqueueing the next full transaction.
+  - Once the earliest enqueued "full transaction" is finished it will re-uses these buffers for enqueueing the next full transaction for next batch of input data.
   - This loop continues till all the batches are processed.
   
-  After this loop finishes we wait on command to to finish all operation that enqueues output data transfers from device to host and signals end of processing.
+  After this loop finishes we wait on command queue for all the operation to finish. We only wait on the command queue that has enqueued output data transfers from device to host since these are the last operations to happen and signal end of processing.
   
   After all these details it should be clear that host code is designed to mimic full sequential host side execution by using **maxScheduledBatches=1** and overlapping pipelined transactional behavior by using **maxScheduledBatches > 1** 
  
  #### Running Application with Software Pipeline   
-Now that we have explained in the previous in detail how we can create a software pipeline behavior on host side using pool of buffers and multiple command queues lets experiment with it and see how performance changes to do this please proceed as follows:
+Now that we have explained in the previous section in detail how we can create a software pipeline behavior on host side using pool of buffers and multiple command queues lets experiment with it and see how performance changes. Please proceed as follows:
 
-1. Run application again, note that the final commandline argument is **4** instead of **1** as was the case in previous run which enable host side write/execute/read overlapping (software pipeline). 
+1. Run application again, note that the final commandline argument is **4** instead of **1** as was the case in previous run which will enable host side write/execute/read overlapping (software pipeline). 
 
     ```bash
     cd $LAB_WORK_DIR/Vitis-AWS-F1-Developer-Labs/modules/module_01/idct
@@ -179,20 +188,21 @@ Now that we have explained in the previous in detail how we can create a softwar
     ```
    ![](../../images/module_01/lab_05_idct/hwRunSwPipeLine.PNG)
     
-1. Another interesting thing to look for compute utilization, please open the profile summary and have a look at compute unit utilization, it should have gone up from 23% to something more than 70%, which means it is now idling considerably less than what it was before we created this software pipeline on host side.
+1. Another interesting thing to look for is compute unit utilization. Please open the profile summary and have a look at compute unit utilization, it should have gone up from 23% to something more than 70%, which means it is now idling considerably less than what it was before we created this software pipeline on host side.
      
     ![](../../images/module_01/lab_05_idct/hwRunCuUtilOpt.PNG) 
 
 
 \
 \
-NOTE: If the compute unit utilization in this case was still less than 50% we could have used a compute unit which has II twice that II of this kernel which is 2 for the kernel we are using and could have ended up saving some hardware resources on FPGA.
+NOTE: If the compute unit utilization in this case was still less than 50% and we have also found out that performance bottleneck is not compute unit but something else like  memory bandwidth or some other block working in pipeline with it, we could have increased the II by 2x which may  allows us to save resources on FPGA.
+
 ### Summary  
 
 In this lab, you learned:
 * How to critically look at application timeline and profile summary
 * Identify potential for performance improvements from application timeline
-* Identify task dependencies and exploit them  
+* Identify task that can overlap to create a software pipeline  
 * Optimize host code to enable software pipelining for performance improvements
 
 ---------------------------------------
