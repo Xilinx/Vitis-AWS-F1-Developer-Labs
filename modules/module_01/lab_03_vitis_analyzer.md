@@ -18,7 +18,7 @@ cd ./build/
 vitis_analyzer profile_summary_hw_emu.csv
 ```
 
-  ![](../../images/module_01/lab_03_idct/hwEmuProfileSummary.png)
+  ![](../../images/module_01/lab_03_idct/hwEmuProfileSummary.PNG)
 
   This report provides data related to how the application runs. Notice that the report has four tabs at the top: **Top Operations**, **Kernels & Compute Units**, **Data Transfers**, and **OpenCL APIs**.
 
@@ -61,11 +61,11 @@ The Vitis v++ compiler also generates **HLS Reports** for each kernel. **HLS Rep
     
     These numbers reported in the table give performance expectation from the kernel in terms of clock cycles and also in time units. 
     
-    ![](../../images/module_01/lab_03_idct/synthReportHwEmu.png)
+    ![](../../images/module_01/lab_03_idct/synthReportHwEmu.PNG)
 
 1. The next thing to look for in the same report is estimate for hardware resources used by this kernel on FPGA. Look for Utilization Estimates section, it should look similar to the following table:
 
-    ![](../../images/module_01/lab_03_idct/utilHwEmuIDCT.png)  
+    ![](../../images/module_01/lab_03_idct/utilHwEmuIDCT.PNG)  
     
     From this table we can see resource usage for this kernel in absolute numbers and percentage of total resources on FPGA. The main resources on the FPGA are Digital Signal Processing modules (DSPs), block RAM memory modules (BRAMs), Flip Flops (FFs) and Look up tables (LUTs). You can note down these resources to compare with the implementation of other hardware kernels.
 1. Next open the following report for kernel **kernel_idct_slow**:
@@ -95,7 +95,7 @@ Open the generated profile summary report generated
 vitis_analyzer build/timeline_trace_hw_emu.csv 
 ```
 
-![](../../images/module_01/lab_03_idct/applicationTimelineHwEmu.png)
+![](../../images/module_01/lab_03_idct/applicationTimelineHwEmu.PNG)
 
 
 
@@ -115,7 +115,7 @@ For IDCT application host side essentially manages data allocation, data movemen
 Device side timeline trace gives details of activity happening on the FPGA device or acceleration card. Here you can find actual hardware activity happening for different CUs, for IDCT we are using only one instance of IDCT kernel so a single CU. All its interfaces to device global memory are traced out. In the case of IDCT it uses three separate interfaces two for co-efficient and input data and one interface for output data. You can zoom into one of the read/write transactions happening on device master AXI interfaces as shown in the figure below and see how fast these data transfers are happening and in which sort of bursts, the timeline will show different bursts and also burst lengths. You can also note that since IDCT coefficients and input data use same DDR memory bank and happen in non-overlapping fashion whereas output write operation has some overlap with device read operation because it uses a separate DDR memory bank. In next labs we will see maximizing this kind of overlap considerably improve application performance.
 
 
-![](../../images/module_01/lab_03_idct/memTxHwEmuDevice.png) 
+![](../../images/module_01/lab_03_idct/memTxHwEmuDevice.PNG) 
 
 
 ### Summary  
