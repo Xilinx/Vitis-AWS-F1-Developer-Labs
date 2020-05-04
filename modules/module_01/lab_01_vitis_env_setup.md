@@ -1,5 +1,5 @@
 ## Lab 1: Vitis Acceleration Environment
-In this lab you will have a look at Vitis acceleration environment. You also will see how to setup environment for running an accelerated application on AWS F1 Instance. You will use a "Hello World" Example, that performs a simple vector addition function on FPGA card.
+This lab demonstrates how to setup Vitis environment and run a simple Hello World application on AWS F1 instance. It also gives overview of Vitis Acceleration environment. 
 
 #### Overview of the AWS F1 Platform and Vitis Flow
 
