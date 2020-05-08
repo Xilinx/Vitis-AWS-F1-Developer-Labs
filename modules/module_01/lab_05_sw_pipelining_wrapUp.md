@@ -1,5 +1,5 @@
 ## Host Host Code Performance Optimizations and Wrap Up
-In this lab we will experiment with host code optimization that will bring us a big performance improvement and then we will wrap up this module by showing different steps on how to close your RDP session and stop your instance. It is important to always stop or terminate AWS EC2 instances when you are done using them. This is a recommended best practice to avoid unwanted charges.
+In this lab we will experiment with host code optimization that will bring us a big performance improvement. Finally we will wrap up this module by showing different steps on how to close your RDP session and stop your instance. It is important to always stop or terminate AWS EC2 instances when you are done using them. This is a recommended best practice to avoid unwanted charges.
  
 In the following sections we will launch the application on F1 instance and analyze application execution using timeline and figure out potential for significant performance improvement, to do this please proceed as follows.
 
@@ -12,7 +12,7 @@ In the following sections we will launch the application on F1 instance and anal
     cd $LAB_WORK_DIR/Vitis-AWS-F1-Developer-Labs/modules/module_01/idct
     ```
 
-    Now open host.cpp and make changes so that hardware run will use  kernel namely "krnl_idct": 
+    Now open host.cpp and make changes so that hardware run will use kernel namely "krnl_idct": 
 
     ```bash
     vim src/host.cpp
@@ -21,7 +21,7 @@ In the following sections we will launch the application on F1 instance and anal
     Go to label "CREATE_KERNEL" near line no.226 and make sure the kernel name string is **"krnl_idct"** and not anything else and compile host application again:
 
     ```bash
-    make compile_host
+    make compile_host TARGET=hw
     ```
 ### Launch Application and generate Reports
 1. Run application as follows by first sourcing runtime setup script if you have not done so before:
@@ -51,14 +51,14 @@ In the following sections we will launch the application on F1 instance and anal
    The system run will also create a profile summary and application timeline in the run folder (idct here) open application timeline:
    
    ```bash
-   vitis_analyzer timeline_trace.csv
+   vitis_analyzer ./xclbin.run_summary
    ```
    
    Now in the host side application timeline part go to first write transaction and zoom in appropriately and you will see a timeline similar to the one shown below:
    
       ![](../../images/module_01/lab_05_idct/hwRunNoSwPipeLine.PNG) 
       
-  In next section we will try to comprehend this waveform and will perform host side code optimization to gain in performance.
+  In next section we will try to comprehend this waveform and will perform host side code optimization to improve performance.
 
 ### Application Performance Analysis
 
@@ -68,7 +68,7 @@ We will open application profile summary and by looking at the profile summary a
 1. In the run directory (idct) open profile summary
 
     ```bash
-   vitis_analyzer profile_summary.csv
+   vitis_analyzer ./build/xclbin.run_summary
     ```
    Now from left hand side panel select "Profile Summary" and from the profile summary view go to "Kernels and Compute Units" and you will see numbers about kernels and compute unit as shown in the figure below:
    
@@ -78,7 +78,15 @@ We will open application profile summary and by looking at the profile summary a
   
  #### Application Timeline Analysis 
  
- By looking at the waveform we can observe that host sends data through PCI on write interface for processing and only once the data transfer completes the kernel enqueued which kick starts compute unit. Once the compute unit finishes host enqueues read back to read output data produced by kernel from device memory. Whole of this cycle then repeats. One very important thing to note is that host does all of these transactions sequentially, only initiating new transaction (task getting enqueued on command queue) after previous one is finished. Given that most of the PCI and DDR interfaces have support for full duplex transports we can do number of optimizations by doing the dependency analysis.
+ By looking at the waveform we can observe that:
+ 
+ *  Host sends data through PCI on write interface for processing and only once the data transfer completes the enqueued kernel can kick starts compute unit.
+ 
+ * Once the compute unit finishes processing current batch of input data only then  output data produced by kernel requested by host enqueue start to flow.
+ 
+ * Whole of this cycle then repeats again and again till all batches of input are processed.
+     
+ One very important thing to note is that host does all of these transactions sequentially, only initiating new transaction (task getting enqueued on command queue) after previous one is finished. Given that most of the PCI and DDR interfaces have support for full duplex transports we can do number of optimizations by doing the dependency analysis.
  
  #### Task Dependency Analysis 
   
@@ -108,7 +116,11 @@ This section we will explore how host code captures dependencies. Please proceed
     ```bash
     vim idct/src/krnl_idct_wrapper.cpp
     ```
-    The host code that deals with FPGA accelerator and coordinates most of its activity is organized in two different files as explained in one the previous labs also, namely "host.cpp" and "krnl_idct_wrapper.cpp". The code in "host.cpp" deals with the creation of objects such as command queue, context, kernel and loads FPGA with binary that contains compiled kernels. The piece of host code inside "krnl_idct_wrapper.cpp" is organized in a function body to make it callable inside a std::thread.
+    The host code that deals with FPGA accelerator and coordinates most of its activity is organized in two different files as explained in one the previous labs also, namely:
+     * "host.cpp" and 
+     * "krnl_idct_wrapper.cpp".
+      
+    The code in "host.cpp" deals with the creation of objects such as command queue, context, kernel and loads FPGA with binary that contains compiled kernels. The piece of host code inside "krnl_idct_wrapper.cpp" is organized in a function body to make it callable inside a std::thread.
      
 1.  After opening "krnl_idct_wrapper.cpp" go to label "EVENTS_AND_WAIT_LISTS" near line no.48: 
 
@@ -121,26 +133,38 @@ This section we will explore how host code captures dependencies. Please proceed
        
 #### Batching and Pool of Buffers
 
+##### Duplicating Input and Output Buffers 
+
 For using IDCT kernel we need three buffers for:
 
 - input data
 - input IDCT co-efficients
 - output data
 
-Since we want to design host side such that we can overlap different operations so we need to have duplicate buffers for all inputs and outputs. Host application has a parameter called **maxScheduledBatches** which is used to define the level of duplicity, essentially how many buffers for storing different inputs or outputs for multiple kernel calls. The host application is written such that this parameter can be passed to host application at command line as argument.
+Since we want to design host side such that we can overlap different operations so we need to have duplicate buffers for all inputs and outputs kernel needs to process per call. Host application has a parameter called **maxScheduledBatches** which is used to define the level of duplicity, essentially how many buffers for storing different inputs or outputs for multiple kernel calls. The host application is written such that this parameter can be passed to host application at command line as argument.
  
  - **maxScheduledBatches = 1:**  Setting its value to 1 essentially means we have one buffer for storing only one input and output block. Because of this we cannot issue multiple kernel enqueues at the same time hence no overlapping of transactions can happen from host side. So write to device, kernel execution and read back from device all happen sequentially
  
   - **maxScheduledBatches > 1:**  Setting it to a value greater than 1 means we have duplicate resources and we can potentially enable overlapping transactions from host side
    
-  You can also observe that **maxScheduledBatches** is the parameter which sizes all other vectors such as event vectors and wait list. To understand how **maxScheduledBatches > 1** enable overlapping of different operations, lets define a "full transaction" as set of following enqueue ops from host: **{_write input data to device, execute kernel, read output data from device_}** . With multiple buffers available for input/output  data(maxScheduledBatches > 1) we can conceptually enqueue multiple full transactions on command queue in at a time which will potentially set stage for overlapping simple transactions.
+  You can also observe that **maxScheduledBatches** is the parameter which sizes all other vectors such as event vectors and wait list. To understand how **maxScheduledBatches > 1** enable overlapping of different operations lets define:
+   
+  **Full Transaction**: as set of following enqueue operations from host for single kernel call:
+   
+  * write input data to device
+  * execute kernel
+  * read output data from device
   
-  Given the potential created by maxScheduledBatches > 1, To achieve the overlapping transactions host uses three different in order command queues :
-  - first is used to enqueue all the tasks that move input data to device
-  - seconds is used to enqueue all kernel executions
-  - third is used to enqueue all device to host output data movements
+  With multiple buffers available for each set of input and output  data buffers(maxScheduledBatches > 1) we can conceptually enqueue multiple full transactions on command queue at a time which will potentially set stage for overlapping between the execution of different full transactions.
+ 
+ ##### Multiple Command Queues
+ 
+  Given the potential created by **maxScheduledBatches > 1**, To achieve the overlapping transactions host uses three different in order command queues:
+  - One is used to enqueue all the tasks that move input data to device
+  - Another is used to enqueue all kernel executions
+  - Third one is used to enqueue all device to host output data movements
   
-  The in order queues are used to make sure that data dependencies between multiple similar tasks ( like moving input data for 2nd kernel compute should not happen before input data for 1st kernel compute has finished since it may create contention of memory interface and lower performance) are defined implicitly.
+  The in order queues are used to make sure that data dependencies between multiple similar tasks ( like moving input data for 2nd kernel call should not happen before input data for 1st kernel call has finished since it may create contention of memory interface and lower performance) are defined implicitly.
   
   Now to understand main loop that does all task enqueueing and resource management please go to label "BATCH_PROCESSING_LOOP" near line no.68 and observe the following:
   - This loop has total number of iterations equal to maximum number of batches to be processed (passed as application commandline argument)
@@ -150,12 +174,12 @@ Since we want to design host side such that we can overlap different operations 
   - Once the earliest enqueued "full transaction" is finished it will re-uses these buffers for enqueueing the next full transaction for next batch of input data.
   - This loop continues till all the batches are processed.
   
-  After this loop finishes we wait on command queue for all the operation to finish. We only wait on the command queue that has enqueued output data transfers from device to host since these are the last operations to happen and signal end of processing.
+  After this loop finishes we wait on command queue for all the operation to finish. We only wait on the command queue that was used enqueue output data transfers from device to host since these are the last operations to happen and implicitly signal end of processing.
   
   After all these details it should be clear that host code is designed to mimic full sequential host side execution by using **maxScheduledBatches=1** and overlapping pipelined transactional behavior by using **maxScheduledBatches > 1** 
  
  #### Running Application with Software Pipeline   
-Now that we have explained in the previous section in detail how we can create a software pipeline behavior on host side using pool of buffers and multiple command queues lets experiment with it and see how performance changes. Please proceed as follows:
+Now that we have explained in the previous section in detail how we can create a software pipeline on host side using pool of buffers and multiple command queues lets experiment with it and see how performance changes. Please proceed as follows:
 
 1. Run application again, note that the final commandline argument is **4** instead of **1** as was the case in previous run which will enable host side write/execute/read overlapping (software pipeline). 
 
@@ -184,13 +208,17 @@ Now that we have explained in the previous section in detail how we can create a
 1. To confirm that now read/write and execute transactions are overlapping (software pipeline is created) you can again open application timeline re-created by the last run, it should show timeline similar to the one shown in figure below:
 
     ```bash
-    vitis_analyzer timeline_trace.csv
+    vitis_analyzer ./xclbin.run_summary
     ```
    ![](../../images/module_01/lab_05_idct/hwRunSwPipeLine.PNG)
     
-1. Another interesting thing to look for is compute unit utilization. Please open the profile summary and have a look at compute unit utilization, it should have gone up from 23% to something more than 70%, which means it is now idling considerably less than what it was before we created this software pipeline on host side.
+1. Another interesting thing to look for is compute unit utilization:
+*   Please open the profile summary and have a look at compute unit utilization
+*   it should have gone up from 23% to something more than 70%
+
+which means it is now idling considerably less than what it was before we created this software pipeline on host side.
      
-    ![](../../images/module_01/lab_05_idct/hwRunCuUtilOpt.PNG) 
+![](../../images/module_01/lab_05_idct/hwRunCuUtilOpt.PNG) 
 
 
 \
