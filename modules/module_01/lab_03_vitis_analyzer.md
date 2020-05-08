@@ -81,7 +81,7 @@ The Vitis v++ compiler also generates **HLS Reports** for each kernel. **HLS Rep
         ```bash
         vim $LAB_WORK_DIR/Vitis-AWS-F1-Developer-Labs/modules/module_01/idct/src/krnl_idct.cpp
         ```
-       and go to label "PIPELINE_PRAGMA" near line no.297 which places a HLS pragma for loop pipelining and note down II constraint, which states that the loop body in which this pragma is placed should have an initiation interval of 2 which means back to back loop iteration should start after every 2 cycles only ( e.g. next loop iteration should start processing after two cycles of current iteration and they should do processing in an overlapping fashion).
+       and go to label "PIPELINE_PRAGMA" near line no.297: an HLS pragma is placed here for loop pipelining and note down II=2 constraint, which means back to back loop iteration should start after every 2 cycles ( e.g. next loop iteration should start processing after two cycles of current iteration and they should do processing in an overlapping fashion).
        
    - Now open file for seconds kernel **krnl_idct_slow.cpp**:
         ```bash
