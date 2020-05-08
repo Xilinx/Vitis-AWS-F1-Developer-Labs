@@ -86,11 +86,20 @@ The Vitis v++ compiler also generates **HLS Reports** for each kernel. **HLS Rep
    - Now open file for seconds kernel **krnl_idct_slow.cpp**:
         ```bash
         vim $LAB_WORK_DIR/Vitis-AWS-F1-Developer-Labs/modules/module_01/idct/src/krnl_idct_slow.cpp
-s go to label "PIPELINE_PRAGMA" near line no.297 you will notice here the II constrains is 8, which mean back to back loop iterations within the body of which this constraint is placed, should start after 8 cycles. This room of 8 cycles allows Vitis HLS tool to share resources if possible and hence better resource utilization. Similarly you can have a look at third kernel namely **krnl_idct_med** which has II=4 constraint and compare resources. Generally increasing II can reduce resources but it may not be a linear relation depending on the availability of resources in design itself which can be shared.
+go to label "PIPELINE_PRAGMA" near line no.297 you will notice here the II constrains is 8, which mean back to back loop iterations within the body of which this constraint is placed, should start after 8 cycles. This room of 8 cycles allows Vitis HLS tool to share resources if possible and hence better resource utilization. Similarly you can have a look at third kernel namely **krnl_idct_med** which has II=4 constraint and compare resources. _Generally increasing II can reduce resources but it may not be a linear relation depending on the availability of resources in design itself which can be shared._
        
 #### Application Timeline report
 
-In addition to the profile summary file, the emulation run also generates an timeline trace file as part of run summary. This gives more details about full application behavior including the interactions with FPGA and execution times on hardware side (FPGA Card). We can analyze this report for host side application issues and other things like looking at specific data transfer rates, kernel execution times for different enqueues. Essentially a timeline describing application lifetime with annotations for data transfer sizes, transfer times and bandwidth utilization. The timeline also gives event dependencies between different enqueued tasks such as memory transfers and kernel execution. These dependencies can be seen by simple mouse click on any task on timeline trace.  
+In addition to the profile summary file, the emulation run also generates an timeline trace file as part of run summary. This gives more details:
+- about full application behavior
+- the interactions with FPGA and 
+- execution times on hardware side (FPGA Card).
+
+We can analyze this report for host side application issues and other things like:
+ - looking at specific data transfer rates
+ - kernel execution times for different enqueued operations. 
+ 
+ Essentially a timeline describes application lifetime with annotations for data transfer sizes, transfer times and bandwidth utilization. The timeline also gives event dependencies between different enqueued tasks such as memory transfers and kernel execution. These dependencies can be seen by simple mouse click on any task on timeline trace.  
 
 Open the generated run summary report:
 
@@ -108,7 +117,7 @@ The **Application Timeline** collects and displays host and device events on a c
 Application Timeline has two distinct sections for **Host** and **Device**.
 
 ##### Host Application Timeline
-For IDCT application host side essentially manages data allocation, data movements and kernel invocations. It uses multiple OpenCL buffers that help to keep data ready for device to process during next kernel invocation, it uses a pool of these buffers based on a circular pointer. At the start host enqueues memory transfers and kernel enqueues using this pool of buffers. Once this pool is exhausted, the application checks for any buffers which are free after being used by device and if any buffer becomes new data is associated with these buffers as soon as possible and different task are enqueued again. The timeline captures this behavior for IDCT application. The dependencies between data transfers and kernel execution are created in a fashion described below:
+Host side uses multiple sets of OpenCL buffers. Each set contains 2 input and 1 output buffer sufficient for single kernel call. Multiple set of buffers help to enqueue multiple kernel calls at the same time. It uses a pool of buffers based on a circular pointer. At the start host enqueues multiple kernel calls and corresponding memory transfers using this pool of buffers. Once the complete pool is exhausted, the application checks for a set of buffers which is free after being used by any kernel enqueued previously. If a set of free buffers is available for kernel input and output a new task is again enqueued with new I/O data. The dependencies between data transfers and kernel execution are created in a fashion described below:
 
   * Data transfers from host to device global memory don't depend on anything and hence they can pretty much complete anytime before kernel execution which can be seen by zooming into the timeline as shown in the figure below and highlighted by yellow ellipse
  
