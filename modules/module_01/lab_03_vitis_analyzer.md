@@ -35,11 +35,8 @@ After Vitis_analyzer opens run summary, from left hand side pan select "**Profil
 
   * **OpenCL APIs**: Shows all the OpenCL API command executions, how many time each was executed, and how long they take to execute or how much time was spent during which this call was active.
 
-3. Click on the **Kernels & Compute Units** tab of the **Profile Summary** report, locate and note the following numbers:
+Click on the **Kernels & Compute Units** tab of the **Profile Summary** report, locate and note down the Kernel Total Time (ms).
 
-  - Kernel Total Time (ms):
-
-This number will serve as reference point to compare against after optimization.    
 
 #### Vitis Link Summary and HLS reports
 
@@ -124,17 +121,16 @@ After Vitis_analyzer opens run summary, from left hand side pan select "**Applic
 
 
 
-The **Application Timeline** collects and displays host and device events on a common timeline to help you understand and visualize the overall health and performance of your systems. These events include OpenCL API calls from the host code: when they happen and how long each of them takes.
-Application Timeline has two distinct sections for **Host** and **Device**.
+The **Application Timeline**  shown above collects and displays host and device events on a common timeline to help you understand and visualize the overall health and performance of your systems. These events include OpenCL API calls from the host code: when they happen and how long each of them takes. For example the rows marked by blue and yellow arrows trace read and write data movements from host side. The events inside blue and yellow circles show actual data transfers happening on this timeline. Application Timeline has two distinct sections for **Host** and **Device**.
 
 ##### Host Application Timeline
-Host side uses multiple sets of OpenCL buffers. Each set contains 2 input and 1 output buffer sufficient for single kernel call. Multiple set of buffers help to enqueue multiple kernel calls at the same time. Host uses a pool of buffers based on a circular pointer. At the start host enqueues multiple kernel calls and corresponding memory transfers using this pool of buffers. Once the complete pool is exhausted, the host application checks for a set of buffers which is free after being used by any kernel enqueued previously. If a set of free buffers is available for kernel input and output a new task is enqueued with new I/O data. The dependencies between data transfers and kernel execution are created in a fashion described below:
+Host side uses multiple sets of OpenCL buffers. Each set contains 2 input and 1 output buffer sufficient for single kernel call. Multiple set of buffers help to enqueue multiple kernel calls at the same time. Host uses a pool of buffers based on a circular pointer. At the start host enqueues multiple kernel calls and corresponding memory transfers using this pool of buffers. Once the complete pool is exhausted, the host application checks for a set of buffers which is free after being used by any kernel enqueued previously. If a set of free buffers is available for kernel input and output a new task is enqueued with new input data. The dependencies between data transfers and kernel execution are created in a fashion described below:
 
   * Data transfers from host to device global memory don't depend on anything and hence they can pretty much complete anytime before kernel execution which can be seen by zooming into the timeline as shown in the figure below and highlighted by yellow ellipse
  
   * Kernel execution/enqueues depend on host to device data transfers and also on any kernel enqueue that was done before, so they complete after related transfers and previous kernel enqueues. In the timeline below yellow ellipse shows start of next kernel enqueue happening after data transfer and it also happens when previous kernel enqueue operation has finished marked in red ellipse.
   
-  * Transfers from host to device depend on kernel execution so they always complete after kernel enqueue calls complete. It is shown by operation in below ellipse as it happens after previous kernel enqueue operation finishes marked by red ellipse.
+  * Transfers from host to device depend on kernel execution so they always complete after kernel enqueue calls complete. It is shown by an operation in blue ellipse as it happens after previous kernel enqueue operation finishes marked by red ellipse.
   
     ![](../../images/module_01/lab_03_idct/kernEnqAfterRead.PNG) 
     
