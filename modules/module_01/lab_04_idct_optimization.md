@@ -140,6 +140,7 @@ Go to label "FUNCTION_PIPELINE" near line no.370 here you will see four differen
 - write_blocks 
 
 read and write blocks simply reads data and write data from memory interfaces and streams it to execute function which calls IDCT function to perform the core compute. The read and write functions can be pipelined with desired II with overall performance dictated by "execute" function II. It is a functional pipeline where all of these functions will be constructed as independent hardware modules. The overall performance will be defined by any block that has the lowest performance which essentially means largest II. Since execute block carries out almost all compute so II variation on this block will show significant overall performance and resource utilization variations. 
+
 During this experiment we will do actual system runs instead of any using any emulation mode. For these experiments a pre-built FPGA binary file is provided. The user can also build a binary, procedure for building this file will described in a latter sections.
 
 To see how pipeline pragmas with different II are applied to different kernels, open different kernel source files and compare II constraints placed near label "PIPELINE_PRAGMA:" in each file around line no.297, you will see II as follows:
@@ -160,7 +161,7 @@ To see how pipeline pragmas with different II are applied to different kernels, 
 
 We won't built actual FGPA binary here so to get the look and feel of II effects on resources we can use results from hardware emulation runs since it also performs kernel synthesis. Since we have ran hw_emulation in previous experiment you can go to build folder and have a look at Vitis_hls reports to find out Initiation Interval and Latency for these kernels as well as resource utilization. The resource utilization will have a trend showing decrease in utilization with increase in II.
 
-1. Open and compare synthesis report to note down IIs/Latencies and resource utilization:
+1. Open and compare synthesis report to note down IIs/Latencies and resource utilization ( you can also use link summary as discussed in previous lab):
  
     ```bash
     vim ./build_hw_emu/reports/krnl_idct_med.hw_emu/hls_reports/krnl_idct_med_csynth.rpt
@@ -283,7 +284,7 @@ We won't built actual FGPA binary here so to get the look and feel of II effects
     =====================================================================
     ```   
    
-**NOTE**: in the last three experiments, with II going from 2 to 4 and then 8, the performance should be going down by 2x every time but it was not the case, reason for this is that performance is not only defined by kernel or compute performance but it also depends on memory bandwidth available to CU and host at different times and sometime it dictates performance. But one thing should be clear from the last experiment that II variations have significant effect on performance and hardware resource consumption.   
+**NOTE**: In last three experiments, with II going from 2 to 4 and then 8, the performance should be going down by 2x every time but it was not the case, reason for this is that performance is not only defined by kernel or compute performance but it also depends on memory bandwidth available to CU and host at different times and sometime it dictates performance. But one thing should be clear from the last experiment that II variations have significant effect on performance and hardware resource consumption.   
 
 
 ### Summary  

@@ -154,6 +154,7 @@ Device side timeline trace gives details of activity happening on the FPGA devic
 
 In this lab, you learned:
 * About different type of reports produced by Vitis
+* About Vitis Link Summary
 * How to read these reports for important metrics
 * How to analyze timeline traces for host and device efficiency and potential improvements
 
