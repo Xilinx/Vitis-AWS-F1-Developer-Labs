@@ -45,7 +45,7 @@ We will carry out a simple experiment that will illustrate the effects and power
     make run TARGET=hw_emu
     ```
    
-   The hardware emulation will build all the kernels and use **krnl_idct** for emulation. Now open Vitis_hls reports as follows and see different metrics:
+   The hardware emulation will build all the kernels and use **krnl_idct** for emulation. Now open Vitis_hls reports(or use link summary) as follows and see different metrics:
    
     ```bash
     cd $LAB_WORK_DIR/Vitis-AWS-F1-Developer-Labs/modules/module_01/
@@ -81,7 +81,7 @@ We will carry out a simple experiment that will illustrate the effects and power
     vitis_analyzer ./build_hw_emu/xclbin.run_summary
    
     ```
-   * Once vitis_analyzer is open select Profile Summary from left side and then select "Kernel and Compute Units" section. It gives execution estimates for kernel and compute unit. Compute Unit Utilization section reports min/max/avg estimated execution times note it down.
+   * Once vitis_analyzer is open select **Profile Summary** from left side and then select **Kernel and Compute Units** section. It gives execution estimates for kernel and compute unit. Compute Unit Utilization section reports min/max/avg estimated execution times note it down.
    * Next open the application time line by selecting "Application Timeline" from left hand panel and it opens up in right side main window.
    * Zoom in close to first transaction happening on device time line on read/write interfaces, snapshot for this is shown in the figure below and focus on the part marked by yellow box:
    
@@ -291,7 +291,7 @@ We won't built actual FGPA binary here so to get the look and feel of II effects
 
 In this lab, you learned:
 * How to use dataflow optimization to improve performance
-* How II variation during loop pipelining effect performance and resource utilization on FPGA
+* How II variation during loop pipelining effect performance and resource utilization
 ---------------------------------------
 
 <p align="center"><b>

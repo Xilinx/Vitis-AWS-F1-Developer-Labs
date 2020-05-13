@@ -63,14 +63,14 @@ In the following sections we will launch the application on F1 instance and anal
 ### Application Performance Analysis
 
 #### Profile Summary : Compute Unit Utilization
-We will open application profile summary and by looking at the profile summary and application timeline we can find a potential for application performance improvement. To open the profile summary proceed as follows:
+Now lets open profile summary and by looking at the profile summary and timeline find potential for performance improvement. To open the profile summary proceed as follows:
 
 1. In the run directory (idct) open profile summary
 
     ```bash
    vitis_analyzer ./build/xclbin.run_summary
     ```
-   Now from left hand side panel select "Profile Summary" and from the profile summary view go to "Kernels and Compute Units" and you will see numbers about kernels and compute unit as shown in the figure below:
+   Now from left hand side panel select **"Profile Summary"** and from the profile summary view go to **"Kernels and Compute Units"** and you will see numbers as shown in the figure below:
    
       ![](../../images/module_01/lab_05_idct/hwRunCuUtil.PNG) 
       
@@ -97,7 +97,7 @@ We will open application profile summary and by looking at the profile summary a
   - **Output Data Transfer to Host:** Next Kernels Compute has no dependency on output data calculated by current kernel call and transferred back to host. The output data transfer for current compute can continue in background while next kernel compute can start.
  
  In nutshell this dependency analysis clarifies and reveals that:
-  - while kernel is processing current data block host can start sending next input data block for next kernel compute
+  - While kernel is processing current data block host can start sending next input data block for next kernel compute
   - kernel/CU can start processing next input data block as soon as it becomes available
   - the output data transfer to host (produced by kernel/CU execution) can start as soon as current kernel/CU call finishes and continue in background while kernel/CU starts processing next input block. 
   
@@ -143,19 +143,19 @@ For using IDCT kernel we need three buffers for:
 
 Since we want to design host side such that we can overlap different operations so we need to have duplicate buffers for all inputs and outputs kernel needs to process per call. Host application has a parameter called **maxScheduledBatches** which is used to define the level of duplicity, essentially how many buffers for storing different inputs or outputs for multiple kernel calls. The host application is written such that this parameter can be passed to host application at command line as argument.
  
- - **maxScheduledBatches = 1:**  Setting its value to 1 essentially means we have one buffer for storing only one input and output block. Because of this we cannot issue multiple kernel enqueues at the same time hence no overlapping of transactions can happen from host side. So write to device, kernel execution and read back from device all happen sequentially
+ - **maxScheduledBatches = 1:**  Setting its value to 1 essentially means we have one buffer for storing only one input and output block. Because of this we cannot issue multiple memory movements commands and kernel enqueues at the same time hence no overlapping of transactions can happen from host side. So write to device, kernel execution and read back from device all happen sequentially
  
-  - **maxScheduledBatches > 1:**  Setting it to a value greater than 1 means we have duplicate resources and we can potentially enable overlapping transactions from host side
+  - **maxScheduledBatches > 1:**  Setting it to a value greater than 1 means we have duplicate resources (multiple set of input and output buffers ) and we can potentially enable overlapping transactions from host side
    
   You can also observe that **maxScheduledBatches** is the parameter which sizes all other vectors such as event vectors and wait list. To understand how **maxScheduledBatches > 1** enable overlapping of different operations lets define:
    
-  **Full Transaction**: as set of following enqueue operations from host for single kernel call:
+  **Full Transaction**: is a as set of following enqueue operations from host for single kernel call:
    
   * write input data to device
   * execute kernel
   * read output data from device
   
-  With multiple buffers available for each set of input and output  data buffers(maxScheduledBatches > 1) we can conceptually enqueue multiple full transactions on command queue at a time which will potentially set stage for overlapping between the execution of different full transactions.
+  With multiple buffers available for each set of input and output  data buffers(maxScheduledBatches > 1) we can conceptually enqueue multiple full transactions on command queue at a time which will potentially set stage for overlapping between execution of different full transactions.
  
  ##### Multiple Command Queues
  
@@ -164,12 +164,12 @@ Since we want to design host side such that we can overlap different operations 
   - Another is used to enqueue all kernel executions
   - Third one is used to enqueue all device to host output data movements
   
-  The in order queues are used to make sure that data dependencies between multiple similar tasks ( like moving input data for 2nd kernel call should not happen before input data for 1st kernel call has finished since it may create contention of memory interface and lower performance) are defined implicitly.
+  The in order queues are used to make sure that data dependencies between multiple similar tasks ( like moving input data for 2nd kernel call should not happen before input data for 1st kernel call has finished since it may create contention at memory interface and lower performance) are defined implicitly.
   
   Now to understand main loop that does all task enqueueing and resource management please go to label "BATCH_PROCESSING_LOOP" near line no.68 and observe the following:
   - This loop has total number of iterations equal to maximum number of batches to be processed (passed as application commandline argument)
   - One batch is processed by a single kernel call
-  - Initially when this loop starts it will schedule full transactions  equals to ***maxScheduledBatches* essentially starts using all the Buffer resources allocated and defined by maxScheduledBatches > 1
+  - Initially when this loop starts it will schedule multiple full transactions  equal to **maxScheduledBatches**, essentially starts using all the buffer resources allocated and defined by maxScheduledBatches > 1
   - After this it will wait for very first "full transaction" to complete by using a **earlyKernelEnqueue** pointer which always points to earliest enqueued "full transaction" still not finished ( meaning write to device, kernel execute and output data read back not complete).
   - Once the earliest enqueued "full transaction" is finished it will re-uses these buffers for enqueueing the next full transaction for next batch of input data.
   - This loop continues till all the batches are processed.
@@ -223,7 +223,7 @@ which means it is now idling considerably less than what it was before we create
 
 \
 \
-NOTE: If the compute unit utilization in this case was still less than 50% and we have also found out that performance bottleneck is not compute unit but something else like  memory bandwidth or some other block working in pipeline with it, we could have increased the II by 2x which may  allows us to save resources on FPGA.
+NOTE: If the compute unit utilization in this case was still less than 50% and we have also found out that performance bottleneck is not compute unit but something else like  memory bandwidth or some other block working in pipeline with it, we could have increased the II by 2x to 4 which may have allowed us to save resources on FPGA.
 
 ### Summary  
 
