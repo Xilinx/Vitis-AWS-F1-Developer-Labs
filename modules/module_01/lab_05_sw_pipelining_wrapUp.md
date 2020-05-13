@@ -1,4 +1,4 @@
-## Host Host Code Performance Optimizations and Wrap Up
+## Host Code Performance Optimizations and Wrap Up
 In this lab we will experiment with host code optimization that will bring us a big performance improvement. Finally we will wrap up this module by showing different steps on how to close your RDP session and stop your instance. It is important to always stop or terminate AWS EC2 instances when you are done using them. This is a recommended best practice to avoid unwanted charges.
  
 In the following sections we will launch the application on F1 instance and analyze application execution using timeline and figure out potential for significant performance improvement, to do this please proceed as follows.
