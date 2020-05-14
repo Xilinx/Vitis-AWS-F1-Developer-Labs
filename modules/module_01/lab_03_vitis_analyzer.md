@@ -80,7 +80,7 @@ The Vitis v++ compiler also generates **HLS Reports** for each kernel. **HLS Rep
 From the latency numbers for all the kernels it should be clear that "krnl_idct" has the minimum latency and "krnl_idct_slow" has the maximum latency. These kernels are explicitly design to have these latencies to perform some experiments. 
 Next we will see how we have generated these kernels with minor difference which is in terms of **HLS Pragmas** that we have used for loop pipelining and dataflow optimization. To do this:
     
- - First open file source file **krnl_idct.cpp** and go to label "PIPELINE_PRAGMA" near line no.297:
+ - First open file source file **krnl_idct.cpp** and go to label "PIPELINE_PRAGMA" near line 297:
  
     ```bash
     vim $LAB_WORK_DIR/Vitis-AWS-F1-Developer-Labs/modules/module_01/idct/src/krnl_idct.cpp
@@ -88,7 +88,7 @@ Next we will see how we have generated these kernels with minor difference which
    
     an HLS pragma is placed here for loop pipelining and note down II=2 constraint, which means back to back loop iteration should start after every 2 cycles ( e.g. next loop iteration should start processing after two cycles of current iteration and they should do processing in an overlapping fashion).
        
-- Now open file for second kernel **krnl_idct_slow.cpp**  go to label "PIPELINE_PRAGMA" near line no.297:
+- Now open file for second kernel **krnl_idct_slow.cpp**  go to label "PIPELINE_PRAGMA" near line 297:
 
     ```bash
     vim $LAB_WORK_DIR/Vitis-AWS-F1-Developer-Labs/modules/module_01/idct/src/krnl_idct_slow.cpp
@@ -141,7 +141,7 @@ Device side timeline trace gives details of activity happening on the FPGA devic
 
 * Green ellipse highlights read and write interfaces with same port names as used in kernel C/C++ description 
 * Yellow ellipse highlights movement of co-efficients
-* Red ellipse highlights movement of input data from device memory to kernel and blocks within the transaction show different no. of burst that happened.
+* Red ellipse highlights movement of input data from device memory to kernel and blocks within the transaction show different number of burst that happened.
 * Blue ellipse highlights data movement from kernel to device memory in different bursts, by hovering mouse on these burst it displays a tooltip with burst statistics ( kernel, compute, start, stop, size, data rate etc.).
 
  You can also note that since IDCT coefficients and input data use same DDR memory bank and happen in non-overlapping fashion whereas output write operation has some overlap with device read operation because it uses a separate DDR memory bank.  In next labs we will see maximizing this kind of overlap considerably improve application performance.

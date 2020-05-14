@@ -39,7 +39,7 @@ We will carry out a simple experiment that will illustrate the effects and power
     vim src/host.cpp
     ```
    
-    go to label **CREATE_KERNEL** near line no.226 and make sure the kernel name string is "krnl_idct" and not anything else. Now run hardware emulation as follows:
+    go to label **CREATE_KERNEL** near line 226 and make sure the kernel name string is "krnl_idct" and not anything else. Now run hardware emulation as follows:
     
     ```bash
     make run TARGET=hw_emu
@@ -100,7 +100,7 @@ We will carry out a simple experiment that will illustrate the effects and power
     vim src/host.cpp
     ```  
 
-    Go to label "CREATE_KERNEL" near line no.226 and change the kernel name string to "krnl_idct_noflow" and run hardware emulation:
+    Go to label "CREATE_KERNEL" near line 226 and change the kernel name string to "krnl_idct_noflow" and run hardware emulation:
 
     ```bash
     make run TARGET=hw_emu
@@ -132,7 +132,7 @@ In this section we will experiment with Initiation Interval for loop pipelining.
 vim src/krnl_idct.cpp
 ```
   
-Go to label "FUNCTION_PIPELINE" near line no.370 here you will see four different function calls within the dataflow optimization region:
+Go to label "FUNCTION_PIPELINE" near line 370 here you will see four different function calls within the dataflow optimization region:
 
 - read_blocks
 - read_blocks
@@ -143,7 +143,7 @@ read and write blocks simply reads data and write data from memory interfaces an
 
 During this experiment we will do actual system runs instead of any using any emulation mode. For these experiments a pre-built FPGA binary file is provided. The user can also build a binary, procedure for building this file will described in a latter sections.
 
-To see how pipeline pragmas with different II are applied to different kernels, open different kernel source files and compare II constraints placed near label "PIPELINE_PRAGMA:" in each file around line no.297, you will see II as follows:
+To see how pipeline pragmas with different II are applied to different kernels, open different kernel source files and compare II constraints placed near label "PIPELINE_PRAGMA:" in each file around line 297, you will see II as follows:
 
 - krnl_idct      : II=2
 - krnl_idct_med  : II=4
@@ -178,7 +178,7 @@ We won't built actual FGPA binary here so to get the look and feel of II effects
    vim src/host.cpp
     ```
    
-   Go to label "CREATE_KERNEL" near line no.226 and make sure the kernel name string is "krnl_idct". and build host application as follows:
+   Go to label "CREATE_KERNEL" near line 226 and make sure the kernel name string is "krnl_idct". and build host application as follows:
    
    ```bash
    make compile_host TARGET=hw
@@ -216,7 +216,7 @@ We won't built actual FGPA binary here so to get the look and feel of II effects
    vim src/host.cpp
     ```
    
-   Go to label "CREATE_KERNEL" near line no.226 and make sure the kernel name string is "krnl_idct_med". and build host application again as follows:
+   Go to label "CREATE_KERNEL" near line 226 and make sure the kernel name string is "krnl_idct_med". and build host application again as follows:
    
    ```bash
    make compile_host TARGET=hw
@@ -254,7 +254,7 @@ We won't built actual FGPA binary here so to get the look and feel of II effects
     vim src/host.cpp
     ```
    
-   Go to label "CREATE_KERNEL" near line no.226 and make sure the kernel name string is "krnl_idct_slow". and build host application again as follows:
+   Go to label "CREATE_KERNEL" near line 226 and make sure the kernel name string is "krnl_idct_slow". and build host application again as follows:
    
     ```bash
     make compile_host TARGET=hw
