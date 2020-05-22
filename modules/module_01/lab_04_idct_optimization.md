@@ -1,8 +1,8 @@
-## IDCT Kernel Hardware Optimizations and Performance Analysis
+## IDCT FPGA Kernel: Optimizations and Performance Analysis
 
-This lab builds on top of previous labs which gave an overview of the Vitis development environment and explained the various performance analysis capabilities provided by the tool using different reports. In this lab you will utilize these analysis capabilities to drive and measure performance improvements enabled by code optimizations. This lab illustrates the DATAFLOW optimization and loop pipelining variations and their effect on overall performance. 
+This lab builds on top of previous labs which gave an overview of the Vitis development environment and explained the various performance analysis capabilities provided by the tool using different reports. In this lab you will utilize these analysis capabilities to drive and measure performance improvements enabled by code optimizations. This lab illustrates the dataflow optimization and loop pipelining variations effects on overall performance. 
 
-Please note that although the entire lab is performed on an F1 instance, only the steps that involve hardware runs need to be to be run on F1 instance. All the interactive development, profiling and optimization steps would normally be performed on-premise or on a cost-effective AWS EC2 instance such as C4. However, to avoid switching from C4 to F1 instances during this lab, all the steps are performed on the F1 instance.
+Please note that although the entire lab is performed on an F1 instance, only the steps that involve use hardware/FPGA card need to run on F1 instance. All the interactive development, profiling and optimization steps would normally be performed on-premise or on a cost-effective AWS EC2 instance such as C4. However, to avoid switching from C4 to F1 instance during this lab, all the steps are performed on the F1 instance.
 
 If you have closed the terminal window at the end of the previous lab, open a new one, run setup script and go back to the project folder:
 
@@ -20,7 +20,7 @@ If you have closed the terminal window at the end of the previous lab, open a ne
     ```
    
 ### Optimizing the IDCT kernel using Dataflow
-We will carry out a simple experiment that will illustrate the effects and power of dataflow optimization. The FPGA binary built and used for experiments is built to have 4 different kernels, there are minor difference between them and they are created to illustrate different performance optimizations. In this experiment we will focus on two kernels namely **krnl_idct** and **krnl_idct_noflow** and compare them.
+We will carry out a simple experiment that will illustrate the effects and power of dataflow optimization. The FPGA binary built and used for experiments is built to have 4 different kernels. There are minor differences among them and they are created to illustrate different performance optimizations. In this experiment we will focus on two kernels namely **krnl_idct** and **krnl_idct_noflow** and compare them.
  
 #### Comparing FPGA Resource Usage
 1. Open kernel source files and compare
@@ -30,9 +30,9 @@ We will carry out a simple experiment that will illustrate the effects and power
     vim src/krnl_idct_noflow.cpp
     ``` 
    
-   these files contain description for both of these kernels, they are exactly identical kernel with different names and one major difference. Dataflow optimization is enabled for **krnl_idct** in **krnl_idct.cpp** whereas it is not used for other kernel **krnl_idct_noflow** in **knrl_idct_noflow.cpp**. You can see this by going to a label called "DATAFLOW_PRAGMA" which is placed as marker near line 358 in both the files. An HLS Pragma is applied here, it is enabled for "krnl_idct" and disabled for other by commenting out. The application of this pragma makes functions in the region execute concurrently and create a function pipeline which overlaps calculations in different functions as compared to full sequential execution. The functions in this region are connected through FIFOs generally called hls::streams, it is one of the recommended style for the functions used in dataflow region, given that the data is produced or consumed in order at every function boundary.
+   these files contain description for both of these kernels, they are exactly identical kernel with different names and one major difference. Dataflow optimization is enabled for **krnl_idct** in **krnl_idct.cpp** whereas it is not used for other kernel **krnl_idct_noflow** in **knrl_idct_noflow.cpp**. You can see this by going to a label called "DATAFLOW_PRAGMA" which is placed as marker near line 358 in both the files. An HLS Pragma is applied here, it is enabled for "krnl_idct" and disabled for other by commenting out. The application of this pragma makes functions in the region execute concurrently and create a function pipeline which overlaps compute in different functions as compared to full sequential execution. The functions in this region are connected through FIFOs also called hls::streams, it is one of the recommended style for the functions used in dataflow region, given that the data is produced or consumed in order at every function boundary.
       
-1. Now we will look at the synthesis report for latency and II to compare expected performance, please proceed as follows:
+1. Now we will look at the synthesis report for latency and II to compare expected performance, proceed as follows:
 
     ```bash
     cd $LAB_WORK_DIR/Vitis-AWS-F1-Developer-Labs/modules/module_01/idct
@@ -45,7 +45,7 @@ We will carry out a simple experiment that will illustrate the effects and power
     make run TARGET=hw_emu
     ```
    
-   The hardware emulation will build all the kernels and use **krnl_idct** for emulation. Now open Vitis_hls reports(or use link summary) as follows and see different metrics:
+   The hardware emulation will build all variations of kernels and use **krnl_idct** for emulation. Now open Vitis_hls reports(or use link summary) as follows and see different metrics:
    
     ```bash
     cd $LAB_WORK_DIR/Vitis-AWS-F1-Developer-Labs/modules/module_01/
@@ -90,7 +90,7 @@ We will carry out a simple experiment that will illustrate the effects and power
     We can observe from this timeline that:
     * There is overlapping activity at the read and write interfaces for compute unit essentially meaning things are happening concurrently(read_block/execute/write_block functions running concurrently).
     
-    * The amount of overlap seems marginal because we have intentionally chosen very small data size for emulation, the situation will be much better when we go to actual hardware or system run where we can use large data size. In next lab we will compare kernel with and without dataflow optimization with larger data sizes.
+    * The amount of overlap seems marginal because we have intentionally chosen very small data size for emulation, the situation will be much better when we go to actual hardware or system run where we can use large data size.
 
 ##### Kernel without Dataflow Optimization   
        
@@ -139,11 +139,11 @@ Go to label "FUNCTION_PIPELINE" near line 370 here you will see four different f
 - execute
 - write_blocks 
 
-read and write blocks simply reads data and write data from memory interfaces and streams it to execute function which calls IDCT function to perform the core compute. The read and write functions can be pipelined with desired II with overall performance dictated by "execute" function II. It is a functional pipeline where all of these functions will be constructed as independent hardware modules. The overall performance will be defined by any block that has the lowest performance which essentially means largest II. Since execute block carries out almost all compute so II variation on this block will show significant overall performance and resource utilization variations. 
+read and write blocks simply reads data and write data from memory interfaces and stream it to execute function which calls IDCT function to perform the core compute. The read and write functions can be pipelined with desired II with overall performance dictated by "execute" function II. It is a functional pipeline where all of these functions will be constructed as chain of independent hardware modules. The overall performance will be defined by any block that has the lowest performance which essentially means largest II. Since execute block carries out almost all compute so II variation on this block will show significant overall performance and resource utilization variations. 
 
-During this experiment we will do actual system runs instead of any using any emulation mode. For these experiments a pre-built FPGA binary file is provided. The user can also build a binary, procedure for building this file will described in a latter sections.
+Now we will do actual system runs no emulations using a pre-built FPGA binary file. The user can also build a binary using the provided makefile.
 
-To see how pipeline pragmas with different II are applied to different kernels, open different kernel source files and compare II constraints placed near label "PIPELINE_PRAGMA:" in each file around line 297, you will see II as follows:
+To see how pipeline pragmas with different II are applied to kernels, open different kernel source files and compare II constraints placed near label "PIPELINE_PRAGMA:" in each file around line 297, you will see II as follows:
 
 - krnl_idct      : II=2
 - krnl_idct_med  : II=4
@@ -155,7 +155,7 @@ To see how pipeline pragmas with different II are applied to different kernels, 
     vim src/krnl_idct_slow.cpp     
 ```
 
-**NOTE** : _II = 1 cannot be achieved because the device DDR memory width is 512 bits(64 Bytes) and IDCT compute if done is single cycle requires (64*size(short)*8=1024) 1024 bits (128 bytes) per cycle. In terms of how this fact manifest in our model can be seen if we go to "execute" function we can find that it will require 2 reads or writes on FIFO I/O interfaces in single cycle which is not possible._
+**NOTE** : _II = 1 cannot be achieved because the device DDR memory width is 512 bits(64 Bytes) and IDCT compute if done is single cycle requires (64*size(short)*8=1024) 1024 bits (128 bytes) per cycle. In terms of how this fact manifest in our model can be seen by going to "execute" function to find that it will require 2 reads or writes on FIFO I/O interfaces in single cycle which is not possible._
 
 #### Initiation Interval vs. FPGA Resource Usage
 
