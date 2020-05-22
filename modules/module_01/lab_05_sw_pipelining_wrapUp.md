@@ -1,7 +1,7 @@
 ## Host Code Performance Optimizations and Wrap Up
-In this lab we will experiment with host code optimization that will bring us a big performance improvement. Finally we will wrap up this module by showing different steps on how to close your RDP session and stop your instance. It is important to always stop or terminate AWS EC2 instances when you are done using them. This is a recommended best practice to avoid unwanted charges.
+In this lab we will experiment with host code optimizations that will bring us a big performance improvement. Finally we will wrap up this module by showing different steps on how to close your RDP session and stop your instance. It is important to always stop or terminate AWS EC2 instances when you are done using them. This is a recommended best practice to avoid unwanted charges.
  
-In the following sections we will launch the application on F1 instance and analyze application execution using timeline and figure out potential for significant performance improvement, to do this please proceed as follows.
+In the following sections we will launch the application on F1 instance and analyze application execution using timeline, to do this please proceed as follows.
 
 ### Select Right Kernel for Execution
 1. Modify host code to make sure it runs appropriate hardware kernel. Open terminal if you don't have it already open from last lab and do:
@@ -74,7 +74,7 @@ Now lets open profile summary and by looking at the profile summary and timeline
    
       ![](../../images/module_01/lab_05_idct/hwRunCuUtil.PNG) 
       
-  It shows that compute unit utilization is around 23%. Meaning compute unit is busy crunching numbers only for 23% of the time and remaining 77% of time it is stalled/idling. This can be confirmed from the application timeline and which also provides insights why it is so. 
+  It shows that compute unit utilization is around 23%. Meaning compute unit is busy crunching numbers only for 23% of the time and remaining 77% of time it is stalled/idling. This can be confirmed from the application timeline and which also provides insight why it is so. 
   
  #### Application Timeline Analysis 
  
@@ -116,7 +116,7 @@ This section we will explore how host code captures dependencies. Please proceed
     ```bash
     vim idct/src/krnl_idct_wrapper.cpp
     ```
-    The host code that deals with FPGA accelerator and coordinates most of its activity is organized in two different files as explained in one the previous labs also, namely:
+    The host code that deals with FPGA accelerator and coordinates most of its activity is organized in two different files as explained in one of the previous labs also, namely:
      * "host.cpp" and 
      * "krnl_idct_wrapper.cpp".
       
@@ -141,7 +141,7 @@ For using IDCT kernel we need three buffers for:
 - input IDCT co-efficients
 - output data
 
-Since we want to design host side such that we can overlap different operations so we need to have duplicate buffers for all inputs and outputs kernel needs to process per call. Host application has a parameter called **maxScheduledBatches** which is used to define the level of duplicity, essentially how many buffers for storing different inputs or outputs for multiple kernel calls. The host application is written such that this parameter can be passed to host application at command line as argument.
+Since we want to design host side such that we can overlap different operations so we need to have duplicate buffers for all inputs and outputs which kernel needs to process per call. Host application has a parameter called **maxScheduledBatches** which is used to define the level of duplicity, essentially how many buffers for storing different inputs or outputs for multiple kernel calls. The host application is written such that this parameter can be passed to host application at command line as argument.
  
  - **maxScheduledBatches = 1:**  Setting its value to 1 essentially means we have one buffer for storing only one input and output block. Because of this we cannot issue multiple memory movements commands and kernel enqueues at the same time hence no overlapping of transactions can happen from host side. So write to device, kernel execution and read back from device all happen sequentially
  
@@ -149,13 +149,13 @@ Since we want to design host side such that we can overlap different operations 
    
   You can also observe that **maxScheduledBatches** is the parameter which sizes all other vectors such as event vectors and wait list. To understand how **maxScheduledBatches > 1** enable overlapping of different operations lets define:
    
-  **Full Transaction**: is a as set of following enqueue operations from host for single kernel call:
+  **Full Transaction**: as set of following enqueue operations from host for single kernel call:
    
-  * write input data to device
-  * execute kernel
-  * read output data from device
+  * write input data to device (enqueueMigrateMemObjects)
+  * execute kernel (enqueueTask)
+  * read output data from device (enqueueMigrateMemObjects)
   
-  With multiple buffers available for each set of input and output  data buffers(maxScheduledBatches > 1) we can conceptually enqueue multiple full transactions on command queue at a time which will potentially set stage for overlapping between execution of different full transactions.
+  With multiple buffers available for each set of input and output data (maxScheduledBatches > 1) we can conceptually enqueue multiple full transactions on command queue at given time which will potentially set stage for overlapping between execution of different full transactions (i.e. write for first read for next, execute for first write for next etc.).
  
  ##### Multiple Command Queues
  
@@ -167,16 +167,16 @@ Since we want to design host side such that we can overlap different operations 
   The in order queues are used to make sure that data dependencies between multiple similar tasks ( like moving input data for 2nd kernel call should not happen before input data for 1st kernel call has finished since it may create contention at memory interface and lower performance) are defined implicitly.
   
   Now to understand main loop that does all task enqueueing and resource management please go to label "BATCH_PROCESSING_LOOP" near line 68 and observe the following:
-  - This loop has total number of iterations equal to maximum number of batches to be processed (passed as application commandline argument)
+  - This loop has total number of iterations equal to maximum number of batches to be processed (passed as host application command line argument)
   - One batch is processed by a single kernel call
   - Initially when this loop starts it will schedule multiple full transactions  equal to **maxScheduledBatches**, essentially starts using all the buffer resources allocated and defined by maxScheduledBatches > 1
   - After this it will wait for very first "full transaction" to complete by using a **earlyKernelEnqueue** pointer which always points to earliest enqueued "full transaction" still not finished ( meaning write to device, kernel execute and output data read back not complete).
   - Once the earliest enqueued "full transaction" is finished it will re-uses these buffers for enqueueing the next full transaction for next batch of input data.
   - This loop continues till all the batches are processed.
   
-  After this loop finishes we wait on command queue for all the operation to finish. We only wait on the command queue that was used enqueue output data transfers from device to host since these are the last operations to happen and implicitly signal end of processing.
+  After this loop finishes we wait on command queue for all the operation to finish. We only wait on the command queue that was used to enqueue output data transfers from device to host since these are the last operations to happen and implicitly signal end of processing.
   
-  After all these details it should be clear that host code is designed to mimic full sequential host side execution by using **maxScheduledBatches=1** and overlapping pipelined transactional behavior by using **maxScheduledBatches > 1** 
+  After all these details it should be clear that host code is designed to mimic full sequential host side execution by using **maxScheduledBatches=1** and overlapping/pipelined transactional behavior by using **maxScheduledBatches > 1** 
  
  #### Running Application with Software Pipeline   
 Now that we have explained in the previous section in detail how we can create a software pipeline on host side using pool of buffers and multiple command queues lets experiment with it and see how performance changes. Please proceed as follows:
@@ -221,16 +221,12 @@ which means it is now idling considerably less than what it was before we create
 ![](../../images/module_01/lab_05_idct/hwRunCuUtilOpt.PNG) 
 
 
-\
-\
-NOTE: If the compute unit utilization in this case was still less than 50% and we have also found out that performance bottleneck is not compute unit but something else like  memory bandwidth or some other block working in pipeline with it, we could have increased the II by 2x to 4 which may have allowed us to save resources on FPGA.
-
 ### Summary  
 
 In this lab, you learned:
 * How to critically look at application timeline and profile summary
 * Identify potential for performance improvements from application timeline
-* Identify task that can overlap to create a software pipeline  
+* Identify tasks that can overlap to create a software pipeline  
 * Optimize host code to enable software pipelining for performance improvements
 
 ---------------------------------------
