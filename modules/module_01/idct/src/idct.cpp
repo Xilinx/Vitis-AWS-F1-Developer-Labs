@@ -31,8 +31,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **********/
 
 
-#include "idct.hpp"
 
+
+
+
+
+
+#include "idct.hpp"
 
 
 /* ***************************************************************************
@@ -42,10 +47,10 @@ idctSoft:
 Original software implementation of IDCT algorithm used to generate
 golden reference data for 8x8 block of IDCT.
 
-    block     : input data 8x8 block
-    q         : IDCT co-efficient 8x8 block
-    outp      : IDCT output 8x8 block
-    ignoreDC : flag to ignore DC value
+    inBlock     : input data 8x8 block
+    coeffs      : IDCT co-efficient 8x8 block
+    outBlock    : IDCT output 8x8 block
+    ignoreDC    : flag to ignore DC value
 
 *************************************************************************** */
 void idctSoft(const int16_t inBlock[64],
@@ -216,12 +221,12 @@ runCPU:
 Calculates golden reference data on host side to verify FPGA results.
     
     
-    done        : Signals the completion of runCPU
-    blocks      : number of 8x8 IDCT blocks to process
-    source_block: vector of input data, contigeous blocks
-    source_q    : vector of IDCT coefficients
-    golden_vpout: vector of output data, contigeous blocks
-
+    done              : Signals the completion of runCPU
+    numBlocks         : number of 8x8 IDCT blocks to process
+    inBlocks          : vector of input data, contigeous blocks
+    coefss            : vector of IDCT coefficients
+    outBlocksGolden   : vector of output data, contigeous blocks
+    ignoreDC          : flag to ignore DC value
 
 *************************************************************************** */
 void runCPU(

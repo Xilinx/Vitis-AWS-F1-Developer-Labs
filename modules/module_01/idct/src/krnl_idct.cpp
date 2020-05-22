@@ -63,9 +63,9 @@ read_blocks:
 Dataflow block used to interface from input memory to streaming input
 channels.
     
-    in      	: Pointer to input data essentially generate a memory interface
-    out     : stream of output data that connects to memroy interface 
-
+    in        : Pointer to input data essentially generates a memory interface
+    out       : stream of output data that connects to memroy interface 
+    numBlocks : number of blocks to read from memory
 *************************************************************************** */
 template<typename out_t>
 void read_blocks(const out_t *in, hls::stream<out_t> &out, unsigned int numBlocks) 

@@ -22,7 +22,7 @@ FPGA accelerator
     batchSizeBytes      : The data contained in one batch in bytes
     qDataSizeBytes      : The size of IDCT coefficients in bytes
     context             : Device context with initialized device
-    cmdQ                : CommandQueue with out of order exec. enabled.
+    cmdQ                : Command Queues 
     krnl_idct           : IDCT kernel created from device xclbin
     inputData           : Input data vector, contains multiple contiguous batches
     coeffs              : IDCT coefficients vector
@@ -63,38 +63,39 @@ EVENTS_AND_WAIT_LISTS:
     OCL_CHECK(err, err = krnl_idct.setArg(3, m_dev_ignore_dc));
 	OCL_CHECK(err, err = krnl_idct.setArg(4, batchSize));
     bool schedulingBufferFull = false;
-    unsigned int earlyKernelEnqPtr = 0;
+    unsigned int earlyKernelEnqPtr;
 
 BATCH_PROCESSING_LOOP:
 	for (int batch_no = 0; batch_no <totalNumOfBatches ; ++batch_no)
 	{
-        schedulingBufferFull = ( batch_no > (maxScheduledBatches-1) ) ? true : false ;
-        unsigned int batchIndex = (schedulingBufferFull)? earlyKernelEnqPtr : batch_no ;
-        if(schedulingBufferFull)
+
+        earlyKernelEnqPtr = batch_no % maxScheduledBatches;
+        
+        if(batch_no > (maxScheduledBatches-1)) 
         {
             (writeToDeviceEvent[earlyKernelEnqPtr]).wait();
             (kernelExecEvent[earlyKernelEnqPtr]).wait();
             (readFromDeviceEvent[earlyKernelEnqPtr]).wait();
             (kernelWaitList[earlyKernelEnqPtr]).clear();
             (readBackWaitList[earlyKernelEnqPtr]).clear();
-            earlyKernelEnqPtr =  (earlyKernelEnqPtr + 1) % maxScheduledBatches;
         }
-		OCL_CHECK(err,
-				inputDataBuffer[batchIndex] = 
+        
+        OCL_CHECK(err,
+				inputDataBuffer[earlyKernelEnqPtr] = 
 		                      cl::Buffer(context,
 		                                 CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR,
 		                                 batchSizeBytes,
 		                                 &inputData[batch_no * (batchSizeBytes/sizeof(int16_t))],
 		                                 &err));
 		OCL_CHECK(err,
-				qInputDataBuffer[batchIndex] = 
+				qInputDataBuffer[earlyKernelEnqPtr] = 
 		                      cl::Buffer(context,
 		                                 CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR,
 		                                 qDataSizeBytes,
 		                                 &coeffs[0],
 		                                 &err));
 		OCL_CHECK(err,
-				fpgaOutputDataBuffer[batchIndex] = 
+				fpgaOutputDataBuffer[earlyKernelEnqPtr] = 
 		                      cl::Buffer(context,
 		                    		     CL_MEM_WRITE_ONLY | CL_MEM_USE_HOST_PTR,
 		                    		     batchSizeBytes,
@@ -102,34 +103,36 @@ BATCH_PROCESSING_LOOP:
 		                                 &err));
 
 		// Set the kernel arguments
-		OCL_CHECK(err, err = krnl_idct.setArg(0, inputDataBuffer[batchIndex]));
-		OCL_CHECK(err, err = krnl_idct.setArg(1, qInputDataBuffer[batchIndex]));
-		OCL_CHECK(err, err = krnl_idct.setArg(2, fpgaOutputDataBuffer[batchIndex]));
+		OCL_CHECK(err, err = krnl_idct.setArg(0, inputDataBuffer[earlyKernelEnqPtr]));
+		OCL_CHECK(err, err = krnl_idct.setArg(1, qInputDataBuffer[earlyKernelEnqPtr]));
+		OCL_CHECK(err, err = krnl_idct.setArg(2, fpgaOutputDataBuffer[earlyKernelEnqPtr]));
         OCL_CHECK(err,
 				   err = cmdQ[0].enqueueMigrateMemObjects(
-														{inputDataBuffer[batchIndex],qInputDataBuffer[batchIndex]},
+														{inputDataBuffer[earlyKernelEnqPtr],qInputDataBuffer[earlyKernelEnqPtr]},
 														0,
 														NULL,
-														&writeToDeviceEvent[batchIndex] 
+														&writeToDeviceEvent[earlyKernelEnqPtr] 
 													   )
 	              );
-        kernelWaitList[batchIndex].push_back(writeToDeviceEvent[batchIndex]);
+        kernelWaitList[earlyKernelEnqPtr].push_back(writeToDeviceEvent[earlyKernelEnqPtr]);
         OCL_CHECK(err,
 	    		  err = cmdQ[1].enqueueTask(krnl_idct,
-                                         &kernelWaitList[batchIndex], 
-	    				  	  	  	  	 &kernelExecEvent[batchIndex]
+                                         &kernelWaitList[earlyKernelEnqPtr], 
+	    				  	  	  	  	 &kernelExecEvent[earlyKernelEnqPtr]
                                          ) 
                   );
-	    readBackWaitList[batchIndex].push_back(kernelExecEvent[batchIndex]);
+	    readBackWaitList[earlyKernelEnqPtr].push_back(kernelExecEvent[earlyKernelEnqPtr]);
 	    OCL_CHECK(err,
 				  err = cmdQ[2].enqueueMigrateMemObjects(
-						  	  	  	  	  	  	  	  {fpgaOutputDataBuffer[batchIndex]},
+						  	  	  	  	  	  	  	  {fpgaOutputDataBuffer[earlyKernelEnqPtr]},
 												      CL_MIGRATE_MEM_OBJECT_HOST,
-												      &readBackWaitList[batchIndex], 
-	                                                  &readFromDeviceEvent[batchIndex])
+												      &readBackWaitList[earlyKernelEnqPtr], 
+	                                                  &readFromDeviceEvent[earlyKernelEnqPtr])
                   );
    	}
     // Wait for all tasks to finish
+    OCL_CHECK(err, err = cmdQ[0].finish());
+    OCL_CHECK(err, err = cmdQ[1].finish());
     OCL_CHECK(err, err = cmdQ[2].finish());
     for(int v = 0; v<maxScheduledBatches; v++)
     {

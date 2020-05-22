@@ -1,5 +1,5 @@
 /**********
- Copyright (c) 2019, Xilinx, Inc.
+ Copyright (c) 2020, Xilinx, Inc.
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without modification,
@@ -78,13 +78,14 @@ int main(int argc, char *argv[])
                                <<"<Emulate all Batches(1/0)>" << std::endl;
         return EXIT_FAILURE;
     }
+    
     std::string binaryFile = argv[1];
-
     long long unsigned int idctBlockSize = IDCT_SIZE;
     long long unsigned int numBlocks = BATCH_SIZE * NUM_OF_BATCHES;
     long long unsigned int batchSize = BATCH_SIZE;
     long long unsigned int totalNumOfBatches = NUM_OF_BATCHES;
     long long unsigned int maxScheduledBatches = MAX_SCHEDULED_BATCHES;
+    
     if ( argc >= 3 )
     {
         batchSize = atoi(argv[2]);
@@ -103,6 +104,7 @@ int main(int argc, char *argv[])
     }
     
     int enableFullLenEmulation = 0;
+    
     if ( argc >=6 )
     {
         enableFullLenEmulation = atoi (argv[5]);
@@ -110,10 +112,13 @@ int main(int argc, char *argv[])
 
     std::string emuMode("System HW");
     char *emuModePtr = getenv("XCL_EMULATION_MODE");
+    
     if(emuModePtr!=nullptr)
         emuMode = std::string(emuModePtr);
+    
     bool isEmulationModeEnabled =    (emuMode.compare("sw_emu")==0)
                                    | (emuMode.compare("hw_emu")==0);
+    
     std::cout<<"\n------ Identified run mode : "<<emuMode<<std::endl;
     if ( isEmulationModeEnabled  && (!enableFullLenEmulation) )
     {
@@ -176,6 +181,7 @@ int main(int argc, char *argv[])
             inputData[i*idctBlockSize + j] = j;
         }
     }
+    
     for(size_t j = 0; j < (size_t)idctBlockSize; j++)
     {
         qInData[j] = j;
@@ -192,6 +198,7 @@ FPGA_DEVICE_OPENCL_SETUP:
     auto fileBuf = xcl::read_binary_file(binaryFile);
     cl::Program::Binaries bins {{ fileBuf.data(), fileBuf.size() } };
     int valid_device = 0;
+    
     for (unsigned int i = 0; i < devices.size(); i++)
     {
         auto device = devices[i];
@@ -226,6 +233,7 @@ FPGA_DEVICE_OPENCL_SETUP:
 CREATE_KERNEL:
            std::string kernelName = "krnl_idct";
            std::cout << "Device[" << i << "]: programming successful!\n";           
+           std::cout << "------Created Handle for Kernel: " << kernelName <<std::endl;            
            OCL_CHECK(err, krnl_idct = cl::Kernel(program, kernelName.c_str(), &err));
            valid_device++;
            break;

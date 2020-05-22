@@ -22,6 +22,7 @@ help::
 PLATFORM := xilinx_u200_xdma_201830_2
 #PLATFORM := xilinx_aws-vu9p-f1-04261818_dynamic_5_0
 
+ENABLE_STALL_TRACE ?= no
 
 ## TARGET can be set as:
 ## sw_emu: software emulation
@@ -39,7 +40,21 @@ XO_NAME_SLOW := krnl_idct_slow.$(TARGET)
 XCLBIN := krnl_idct.$(TARGET).awsxclbin
 
 SRC_REPO := ./src
-BUILD_DIR := ./build
+
+ifeq ($(TARGET), sw_emu)
+BUILD_DIR ?= ./build_sw_emu
+endif
+
+ifeq ($(TARGET), hw_emu)
+BUILD_DIR ?= ./build_hw_emu
+endif
+
+ifeq ($(TARGET), hw)
+BUILD_DIR ?= ./build
+endif
+
+
+
 
 ################ Set the size of emulation data
 EMU_FULL ?= 1 
@@ -99,7 +114,14 @@ VPPFLAGS += --platform $(PLATFORM) -R1 --save-temps
 VPPFLAGS += --temp_dir $(BUILD_DIR)
 VPPFLAGS += --log_dir $(BUILD_DIR)
 VPPFLAGS += --profile_kernel data:all:all:all:all
-VPPFLAGS += --config krnl_idct.ini
+
+VPPFLAGS += --trace_memory DDR[3]
+
+ifeq ($(ENABLE_STALL_TRACE),yes)
+VPPFLAGS += --profile_kernel stall:all:all:all
+endif
+
+VPPFLAGS += --config krnl_idct.cfg
 
 ## Host Executable File Generation
 
@@ -107,7 +129,8 @@ compile_host: $(BUILD_DIR)/$(HOST_EXE)
 
 $(BUILD_DIR)/$(HOST_EXE): $(HOST_SRC_CPP)
 	mkdir -p $(BUILD_DIR)
-	$(CXX) $(CXXFLAGS) -o $@ $(HOST_SRC_CPP) $(CXXLDFLAGS) 
+	$(CXX) $(CXXFLAGS) -o $@ $(HOST_SRC_CPP) $(CXXLDFLAGS)
+	cp ./xrt.ini $(BUILD_DIR)/xrt.ini
 
 ## Kernel XO and Xclbin File Generation
 
@@ -166,8 +189,6 @@ ifeq ($(TARGET), hw)
 else
 	cd $(BUILD_DIR) && XCL_EMULATION_MODE=$(TARGET) ./host.exe  ./$(XCLBIN) $(BATCH_SIZE) $(NUM_OF_BATCHES) $(MAX_SCHEDULED_BATCHES) $(EMU_FULL)
 endif
-	@cd $(BUILD_DIR) && mv ./profile_summary.csv profile_summary_$(TARGET).csv;
-	@cd $(BUILD_DIR) && mv ./timeline_trace.csv timeline_trace_$(TARGET).csv;
 	
 	
 ## Clean generated files
