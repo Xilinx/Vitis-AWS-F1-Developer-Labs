@@ -174,7 +174,7 @@ Since we want to design host side such that we can overlap different operations 
   - Once the earliest enqueued "full transaction" is finished it will re-uses these buffers for enqueueing the next full transaction for next batch of input data.
   - This loop continues till all the batches are processed.
   
-  After this loop finishes we wait on command queue for all the operation to finish. We only wait on the command queue that was used to enqueue output data transfers from device to host since these are the last operations to happen and implicitly signal end of processing.
+  After this loop finishes we wait on command queues for all the operations to finish.
   
   After all these details it should be clear that host code is designed to mimic full sequential host side execution by using **maxScheduledBatches=1** and overlapping/pipelined transactional behavior by using **maxScheduledBatches > 1** 
  
