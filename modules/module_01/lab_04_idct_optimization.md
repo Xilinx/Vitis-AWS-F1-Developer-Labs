@@ -85,7 +85,7 @@ We will carry out a simple experiment that will illustrate the effects and power
    * Next open the application time line by selecting "Application Timeline" from left hand panel and it opens up in right side main window.
    * Zoom in close to first transaction happening on device time line on read/write interfaces, snapshot for this is shown in the figure below and focus on the part marked by yellow box:
    
-    ![](../../images/module_01/lab_04_idct/hwEmuComputMemTxOverLap.PNG) 
+    ![](images/module_01/lab_04_idct/hwEmuComputMemTxOverLap.PNG) 
     
     We can observe from this timeline that:
     * There is overlapping activity at the read and write interfaces for compute unit essentially meaning things are happening concurrently(read_block/execute/write_block functions running concurrently).
@@ -122,7 +122,7 @@ We will carry out a simple experiment that will illustrate the effects and power
     
     * write activity: lastly write_block execution marked by data write activity on **outBlocks** interface
     
-    ![](../../images/module_01/lab_04_idct/hwEmuComputMemTxNoOverLap.PNG)
+    ![](images/module_01/lab_04_idct/hwEmuComputMemTxNoOverLap.PNG)
     
 ### Kernel Loop Pipelining Using Various Initiation Intervals(IIs)  
 

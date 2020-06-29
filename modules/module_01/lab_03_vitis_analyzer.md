@@ -21,7 +21,7 @@ vitis_analyzer ./build_hw_emu/xclbin.run_summary
 
 After Vitis_analyzer opens run summary, from left hand side pan select "**Profile Summary**" to open it in the main window on right hand side.
 
-  ![](../../images/module_01/lab_03_idct/hwEmuProfileSummary.PNG)
+  ![](images/module_01/lab_03_idct/hwEmuProfileSummary.PNG)
 
   This report provides application run data. Notice that the report has four tabs at the top: **Top Operations**, **Kernels & Compute Units**, **Data Transfers**, and **OpenCL APIs**.
 
@@ -51,17 +51,17 @@ Vitis v++ compiler also generates **HLS Reports** for each kernel. **HLS Reports
     
     The figure below shows the main window opened by vitis_analyzer:
     
-     ![](../../images/module_01/lab_03_idct/hwEmuLinkSummary.PNG)
+     ![](images/module_01/lab_03_idct/hwEmuLinkSummary.PNG)
      
      In the left hand side panel it first list details of link summary then compile summary for each kernels. We will first have a look at somethings from link summary. In the left hand side panel click on **System Diagram**. It bring up a system diagram as shown below:
       
-    ![](../../images/module_01/lab_03_idct/hwEmuLinkSummarySysDia.PNG)
+    ![](images/module_01/lab_03_idct/hwEmuLinkSummarySysDia.PNG)
     
     This diagram shows number of compute units and how they connect to different memory banks and also the host PCIE connection.
     
     Vitis Analyzer also provides important guidance about the kernel compilation or HLS process which can be seen by selecting **System Guidance** as shown in figure below:
     
-    ![](../../images/module_01/lab_03_idct/hwEmuSysGuidance.PNG)
+    ![](images/module_01/lab_03_idct/hwEmuSysGuidance.PNG)
     
     System guidance provides important information about hardware compile and link process for every kernel. In this case guidance about **burst inference** on different kernel memory ports is provided. The messages say that multiple read and write bursts of variable length are inferred on kernel ports. _Burst memory transfer over AXI interfaces generally have better throughput than non-burst transfers_.
 
@@ -69,11 +69,11 @@ Vitis v++ compiler also generates **HLS Reports** for each kernel. **HLS Reports
     Next open synthesis reports and compare them for kernel latencies and resource usage.
     * To do this first select "krnl_idct" to bring the report as shown in figure below. Note down latency(min/max) and resource utilization. From resource utilization table we can see resource usage for the kernels in absolute numbers and percentage of total resources on FPGA. _The main resources on the FPGA are Digital Signal Processing modules (DSPs), block RAM memory modules (BRAMs), Flip Flops (FFs), URAMs and Look up tables (LUTs)._
     
-    ![](../../images/module_01/lab_03_idct/hwEmuHlsSynReportFast.PNG)
+    ![](images/module_01/lab_03_idct/hwEmuHlsSynReportFast.PNG)
    
    *    Next open the HLS synthesis report for "krnl_idct_med" a note down latency and resource utilization, the report for this kernel will be as shown below, note down the latency(min/max) and resource utilization
    
-    ![](../../images/module_01/lab_03_idct/hwEmuHlsSynReportMed.PNG)
+    ![](images/module_01/lab_03_idct/hwEmuHlsSynReportMed.PNG)
     
    *   Lastly open the report for the third kernel namely "krnl_idct_slow" and note down latency(min/max) and resources. 
          
@@ -119,7 +119,7 @@ vitis_analyzer build_hw_emu/xclbin.run_summary
 
 After Vitis_analyzer opens run summary, from left hand side pan select "**Application Timeline**" to open it in the main window on right hand side.
 
-![](../../images/module_01/lab_03_idct/applicationTimelineHwEmu.PNG)
+![](images/module_01/lab_03_idct/applicationTimelineHwEmu.PNG)
 
 
 
@@ -134,7 +134,7 @@ Host side uses multiple sets of OpenCL buffers. Each set contains 2 input and 1 
   
   * Transfers from host to device depend on kernel execution so they always complete after kernel enqueue calls complete. It is shown by an operation in blue ellipse as it happens after previous kernel enqueue operation finishes marked by red ellipse.
   
-    ![](../../images/module_01/lab_03_idct/kernEnqAfterRead.PNG) 
+    ![](images/module_01/lab_03_idct/kernEnqAfterRead.PNG) 
     
   All the **stated dependencies** can also be checked by clicking on any enqueue call it will **display arrow connections** which shows dependencies as specified by application programmer on host side using **OpenCL APIs** while enqueuing different operations.
 
@@ -149,7 +149,7 @@ Device side timeline trace gives details of activity happening on the FPGA devic
  You can also note that since IDCT coefficients and input data use same DDR memory bank and happen in non-overlapping fashion whereas output write operation has some overlap with device read operation because it uses a separate DDR memory bank.  In next labs we will see maximizing this kind of overlap considerably improves application performance.
 
 
-![](../../images/module_01/lab_03_idct/memTxHwEmuDevice.PNG) 
+![](images/module_01/lab_03_idct/memTxHwEmuDevice.PNG) 
 
 
 ### Summary  

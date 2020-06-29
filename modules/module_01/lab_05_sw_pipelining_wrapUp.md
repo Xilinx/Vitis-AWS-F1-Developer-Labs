@@ -56,7 +56,7 @@ In the following sections we will launch the application on F1 instance and anal
    
    Now in the host side application timeline part go to first write transaction and zoom in appropriately and you will see a timeline similar to the one shown below:
    
-      ![](../../images/module_01/lab_05_idct/hwRunNoSwPipeLine.PNG) 
+      ![](images/module_01/lab_05_idct/hwRunNoSwPipeLine.PNG) 
       
   In next section we will try to comprehend this waveform and will perform host side code optimization to improve performance.
 
@@ -72,7 +72,7 @@ Now lets open profile summary and by looking at the profile summary and timeline
     ```
    Now from left hand side panel select **"Profile Summary"** and from the profile summary view go to **"Kernels and Compute Units"** and you will see numbers as shown in the figure below:
    
-      ![](../../images/module_01/lab_05_idct/hwRunCuUtil.PNG) 
+      ![](images/module_01/lab_05_idct/hwRunCuUtil.PNG) 
       
   It shows that compute unit utilization is around 23%. Meaning compute unit is busy crunching numbers only for 23% of the time and remaining 77% of time it is stalled/idling. This can be confirmed from the application timeline and which also provides insight why it is so. 
   
@@ -210,7 +210,7 @@ Now that we have explained in the previous section in detail how we can create a
     ```bash
     vitis_analyzer ./xclbin.run_summary
     ```
-   ![](../../images/module_01/lab_05_idct/hwRunSwPipeLine.PNG)
+   ![](images/module_01/lab_05_idct/hwRunSwPipeLine.PNG)
     
 1. Another interesting thing to look for is compute unit utilization:
 *   Please open the profile summary and have a look at compute unit utilization
@@ -218,7 +218,7 @@ Now that we have explained in the previous section in detail how we can create a
 
 which means it is now idling considerably less than what it was before we created this software pipeline on host side.
      
-![](../../images/module_01/lab_05_idct/hwRunCuUtilOpt.PNG) 
+![](images/module_01/lab_05_idct/hwRunCuUtilOpt.PNG) 
 
 
 ### Summary  
@@ -257,7 +257,7 @@ More modules will be added to the Vitis AWS F1 Developer Labs over time. In the 
 | Tutorial | **Get started on F1 with the Vitis RTL flow** | This guide is targeted to developers with prior hardware design experience and legacy RTL designs. [**Click here**](https://github.com/Xilinx/SDAccel-Tutorials/blob/master/docs/aws-getting-started/RTL/README.md). |
 | Documentation | **Vitis HTML Documentation** | Learn how to get the most out of the Vitis development environment. [**Click here**](https://www.xilinx.com/html_docs/xilinx2018_3/Vitis_doc/). |
 | F1 App | **Vitis Apps and Libraries** | Check-out the growing list of accelerated application and libraries available today. [**Click here**](https://www.xilinx.com/products/design-tools/acceleration-zone.html#libraries). |
-| F1 App | **Test-drive Xilinx GoogLeNet / ResNet on AWS F1** | See for yourself how Xilinx can accelerate machine learning image classification on AWS F1. [**Click here**](https://aws.amazon.com/marketplace/pp/B077FM2JNS). |
+| F1 App | **Test-drive Xilinx GoogLeNet / ResNet on AWS F1** | See for yourself how Xilinx can accelerate machine learning image classification: on AWS F1. [**Click here**](https://aws.amazon.com/marketplace/pp/B077FM2JNS). |
 
 ---------------------------------------
 
