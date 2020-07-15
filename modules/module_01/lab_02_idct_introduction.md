@@ -1,11 +1,11 @@
-## Becoming Familiar With IDCT Application
+# Becoming Familiar With IDCT Application
 
 This lab is designed to teach the fundamentals of the Vitis development environment and programming model. Its contents are tailored, to familiarize user with basic OpenCL APIs, understanding of software and hardware emulation flows, profiling performance and identifying how to optimize host code and kernel hardware implementation.
 
 The kernels or the functions used for FPGA acceleration in this lab are slightly different hardware implementations of Inverse Discrete Cosine Transform (IDCT) algorithm, a function widely used for transform coding in applications like audio/image codecs such as JPEG and High Efficiency Video Coding(HEVC).
 
 
-### Setting Up Vitis Environment
+## Setting Up Vitis Environment
 
 1.  Open a new terminal by right-clicking anywhere in the desktop area and by selecting **Open Terminal**.
 
@@ -36,7 +36,7 @@ The kernels or the functions used for FPGA acceleration in this lab are slightly
 
     Exit **Makefile** view window and let's take a look at the design files.
 
-### Overview of the Application Source Code
+## Overview of the Application Source Code
 
 ---
 The project comprises of multiple files under src directory, following is the list with brief description:
@@ -142,14 +142,14 @@ The project comprises of multiple files under src directory, following is the li
 All of the OpenCL API functions used here are documented by the [Khronos Group](https://www.khronos.org), the maintainers of OpenCL, the open standard for parallel programming of heterogeneous systems.
 
 
-### Running the Application
+## Running the Application
   Vitis applications can run in multiple modes, these modes include software emulation, hardware emulation and actual system run on FPGA acceleration card. Vitis provides two emulation flows which allow testing the application before deploying it on the F1 instance or actual FPGA accelerator. These flows are referred to as software emulation and hardware emulation modes.
 
   * **Software emulation** is used to identify syntax issues and verify the behavior of application in this mode the C/C++ model of kernel is used for execution instead of any hardware or hardware model.
   * **Hardware emulation** is used to get performance estimates for the accelerated application with more realistic results than software emulation flow but it can only provide very accurate estimates about the hardware accelerated function/kernel performance and FPGA resource usage, the memory interfaces and data transfers use approximate models only. In this mode RTL model is used for kernel.
   
 
-#### Running Software Emulation
+### Running Software Emulation
 
 1. Run below commands in the terminal window.
     ```bash
@@ -178,7 +178,7 @@ All of the OpenCL API functions used here are documented by the [Khronos Group](
 
     The generated files are put into `build` folder under `design` directory. You can use `ls` command to investigate the generated files.
 
-#### Running the Hardware Emulation
+### Running the Hardware Emulation
  
 1. After software emulation finishes successfully, you can move forward and run the design in hardware emulation mode. The corresponding command is:
     ```bash
@@ -231,7 +231,7 @@ Here you can choose the batch size, number of batches , max scheduled batches an
    
    *where N is an integer number* 
    
-### Summary 
+## Summary 
 In this lab you learned:
 * About the IDCT application source code structure
 * OpenCL C/C++ APIs used to communicate between Host and FPGA
