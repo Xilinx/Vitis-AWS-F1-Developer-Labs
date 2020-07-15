@@ -1,7 +1,10 @@
-## Module 1: Introduction to the Vitis Acceleration Flow
+# Module 1: Introduction to the Vitis Acceleration Flow
 
+- [Module 1: Introduction to the Vitis Acceleration Flow](#module-1-introduction-to-the-vitis-acceleration-flow)
+  - [Preparing to run the labs](#preparing-to-run-the-labs)
+  - [Module overview](#module-overview)
 
-### Preparing to run the labs
+## Preparing to run the labs
 
 Before starting this module, perform a fresh reinstall of the AWS EC2 FPGA Development Kit and download the lab contents on your instance. Open a new terminal by right-clicking anywhere in the desktop area and by selecting **Open Terminal**, then run the following commands:
 
@@ -18,7 +21,7 @@ rm -rf Vitis-AWS-F1-Developer-Labs
 git clone https://github.com/Xilinx/Vitis-AWS-F1-Developer-Labs.git Vitis-AWS-F1-Developer-Labs
 ```
 
-### Module overview
+## Module overview
 The module is divided into multiple labs. The main goals of this module are:
 1. **Vitis Acceleration Environment** \
 You will get familiar with the steps involved in setting up the environment, building simple **Hello World** host application and running it on the AWS F1 instance using FPGA card.

@@ -1,9 +1,27 @@
-## Host Code Performance Optimizations and Wrap Up
+# Host Code Performance Optimizations and Wrap Up
+- [Host Code Performance Optimizations and Wrap Up](#host-code-performance-optimizations-and-wrap-up)
+  - [Select Right Kernel for Execution](#select-right-kernel-for-execution)
+  - [Launch Application and generate Reports](#launch-application-and-generate-reports)
+  - [Application Performance Analysis](#application-performance-analysis)
+    - [Profile Summary : Compute Unit Utilization](#profile-summary--compute-unit-utilization)
+    - [Application Timeline Analysis](#application-timeline-analysis)
+    - [Task Dependency Analysis](#task-dependency-analysis)
+  - [Optimizing Host Application Code for Performance](#optimizing-host-application-code-for-performance)
+    - [Capturing Task Dependencies](#capturing-task-dependencies)
+    - [Batching and Pool of Buffers](#batching-and-pool-of-buffers)
+      - [Duplicating Input and Output Buffers](#duplicating-input-and-output-buffers)
+      - [Multiple Command Queues](#multiple-command-queues)
+    - [Running Application with Software Pipeline](#running-application-with-software-pipeline)
+  - [Summary](#summary)
+  - [Stopping your instance](#stopping-your-instance)
+  - [Congratulations!](#congratulations)
+  - [Next steps](#next-steps)
+  
 In this lab we will experiment with host code optimizations that will bring us a big performance improvement. Finally we will wrap up this module by showing different steps on how to close your RDP session and stop your instance. It is important to always stop or terminate AWS EC2 instances when you are done using them. This is a recommended best practice to avoid unwanted charges.
  
 In the following sections we will launch the application on F1 instance and analyze application execution using timeline, to do this please proceed as follows.
 
-### Select Right Kernel for Execution
+## Select Right Kernel for Execution
 1. Modify host code to make sure it runs appropriate hardware kernel. Open terminal if you don't have it already open from last lab and do:
 
     ```bash
@@ -23,7 +41,7 @@ In the following sections we will launch the application on F1 instance and anal
     ```bash
     make compile_host TARGET=hw
     ```
-### Launch Application and generate Reports
+## Launch Application and generate Reports
 1. Run application as follows by first sourcing runtime setup script if you have not done so before:
 
     ```bash
@@ -60,9 +78,9 @@ In the following sections we will launch the application on F1 instance and anal
       
   In next section we will try to comprehend this waveform and will perform host side code optimization to improve performance.
 
-### Application Performance Analysis
+## Application Performance Analysis
 
-#### Profile Summary : Compute Unit Utilization
+### Profile Summary : Compute Unit Utilization
 Now lets open profile summary and by looking at the profile summary and timeline find potential for performance improvement. To open the profile summary proceed as follows:
 
 1. In the run directory (idct) open profile summary
@@ -76,7 +94,7 @@ Now lets open profile summary and by looking at the profile summary and timeline
       
   It shows that compute unit utilization is around 23%. Meaning compute unit is busy crunching numbers only for 23% of the time and remaining 77% of time it is stalled/idling. This can be confirmed from the application timeline and which also provides insight why it is so. 
   
- #### Application Timeline Analysis 
+ ### Application Timeline Analysis 
  
  By looking at the waveform we can observe that:
  
@@ -88,7 +106,7 @@ Now lets open profile summary and by looking at the profile summary and timeline
      
  One very important thing to note is that host does all of these transactions sequentially, only initiating new transaction (task getting enqueued on command queue) after previous one is finished. Given that most of the PCI and DDR interfaces have support for full duplex transports we can do number of optimizations by doing the dependency analysis.
  
- #### Task Dependency Analysis 
+ ### Task Dependency Analysis 
   
   - **Input Data:** The host side writes to device memory can  continue in background back to back since it is input data coming from host to device for processing and has no dependencies
   
@@ -103,11 +121,11 @@ Now lets open profile summary and by looking at the profile summary and timeline
   
 Once we have identified these facts we can capture relevant and required dependencies on host side and improve the performance considerably.
 
-### Optimizing Host Application Code for Performance
+## Optimizing Host Application Code for Performance
 
 In this section we will try to dissect the application host code and understand how it is structured and which kind of objects are used to capture the behavior and dependencies as we discussed in last section to gain maximum performance.
 
-#### Capturing Task Dependencies
+### Capturing Task Dependencies
  
 This section we will explore how host code captures dependencies. Please proceed as follows:
 
@@ -131,9 +149,9 @@ This section we will explore how host code captures dependencies. Please proceed
      
     - **readFromDeviceEvent** represents events generated when host finishes reading output data from device memory. 
        
-#### Batching and Pool of Buffers
+### Batching and Pool of Buffers
 
-##### Duplicating Input and Output Buffers 
+#### Duplicating Input and Output Buffers 
 
 For using IDCT kernel we need three buffers for:
 
@@ -157,7 +175,7 @@ Since we want to design host side such that we can overlap different operations 
   
   With multiple buffers available for each set of input and output data (maxScheduledBatches > 1) we can conceptually enqueue multiple full transactions on command queue at given time which will potentially set stage for overlapping between execution of different full transactions (i.e. write for first read for next, execute for first write for next etc.).
  
- ##### Multiple Command Queues
+ #### Multiple Command Queues
  
   Given the potential created by **maxScheduledBatches > 1**, To achieve the overlapping transactions host uses three different in order command queues:
   - One is used to enqueue all the tasks that move input data to device
@@ -178,7 +196,7 @@ Since we want to design host side such that we can overlap different operations 
   
   After all these details it should be clear that host code is designed to mimic full sequential host side execution by using **maxScheduledBatches=1** and overlapping/pipelined transactional behavior by using **maxScheduledBatches > 1** 
  
- #### Running Application with Software Pipeline   
+ ### Running Application with Software Pipeline   
 Now that we have explained in the previous section in detail how we can create a software pipeline on host side using pool of buffers and multiple command queues lets experiment with it and see how performance changes. Please proceed as follows:
 
 1. Run application again, note that the final commandline argument is **4** instead of **1** as was the case in previous run which will enable host side write/execute/read overlapping (software pipeline). 
@@ -221,7 +239,7 @@ which means it is now idling considerably less than what it was before we create
 ![](images/module_01/lab_05_idct/hwRunCuUtilOpt.PNG) 
 
 
-### Summary  
+## Summary  
 
 In this lab, you learned:
 * How to critically look at application timeline and profile summary
@@ -231,7 +249,7 @@ In this lab, you learned:
 
 ---------------------------------------
 
-### Stopping your instance
+## Stopping your instance
 
 * Click the 'X' icon to close your RDP client.
 * On your local machine, return to your browser and to the tab showing the **EC2 Console** and the details of your running instance.
@@ -241,12 +259,12 @@ In this lab, you learned:
    * Use **Stop** if you want to rapidly restart this instance later
    * Use **Terminate** if you want to permanantly delete this instance and its contents
 
-### Congratulations!
+## Congratulations!
 
 You have successfully completed the first module of Vitis AWS F1 Developer Labs.
 
 
-### Next steps
+## Next steps
 
 More modules will be added to the Vitis AWS F1 Developer Labs over time. In the meantime, you can continue learning about AWS F1 and Vitis by exploring the following resources:
 

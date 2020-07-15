@@ -1,7 +1,12 @@
-## Lab 1: Vitis Acceleration Environment
+# Lab 1: Vitis Acceleration Environment
+- [Lab 1: Vitis Acceleration Environment](#lab-1-vitis-acceleration-environment)
+- [Overview of the AWS F1 Platform and Vitis Flow](#overview-of-the-aws-f1-platform-and-vitis-flow)
+- [Running the "Hello World" Example](#running-the-hello-world-example)
+- [Summary](#summary)
+
 This lab demonstrates how to setup Vitis environment and run a simple Hello World application on AWS F1 instance. It also gives overview of **Vitis Acceleration environment**. 
 
-#### Overview of the AWS F1 Platform and Vitis Flow
+### Overview of the AWS F1 Platform and Vitis Flow
 
 The architecture of the AWS F1 platform and the Vitis development flow are presented in a figure below:
 
@@ -12,7 +17,7 @@ The architecture of the AWS F1 platform and the Vitis development flow are prese
 3. **Vitis** is the development environment used to create F1 applications. It comes with a full fledged IDE, x86 and FPGA compilers, profiling and debugging tools.
 4. The **host application** is written in C or C++ and uses the OpenCL APIs to interact with the accelerated functions. The accelerated functions (also referred to as kernels) can be written in C, C++, OpenCL or even RTL. These compiled kernels can be packaged into FPGA images or FPGA binaries here called AFIs.
 
-#### Running the "Hello World" Example
+### Running the "Hello World" Example
 
 The "Hello World" example is an OpenCL application with a simple vector addition accelerator. It uses a precompiled FPGA binary to reduce compilation time and streamline the lab. To run this application proceed as follows:
 
@@ -90,7 +95,7 @@ The "Hello World" example is an OpenCL application with a simple vector addition
 
 This concludes this first lab.
 
-### Summary 
+## Summary 
 In this lab you learned about:
 * Vitis software acceleration development environment 
 * How to launch a simple Hello World application 

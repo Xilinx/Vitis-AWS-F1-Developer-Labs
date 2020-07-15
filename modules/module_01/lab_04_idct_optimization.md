@@ -1,4 +1,18 @@
-## IDCT FPGA Kernel: Optimizations and Performance Analysis
+# IDCT FPGA Kernel: Optimizations and Performance Analysis
+
+- [IDCT FPGA Kernel: Optimizations and Performance Analysis](#idct-fpga-kernel-optimizations-and-performance-analysis)
+  - [Optimizing the IDCT kernel using Dataflow](#optimizing-the-idct-kernel-using-dataflow)
+    - [Comparing FPGA Resource Usage](#comparing-fpga-resource-usage)
+    - [Comparing Execution Times and Application Timeline](#comparing-execution-times-and-application-timeline)
+      - [Kernel with Dataflow Optimization](#kernel-with-dataflow-optimization)
+      - [Kernel without Dataflow Optimization](#kernel-without-dataflow-optimization)
+  - [Kernel Loop Pipelining Using Various Initiation Intervals(IIs)](#kernel-loop-pipelining-using-various-initiation-intervalsiis)
+    - [Initiation Interval vs. FPGA Resource Usage](#initiation-interval-vs-fpga-resource-usage)
+    - [Initiation Interval vs. Acceleration](#initiation-interval-vs-acceleration)
+      - [Performance with II=2](#performance-with-ii2)
+      - [Performance with II=4](#performance-with-ii4)
+      - [Performance with II=8](#performance-with-ii8)
+  - [Summary](#summary)
 
 This lab builds on top of previous labs which gave an overview of the Vitis development environment and explained the various performance analysis capabilities provided by the tool using different reports. In this lab you will utilize these analysis capabilities to drive and measure performance improvements enabled by code optimizations. This lab illustrates the dataflow optimization and loop pipelining variations effects on overall performance. 
 
@@ -19,10 +33,10 @@ If you have closed the terminal window at the end of the previous lab, open a ne
     cd $LAB_WORK_DIR/Vitis-AWS-F1-Developer-Labs/modules/module_01/idct
     ```
    
-### Optimizing the IDCT kernel using Dataflow
+## Optimizing the IDCT kernel using Dataflow
 We will carry out a simple experiment that will illustrate the effects and power of dataflow optimization. The FPGA binary built and used for experiments is built to have 4 different kernels. There are minor differences among them and they are created to illustrate different performance optimizations. In this experiment we will focus on two kernels namely **krnl_idct** and **krnl_idct_noflow** and compare them.
  
-#### Comparing FPGA Resource Usage
+### Comparing FPGA Resource Usage
 1. Open kernel source files and compare
 
     ```bash
@@ -71,9 +85,9 @@ We will carry out a simple experiment that will illustrate the effects and power
    
    By comparison you should notice that the performance of the kernel with dataflow optimization is almost 3 times better in terms of Latency and II and the resource utilization is pretty much still the same.
    
-#### Comparing Execution Times and Application Timeline   
+### Comparing Execution Times and Application Timeline   
 
-##### Kernel with Dataflow Optimization   
+#### Kernel with Dataflow Optimization   
  
 1. The next thing we can see is the compute unit execution time by looking at the profile summary reports. We have already ran hardware emulation for kernel "kernel_idct" which uses dataflow optimization, now open the profile summary report using vitis_analyzer as follows:
 
@@ -92,7 +106,7 @@ We will carry out a simple experiment that will illustrate the effects and power
     
     * The amount of overlap seems marginal because we have intentionally chosen very small data size for emulation, the situation will be much better when we go to actual hardware or system run where we can use large data size.
 
-##### Kernel without Dataflow Optimization   
+#### Kernel without Dataflow Optimization   
        
 1. Now open host.cpp and make changes so that hardware emulation will use second kernel namely "krnl_idct_noflow" and then run the emulation again:
 
@@ -124,7 +138,7 @@ We will carry out a simple experiment that will illustrate the effects and power
     
     ![](images/module_01/lab_04_idct/hwEmuComputMemTxNoOverLap.PNG)
     
-### Kernel Loop Pipelining Using Various Initiation Intervals(IIs)  
+## Kernel Loop Pipelining Using Various Initiation Intervals(IIs)  
 
 In this section we will experiment with Initiation Interval for loop pipelining. To make this experiment easier we have included different kernels that are almost identical except with different names and IIs. To understand the kernel code structure open: 
 
@@ -157,7 +171,7 @@ To see how pipeline pragmas with different II are applied to kernels, open diffe
 
 **NOTE** : _II = 1 cannot be achieved because the device DDR memory width is 512 bits(64 Bytes) and IDCT compute if done is single cycle requires (64*size(short)*8=1024) 1024 bits (128 bytes) per cycle. In terms of how this fact manifest in our model can be seen by going to "execute" function to find that it will require 2 reads or writes on FIFO I/O interfaces in single cycle which is not possible._
 
-#### Initiation Interval vs. FPGA Resource Usage
+### Initiation Interval vs. FPGA Resource Usage
 
 We won't built actual FGPA binary here so to get the look and feel of II effects on resources we can use results from hardware emulation runs since it also performs kernel synthesis. Since we have ran hw_emulation in previous experiment you can go to build folder and have a look at Vitis_hls reports to find out Initiation Interval and Latency for these kernels as well as resource utilization. The resource utilization will have a trend showing decrease in utilization with increase in II.
 
@@ -169,9 +183,9 @@ We won't built actual FGPA binary here so to get the look and feel of II effects
     vim ./build_hw_emu/reports/krnl_idct_slow.hw_emu/hls_reports/krnl_idct_slow_csynth.rpt
     ```
 
-#### Initiation Interval vs. Acceleration
+### Initiation Interval vs. Acceleration
 
-##### Performance with II=2   
+#### Performance with II=2   
 1. Open and modify host code to run "krnl_idct" as follows:
 
     ```bash
@@ -207,7 +221,7 @@ We won't built actual FGPA binary here so to get the look and feel of II effects
     FPGA accelerations ( CPU Exec. Time / FPGA Exec. Time): 11.3477
     =====================================================================
     ```
-##### Performance with II=4   
+#### Performance with II=4   
 
 1. Open and modify host code to run "krnl_idct_med" as follows:
 
@@ -245,7 +259,7 @@ We won't built actual FGPA binary here so to get the look and feel of II effects
     =====================================================================
     ``` 
 
- ##### Performance with II=8
+ #### Performance with II=8
  
  1. Open and modify host code to run "krnl_idct_med" as follows:
 
@@ -287,7 +301,7 @@ We won't built actual FGPA binary here so to get the look and feel of II effects
 **NOTE**: In last three experiments, with II going from 2 to 4 and then 8, the performance should be going down by 2x every time but it was not the case, reason for this is that performance is not only defined by kernel or compute performance but it also depends on memory bandwidth available to CU and host at different times and sometime it dictates performance. But one thing should be clear from the last experiment that II variations have significant effect on performance and hardware resource consumption.   
 
 
-### Summary  
+## Summary  
 
 In this lab, you learned:
 * How to use dataflow optimization to improve performance
