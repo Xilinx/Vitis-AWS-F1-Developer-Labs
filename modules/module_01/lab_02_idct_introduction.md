@@ -1,4 +1,11 @@
 # Becoming Familiar With IDCT Application
+- [Becoming Familiar With IDCT Application](#becoming-familiar-with-idct-application)
+  - [Setting Up Vitis Environment](#setting-up-vitis-environment)
+  - [Overview of the Application Source Code](#overview-of-the-application-source-code)
+  - [Running the Application](#running-the-application)
+    - [Running Software Emulation](#running-software-emulation)
+    - [Running the Hardware Emulation](#running-the-hardware-emulation)
+  - [Summary](#summary)
 
 This lab is designed to teach the fundamentals of the Vitis development environment and programming model. Its contents are tailored, to familiarize user with basic OpenCL APIs, understanding of software and hardware emulation flows, profiling performance and identifying how to optimize host code and kernel hardware implementation.
 
