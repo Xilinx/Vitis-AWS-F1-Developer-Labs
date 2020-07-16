@@ -9,9 +9,9 @@
   - [Kernel Loop Pipelining Using Various Initiation Intervals(IIs)](#kernel-loop-pipelining-using-various-initiation-intervalsiis)
     - [Initiation Interval vs. FPGA Resource Usage](#initiation-interval-vs-fpga-resource-usage)
     - [Initiation Interval vs. Acceleration](#initiation-interval-vs-acceleration)
-      - [Performance with II=2](#performance-with-ii2)
-      - [Performance with II=4](#performance-with-ii4)
       - [Performance with II=8](#performance-with-ii8)
+      - [Performance with II=4](#performance-with-ii4)
+      - [Performance with II=2](#performance-with-ii2)
   - [Summary](#summary)
 
 This lab builds on top of previous labs which gave an overview of the Vitis development environment and explained the various performance analysis capabilities provided by the tool using different reports. In this lab you will utilize these analysis capabilities to drive and measure performance improvements enabled by code optimizations. This lab illustrates the dataflow optimization and loop pipelining variations effects on overall performance. 
@@ -26,7 +26,7 @@ If you have closed the terminal window at the end of the previous lab, open a ne
     source $AWS_FPGA_REPO_DIR/vitis_setup.sh
     ```
     
-1. Go to project folder
+2. Go to project folder
     
     ```bash 
     export LAB_WORK_DIR=/home/centos/src/project_data/
@@ -184,80 +184,7 @@ We won't built actual FGPA binary here so to get the look and feel of II effects
     ```
 
 ### Initiation Interval vs. Acceleration
-
-#### Performance with II=2   
-1. Open and modify host code to run "krnl_idct" as follows:
-
-    ```bash
-   vim src/host.cpp
-    ```
-   
-   Go to label "CREATE_KERNEL" near line 226 and make sure the kernel name string is "krnl_idct". and build host application as follows:
-   
-   ```bash
-   make compile_host TARGET=hw
-   ```    
-1. Now we will run host application on Amazon F1 instance, please perform the Xilinx runtime setup and launch the application as follows:
-
-    ```bash
-    source $AWS_FPGA_REPO_DIR/vitis_runtime_setup.sh
-    ./build/host.exe ./xclbin/krnl_idct.hw.awsxclbin $((1024*128)) 32 1
-    ```
-	
-    You will see an output like this, which shows FGPA acceleration by a factor of 11x:
-   
-    ```
-    Execution Finished
-    =====================================================================
-    ------ All Task finished !
-    ------ Done with CPU and FPGA based IDCTs
-    ------ Runs complete validating results
-    CPU Time:        1.89434 s ( 1894.34ms )
-    CPU Throughput:  270.279 MB/s
-    FPGA Time:       0.166936 s (166.936 ms )
-    FPGA Throughput: 3067.04 MB/s
-    ------ TEST PASSED ------
-    =====================================================================
-    FPGA accelerations ( CPU Exec. Time / FPGA Exec. Time): 11.3477
-    =====================================================================
-    ```
-#### Performance with II=4   
-
-1. Open and modify host code to run "krnl_idct_med" as follows:
-
-    ```bash
-   cd $LAB_WORK_DIR/Vitis-AWS-F1-Developer-Labs/modules/module_01/
-   vim src/host.cpp
-    ```
-   
-   Go to label "CREATE_KERNEL" near line 226 and make sure the kernel name string is "krnl_idct_med". and build host application again as follows:
-   
-   ```bash
-   make compile_host TARGET=hw
-   ```    
-1. Now we will run host application as follows:
-
-	```bash
-	./build/host.exe ./xclbin/krnl_idct.hw.awsxclbin $((1024*128)) 32 1
-	```
- 
-	You will see an output like this, which shows FGPA acceleration by a factor of 9x:
-	
-    ```
-    Execution Finished
-    =====================================================================
-    ------ All Task finished !
-    ------ Done with CPU and FPGA based IDCTs
-    ------ Runs complete validating results
-    CPU Time:        1.9116 s ( 1894.34ms )
-    CPU Throughput:  267.838 MB/s
-    FPGA Time:       0.199102 s (166.936 ms )
-    FPGA Throughput: 2571.55 MB/s
-    ------ TEST PASSED ------
-    =====================================================================
-    FPGA accelerations ( CPU Exec. Time / FPGA Exec. Time): 9.60113
-    =====================================================================
-    ``` 
+We estimated in previous labs that kernel with II=4 may be able to run at maximum throughput but to show the effects of II on overall performance we will start with II=8 and then we will run with II=4 and finally with II=2. The results reported here and on the machine you are using may vary depending on the memory subsystem performance specially PCIe bandwidth available at run time to the application.
 
  #### Performance with II=8
  
@@ -297,7 +224,79 @@ We won't built actual FGPA binary here so to get the look and feel of II effects
     FPGA accelerations ( CPU Exec. Time / FPGA Exec. Time): 7.10467
     =====================================================================
     ```   
+#### Performance with II=4   
+
+1. Open and modify host code to run "krnl_idct_med" as follows:
+
+    ```bash
+   cd $LAB_WORK_DIR/Vitis-AWS-F1-Developer-Labs/modules/module_01/
+   vim src/host.cpp
+    ```
    
+   Go to label "CREATE_KERNEL" near line 226 and make sure the kernel name string is "krnl_idct_med". and build host application again as follows:
+   
+   ```bash
+   make compile_host TARGET=hw
+   ```    
+1. Now we will run host application as follows:
+
+	```bash
+	./build/host.exe ./xclbin/krnl_idct.hw.awsxclbin $((1024*128)) 32 1
+	```
+ 
+	You will see an output like this, which shows FGPA acceleration by a factor of 9x:
+	
+    ```
+    Execution Finished
+    =====================================================================
+    ------ All Task finished !
+    ------ Done with CPU and FPGA based IDCTs
+    ------ Runs complete validating results
+    CPU Time:        1.9116 s ( 1894.34ms )
+    CPU Throughput:  267.838 MB/s
+    FPGA Time:       0.199102 s (166.936 ms )
+    FPGA Throughput: 2571.55 MB/s
+    ------ TEST PASSED ------
+    =====================================================================
+    FPGA accelerations ( CPU Exec. Time / FPGA Exec. Time): 9.60113
+    =====================================================================
+    ``` 
+#### Performance with II=2   
+1. Open and modify host code to run "krnl_idct" as follows:
+
+    ```bash
+   vim src/host.cpp
+    ```
+   
+   Go to label "CREATE_KERNEL" near line 226 and make sure the kernel name string is "krnl_idct". and build host application as follows:
+   
+   ```bash
+   make compile_host TARGET=hw
+   ```    
+1. Now we will run host application on Amazon F1 instance, please perform the Xilinx runtime setup and launch the application as follows:
+
+    ```bash
+    source $AWS_FPGA_REPO_DIR/vitis_runtime_setup.sh
+    ./build/host.exe ./xclbin/krnl_idct.hw.awsxclbin $((1024*128)) 32 1
+    ```
+	
+    You will see an output like this, which shows FGPA acceleration by a factor of 11x:
+   
+    ```
+    Execution Finished
+    =====================================================================
+    ------ All Task finished !
+    ------ Done with CPU and FPGA based IDCTs
+    ------ Runs complete validating results
+    CPU Time:        1.89434 s ( 1894.34ms )
+    CPU Throughput:  270.279 MB/s
+    FPGA Time:       0.166936 s (166.936 ms )
+    FPGA Throughput: 3067.04 MB/s
+    ------ TEST PASSED ------
+    =====================================================================
+    FPGA accelerations ( CPU Exec. Time / FPGA Exec. Time): 11.3477
+    =====================================================================
+    ```   
 **NOTE**: In last three experiments, with II going from 2 to 4 and then 8, the performance should be going down by 2x every time but it was not the case, reason for this is that performance is not only defined by kernel or compute performance but it also depends on memory bandwidth available to CU and host at different times and sometime it dictates performance. But one thing should be clear from the last experiment that II variations have significant effect on performance and hardware resource consumption.   
 
 

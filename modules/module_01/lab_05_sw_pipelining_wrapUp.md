@@ -1,6 +1,7 @@
 # Host Code Performance Optimizations and Wrap Up
+
 - [Host Code Performance Optimizations and Wrap Up](#host-code-performance-optimizations-and-wrap-up)
-  - [Select Right Kernel for Execution](#select-right-kernel-for-execution)
+  - [Select Kernel for Execution](#select-kernel-for-execution)
   - [Launch Application and generate Reports](#launch-application-and-generate-reports)
   - [Application Performance Analysis](#application-performance-analysis)
     - [Profile Summary : Compute Unit Utilization](#profile-summary--compute-unit-utilization)
@@ -12,6 +13,8 @@
       - [Duplicating Input and Output Buffers](#duplicating-input-and-output-buffers)
       - [Multiple Command Queues](#multiple-command-queues)
     - [Running Application with Software Pipeline](#running-application-with-software-pipeline)
+    - [Running Application with Software Pipeline and Kernel With II=4](#running-application-with-software-pipeline-and-kernel-with-ii4)
+  - [Estimated Performance vs. Measured Performance](#estimated-performance-vs-measured-performance)
   - [Summary](#summary)
   - [Stopping your instance](#stopping-your-instance)
   - [Congratulations!](#congratulations)
@@ -21,7 +24,7 @@ In this lab we will experiment with host code optimizations that will bring us a
  
 In the following sections we will launch the application on F1 instance and analyze application execution using timeline, to do this please proceed as follows.
 
-## Select Right Kernel for Execution
+## Select Kernel for Execution
 1. Modify host code to make sure it runs appropriate hardware kernel. Open terminal if you don't have it already open from last lab and do:
 
     ```bash
@@ -238,7 +241,50 @@ which means it is now idling considerably less than what it was before we create
      
 ![](images/module_01/lab_05_idct/hwRunCuUtilOpt.PNG) 
 
+### Running Application with Software Pipeline and Kernel With II=4
+Now that we have setup our host side software pipeline, which ensures that data movements between host device are happening at full throughput in an overlappping fashion. Let go back and try to choose a kernel that has II=4 and verify if the performance estimation we did in previous lab comes close to what we predicted. Our prediction was kernel with II=4 may have similar throughput to kernel with II=2.
 
+1. Modify host code to make sure it runs appropriate hardware kernel wiht II=4. Open terminal if you don't have it already open from last lab and do:
+
+    ```bash
+    source $AWS_FPGA_REPO_DIR/vitis_setup.sh
+    export LAB_WORK_DIR=/home/centos/src/project_data/
+    cd $LAB_WORK_DIR/Vitis-AWS-F1-Developer-Labs/modules/module_01/idct
+    ```
+
+    Now open host.cpp and make changes so that hardware run will use kernel namely "krnl_idct_med": 
+
+    ```bash
+    vim src/host.cpp
+    ```  
+
+    Go to label "CREATE_KERNEL" near line 226 and make sure the kernel name string is **"krnl_idct_med"** and not anything else and compile host application again:
+
+    ```bash
+    make compile_host TARGET=hw
+    ``` 
+1. Run application again:
+
+    ```bash
+    cd $LAB_WORK_DIR/Vitis-AWS-F1-Developer-Labs/modules/module_01/idct
+    ./build/host.exe ./xclbin/krnl_idct.hw.awsxclbin $((1024*128)) 32 4
+    ```
+The throughput estimate and the acceleration factor reported will be similar to the max acceleration we achieved in last experiment with II=2. 
+
+## Estimated Performance vs. Measured Performance
+We estimated the kernel latency and performance of overall system in one of the previous labs which was as follows:
+    
+    ```
+    Estimted Kernel Latency =  = 1.33ms 
+    Estimated Overall Application Performance = 8.4GB/s  
+    ```
+The measured performance is as follows:
+    ```
+    Measured Kernel Latency =  = 1.8ms 
+    Measured Overall Application Performance = 6.4GB/s  
+    ```
+The measured kernel latency can be found in run summary for application using Vitis Analyzer as explained in previous labs. From these numbers we can see that in terms of throughput or latency estimates we achieveD almost 70% of what was estimated. The difference between estimates and the measured stems from the fact that **once application software pipeline is created the device DDRs memories start to see contention between host and kernel where one is reading and other is writing. For example when host is reading kernel output moving data from device DDR to its global memory at the same time kernel is processing next block and writing new output data for next call, similar phenomenon happens for device DDR where kernel is reading and host is writing input data for next call** This contention can be resolved if more device DDR memories are available by using device DDRs in ping pong fashion. Another AWS training module namely [Bloom filter](https://github.com/Xilinx/SDAccel-AWS-F1-Developer-Labs/tree/master/modules/module_02) uses it.
+ 
 ## Summary  
 
 In this lab, you learned:
