@@ -297,7 +297,7 @@ We estimated in previous labs that kernel with II=4 may be able to run at maximu
     FPGA accelerations ( CPU Exec. Time / FPGA Exec. Time): 11.3477
     =====================================================================
     ```   
-**NOTE**: In last three experiments, with II going from 2 to 4 and then 8, the performance should be going down by 2x every time but it was not the case, reason for this is that performance is not only defined by kernel or compute performance but it also depends on memory bandwidth available to CU and host at different times and sometime it dictates performance. But one thing should be clear from the last experiment that II variations have significant effect on performance and hardware resource consumption.   
+**NOTE**: In last three experiments, with II going from 8 to 4 and then 2, the overall performance should be going up by 2x every time but it was not the case, reason for this is that performance is not only defined by kernel or compute performance but it also depends on memory bandwidth available to CU and host at different times and sometime it dictates performance. But one thing should be clear from the last experiment that II variations have significant effect on performance and hardware resource consumption.   
 
 
 ## Summary  
