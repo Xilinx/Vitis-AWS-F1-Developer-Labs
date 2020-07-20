@@ -164,23 +164,23 @@ The system architecture and memory subsystems play a crucial role in defining th
  1.  **Compute limited applications** : In the case of compute limited applications the performance is limited by compute complexity. The challenge is to architecture accelerators/compute units and compose a system that may consists of multiple compute units that can meet the required throughput or saturate memory bandwidth
  2.  **Memory bandwidth or IO limited applications**: These type of applications do carry computational complexity and need dedicated accelerators but it is relatively easier to come up with accelerators/compute units that can easily saturate memory bandwidth and reach maximum achievable performance for the given memory bandwidth. 
  
- In general lowest memory bandwidth from different components in the memory sub-system defines the upper bound to max achievable performance, but in case of memory bandwidth limited applications it plays a more critical role. In case of AWS F1 FPGA instance the IO data movements between host and FPGA happens as follows:
+ In general lowest memory bandwidth component in the memory sub-system defines the upper bound to max achievable performance, but in case of memory bandwidth limited applications it plays a more critical role. In case of AWS F1 FPGA instance the IO data movements between host and FPGA kernel happen as follows:
  1. Input data moves from Host through PCIe to Device DDR memories
- 2. Kernel/CUs reads data from Device DDR memories for processing 
- 3. Kernel writes output data back to DDR memories
+ 2. Kernel/CUs reads input data from Device DDR memories for processing 
+ 3. Kernel writes output data back to DDR memories after processing
  4. Finally host reads output data from Device DDR memories 
  
- 2D IDCT carries a significant potential for acceleration compared to CPU performance as will be evident with final results but in general its a memory bandwidth limited kernel so its performance will be capped by any component in the memory subsystem that has minimum bandwidth. We can use memory subsystem data transfer rate specs from datasheets but to have better estimates, it is recommended to use Xilinx run time utility such as xbutil to perform bandwidth test and use its measurement for estimation. From the measurements for AWS F1 instance it was found this bottleneck bandwidth is around 7.7 GB/s. Another important number that we can use for estimating the latency of kernel is device DDR read and write bandwidths, from measurements it was found to be around 12GB/s.
+ 2D IDCT carries a significant potential for acceleration compared to CPU performance as will be evident with final results but in general its a memory bandwidth limited kernel so its performance will be capped by any component in the memory subsystem that has minimum bandwidth. We can use memory subsystem data transfer rate specs from datasheets but to have better estimates, it is recommended to use Xilinx run time utility such as xbutil to perform bandwidth test and use its measurement for estimation. From the measurements for AWS F1 instance it was found this bottleneck bandwidth is around 8.4 GB/s. Another important number that we can use for estimating the latency of kernel is device DDR read and write bandwidths, from measurements it was found to be around 12GB/s.
  
  ### Kernel Performance Estimation
- By looking at the kernel source code in "krnl_idct.cpp" around line 370 we can easily see dataflow pipeline consists of 4 different functions, read_blocks, execute and write_blocks. The write_block is called twice once for loading co-efficients but the size of co-efficients is very small as compared to main data chunk that is processed so it can be ignored. By looking at the definitions of these functions it is clear that all functions can be pipelined with II=1 except "execute" which performs 2D IDCT the reason being it needs 1024(64*64*2*8) bits to process per cycle which is not possible with 512 bit device memory interfaces. Essentially read_blocs and write_blocks which connect to memories can provide IDCT with 512 bit wide sample every cycle. The Kernel latency and throughput can be estimated as follows:
+ By looking at the kernel source code in "krnl_idct.cpp" around line 370 we can easily see dataflow pipeline consists of 4 different functions, read_blocks, execute and write_blocks. The write_block is called twice once for loading co-efficients but the size of co-efficients is very small as compared to main data chunk that is processed so it can be ignored. By looking at the definitions of these functions it is clear that all functions can be pipelined with II=1 except "execute" which performs 2D IDCT the reason being it needs 1024(64 * 64 * 2 * 8) bits to process per cycle which is not possible since it read and write from device DDR memories with 512 bit device interfaces. Essentially read_blocs and write_blocks which connect to memories can provide IDCT with only 512 bit wide sample every cycle. The Kernel latency and throughput can be estimated as follows:
  
   ```
-    IDCT Data Processed per Call/II = 64*64*2 ( size of short type in bytes) = 128 Bytes
-    Kernel Frequency fmax           = 250 MHz
-    IDCT Initiation Interval (II)   = 2
-    IDCT Throughput (Max)           = fmax * 1/(II) * Data Processed per II = 16 GB/S 
-    IDCT Throughput (Capped)        = Min ( IDCT Throughput(max) , Measured Device DDR Bandwidth)= 12GB/s
+    IDCT Data Processed per Call(II) = 64*64*2 ( size of short type in bytes) = 128 Bytes
+    Kernel Frequency fmax            = 250 MHz
+    IDCT Initiation Interval (II)    = 2
+    IDCT Throughput (Max)            = fmax * 1/(II) * Data Processed per II = 16 GB/S 
+    IDCT Throughput (Capped)         = Min ( IDCT Throughput(max) , Measured Device DDR Bandwidth)= 12GB/s
   ``` 
 We have used fmax as 250MHz which is conservative estimate generally kernel can be synthesized with frequencies upto 300MHz. Since we know that the maximum bandwidth available to kernel from device DDR memories as per measurement is 12 GB/s so throughput will be capped at 12 GB/s.
 
