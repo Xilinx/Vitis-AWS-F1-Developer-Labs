@@ -141,5 +141,9 @@ BATCH_PROCESSING_LOOP:
     }
 	
 	done = true;
-
+	delete [] kernelWaitList;
+	delete [] readBackWaitList;
+	delete [] inputDataBuffer;
+	delete [] qInputDataBuffer;
+	delete [] fpgaOutputDataBuffer;
 }
