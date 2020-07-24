@@ -1,6 +1,6 @@
 # Becoming Familiar With IDCT Application
 
-- [Becoming Familiar With IDCT Application](#becoming-familiar-with-idct-application)
+
   - [Setting Up Vitis Environment](#setting-up-vitis-environment)
   - [Overview of the Application Source Code](#overview-of-the-application-source-code)
   - [Theoretical Application Performance Estimation](#theoretical-application-performance-estimation)

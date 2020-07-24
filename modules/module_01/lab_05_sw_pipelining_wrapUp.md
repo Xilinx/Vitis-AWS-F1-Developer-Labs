@@ -1,6 +1,5 @@
 # Host Code Performance Optimizations and Wrap Up
 
-- [Host Code Performance Optimizations and Wrap Up](#host-code-performance-optimizations-and-wrap-up)
   - [Select Kernel for Execution](#select-kernel-for-execution)
   - [Launch Application and generate Reports](#launch-application-and-generate-reports)
   - [Application Performance Analysis](#application-performance-analysis)

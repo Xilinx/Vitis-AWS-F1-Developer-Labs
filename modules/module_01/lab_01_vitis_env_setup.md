@@ -1,5 +1,4 @@
 # Lab 1: Vitis Acceleration Environment
-- [Lab 1: Vitis Acceleration Environment](#lab-1-vitis-acceleration-environment)
 - [Overview of the AWS F1 Platform and Vitis Flow](#overview-of-the-aws-f1-platform-and-vitis-flow)
 - [Running the "Hello World" Example](#running-the-hello-world-example)
 - [Summary](#summary)

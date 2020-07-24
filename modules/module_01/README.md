@@ -1,8 +1,8 @@
 # Module 1: Introduction to the Vitis Acceleration Flow
 
-- [Module 1: Introduction to the Vitis Acceleration Flow](#module-1-introduction-to-the-vitis-acceleration-flow)
-  - [Preparing to run the labs](#preparing-to-run-the-labs)
-  - [Module overview](#module-overview)
+
+- [Preparing to run the labs](#preparing-to-run-the-labs)
+- [Module overview](#module-overview)
 
 ## Preparing to run the labs
 

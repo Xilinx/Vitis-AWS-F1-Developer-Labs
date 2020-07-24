@@ -1,14 +1,13 @@
 
 # Application Performance Analysis
 
-- [Application Performance Analysis](#application-performance-analysis)
-  - [Analyzing the Reports](#analyzing-the-reports)
-    - [Profile Summary Report](#profile-summary-report)
-    - [Vitis Link Summary and HLS reports](#vitis-link-summary-and-hls-reports)
-    - [Application Timeline report](#application-timeline-report)
-      - [Host Application Timeline](#host-application-timeline)
-      - [Device Execution Timeline](#device-execution-timeline)
-  - [Summary](#summary)
+- [Analyzing the Reports](#analyzing-the-reports)
+- [Profile Summary Report](#profile-summary-report)
+- [Vitis Link Summary and HLS reports](#vitis-link-summary-and-hls-reports)
+- [Application Timeline report](#application-timeline-report)
+  - [Host Application Timeline](#host-application-timeline)
+  - [Device Execution Timeline](#device-execution-timeline)
+- [Summary](#summary)
 
 In this lab we will have a look at the different types of reports produced by Vitis during emulation and FPGA/hardware runs. We will use these reports to analyze performance metrics and identify potential for performance improvement. 
 

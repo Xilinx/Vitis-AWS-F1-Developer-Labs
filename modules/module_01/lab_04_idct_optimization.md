@@ -1,6 +1,6 @@
 # IDCT FPGA Kernel: Optimizations and Performance Analysis
 
-- [IDCT FPGA Kernel: Optimizations and Performance Analysis](#idct-fpga-kernel-optimizations-and-performance-analysis)
+
   - [Optimizing the IDCT kernel using Dataflow](#optimizing-the-idct-kernel-using-dataflow)
     - [Comparing FPGA Resource Usage](#comparing-fpga-resource-usage)
     - [Comparing Execution Times and Application Timeline](#comparing-execution-times-and-application-timeline)
