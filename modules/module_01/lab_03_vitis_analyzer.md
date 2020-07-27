@@ -29,9 +29,9 @@ After hardware emulation run completes, a run summary is generated in the `build
   ```
 
   After Vitis_analyzer opens run summary, from left hand side pan select "**Profile Summary**" to open it in the main window on right hand side.
-
-    ![](images/module_01/lab_03_idct/hwEmuProfileSummary.PNG)
-
+  
+ ![](images/module_01/lab_03_idct/hwEmuProfileSummary.PNG)
+  
   This report provides application run data. Notice that the report has four tabs at the top: **Top Operations**, **Kernels & Compute Units**, **Data Transfers**, and **OpenCL APIs**.
 
 2. Click through and inspect each of the tabs:

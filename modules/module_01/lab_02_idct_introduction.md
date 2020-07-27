@@ -180,7 +180,7 @@ The system architecture and memory subsystems play a crucial role in defining th
     Kernel Frequency fmax       = 250 MHz
     Initiation Interval (II)    = 2
     Throughput (Max)            = Fmax * (Data processed per Call) / II = 16 GB/s
-    Throughput (Capped)         = Min (IDCT Throughput(max Measured Device DDR Bandwidth)= 12 GB/s
+    Throughput (Capped)         = Min  (Throughput(max), Measured Device DDR Bandwidth)= 12 GB/s
   ``` 
 Here, fmax of 250 MHz is used and also since the maximum bandwidth available to kernel from device DDR memories is estimated as 12 GB/s, so throughput is capped at 12 GB/s.
 
