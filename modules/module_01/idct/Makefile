@@ -19,8 +19,8 @@ help::
 ## Or you can add other platfom and set PLATFORM variable to it
 
 #PLATFORM := $(AWS_PLATFORM)
-PLATFORM := xilinx_u200_xdma_201830_2
-#PLATFORM := xilinx_aws-vu9p-f1-04261818_dynamic_5_0
+#PLATFORM := xilinx_u200_xdma_201830_2
+PLATFORM := xilinx_aws-vu9p-f1-04261818_dynamic_5_0
 
 ENABLE_STALL_TRACE ?= no
 
