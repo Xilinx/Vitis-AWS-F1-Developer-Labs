@@ -32,7 +32,7 @@ To discuss the application structure, the use of OpenCL APIs for host side, and 
 To build and launch an application in different emulation modes to generate different types of traces and performance reports and also verify FPGA output results against software reference model
 1. **IDCT Kernel Hardware Optimizations and Performance Analysis**\
 To demonstrate the Dataflow hardware optimization that enables significant acceleration and discuss some micro-architecture variations by using different loop pipelining constraints.
-1. **Host Host Code Performance Optimizations and Wrap Up**\
+1. **Host Code Performance Optimizations and Wrap Up**\
 To illustrate how Vitis analysis tools and reports can be used to optimally structure host code for significant performance improvements
 
 After you complete the last lab, you will be guided to close your RDP session, stop your F1 instance, and explore next steps to continue your experience with Vitis on AWS.
@@ -41,4 +41,5 @@ After you complete the last lab, you will be guided to close your RDP session, s
 
 <p align="center"><b>
 Start the first lab: <a href="lab_01_vitis_env_setup.md">Vitis Acceleration Environment</a>
+<p align="center"><sup>Copyright&copy; 2020 Xilinx</sup></p>
 </b></p>

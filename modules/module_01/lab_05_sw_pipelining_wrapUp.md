@@ -312,4 +312,5 @@ You have successfully completed the first module of Vitis AWS F1 Developer Labs.
 
 <p align="center"><b>
 Return to the beginning: <a href="../../README.md">Vitis AWS F1 Developer Labs</a>
+<p align="center"><sup>Copyright&copy; 2020 Xilinx</sup></p>
 </b></p>

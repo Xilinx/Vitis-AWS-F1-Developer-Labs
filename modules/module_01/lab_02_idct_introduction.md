@@ -303,4 +303,5 @@ In this lab, you learned the following:
 
 <p align="center"><b>
 Start the next lab: <a href="lab_03_vitis_analyzer.md">Application Performance Analysis</a>
-</b></p> 
+<p align="center"><sup>Copyright&copy; 2020 Xilinx</sup></p>
+</b></p>

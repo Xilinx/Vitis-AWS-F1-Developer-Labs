@@ -105,4 +105,5 @@ In this lab, you learned the following:
 
 <p align="center"><b>
 Start the next lab: <a href="lab_02_idct_introduction.md">Becoming Familiar With IDCT Application</a>
+<p align="center"><sup>Copyright&copy; 2020 Xilinx</sup></p>
 </b></p>

@@ -177,5 +177,6 @@ In the next labs, you will utilize these analysis capabilities to drive and meas
 
 <p align="center"><b>
 Start the next lab: <a href="lab_04_idct_optimization.md">IDCT Kernel Hardware Optimizations and Performance Analysis</a>
+<p align="center"><sup>Copyright&copy; 2020 Xilinx</sup></p>
 </b></p>  
  
