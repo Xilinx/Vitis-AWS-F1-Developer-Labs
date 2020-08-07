@@ -14,11 +14,11 @@
       - [Performance with II=2](#performance-with-ii2)
   - [Summary](#summary)
 
-This lab builds on top of previous labs which gave an overview of the Vitis development environment and explained the various performance analysis capabilities provided by the tool using different reports. In this lab, you will utilize these analysis capabilities to drive and measure performance improvements enabled by code optimizations. This lab illustrates the dataflow optimization and loop pipelining variations effects on overall performance.
+This lab builds on top of previous labs which gave an overview of the Vitis development environment and explained the various performance analysis capabilities provided by the tool using different reports. This lab, will demonstrate these analysis capabilities and use them to drive and measure performance improvements enabled by code optimizations. This lab illustrates the dataflow optimization and loop pipelining variations effects on overall performance.
 
 >**NOTE**: Although the entire lab is performed on an F1 instance, only the steps that involve use hardware/FPGA card need to run on F1 instance. All the interactive development, profiling and optimization steps would normally be performed on-premise or on a cost-effective AWS EC2 instance such as C4. However, to avoid switching from C4 to F1 instance during this lab, all the steps are performed on the F1 instance.
 
-If you have closed the terminal window at the end of the previous lab, open a new one, run setup script and go back to the project folder:
+If the terminal window at the end of the previous lab was closed, open a new one, run setup script and go back to the project folder:
 
 1.  Source the Vitis environment  
 
@@ -35,7 +35,7 @@ If you have closed the terminal window at the end of the previous lab, open a ne
 
 ## Optimizing the IDCT Kernel using Dataflow
 
-Carry out a simple experiment that will illustrate the effects and power of dataflow optimization. The FPGA binary built and used for experiments is built to have four different kernels. There are minor differences among them and they are created to illustrate different performance optimizations. In this experiment, you will focus on two kernels namely **krnl_idct** and **krnl_idct_noflow** and compare them.
+Carry out a simple experiment that will illustrate the effects and power of dataflow optimization. The FPGA binary built and used for experiments is built to have four different kernels. There are minor differences among them and they are created to illustrate different performance optimizations. This experiment will focus on two kernels namely **krnl_idct** and **krnl_idct_noflow** and compare them.
 
 ### Comparing FPGA Resource Usage
 
@@ -46,7 +46,7 @@ Carry out a simple experiment that will illustrate the effects and power of data
     vim src/krnl_idct_noflow.cpp
     ```
 
-   These files contain description for both of these kernels. They are exactly identical kernel with different names and one major difference: Dataflow optimization is enabled for **krnl_idct** in **krnl_idct.cpp** whereas it is not used for other kernel **krnl_idct_noflow** in **knrl_idct_noflow.cpp**. You can see this by going to a label called "DATAFLOW_PRAGMA" which is placed as marker near line 358 in both the files. An HLS Pragma is applied here, it is enabled for "krnl_idct" and disabled for other by commenting out. The application of this pragma makes functions in the region execute concurrently and create a function pipeline which overlaps compute in different functions as compared to full sequential execution. The functions in this region are connected through FIFOs also called hls::streams, it is one of the recommended style for the functions used in dataflow region, given that the data is produced or consumed in order at every function boundary.
+   These files contain description for both of these kernels. They are exactly identical kernel with different names and one major difference: Dataflow optimization is enabled for **krnl_idct** in **krnl_idct.cpp** whereas it is not used for other kernel **krnl_idct_noflow** in **knrl_idct_noflow.cpp**. It can be sees by going to a label called "DATAFLOW_PRAGMA" which is placed as marker near line 358 in both the files. An HLS Pragma is applied here, it is enabled for "krnl_idct" and disabled for other by commenting out. The application of this pragma makes functions in the region execute concurrently and create a function pipeline which overlaps compute in different functions as compared to full sequential execution. The functions in this region are connected through FIFOs also called hls::streams, it is one of the recommended style for the functions used in dataflow region, given that the data is produced or consumed in order at every function boundary.
 
 1. Look at the synthesis report for latency and II to compare expected performance, proceed as follows:
 
@@ -85,13 +85,13 @@ Carry out a simple experiment that will illustrate the effects and power of data
    vim ./build_hw_emu/reports/krnl_idct_noflow.hw_emu/hls_reports/krnl_idct_noflow_csynth.rpt
    ```
 
-   By comparison you should notice that the performance of the kernel with dataflow optimization is almost 3 times better in terms of Latency and II and the resource utilization is pretty much still the same.
+   By comparison one should notice that the performance of the kernel with dataflow optimization is almost 3 times better in terms of Latency and II and the resource utilization is pretty much still the same.
 
 ### Comparing Execution Times and Application Timeline
 
 #### Kernel with Dataflow Optimization
 
-You can see the compute unit execution time by looking at the profile summary reports. You have already run hardware emulation for kernel "kernel_idct" which uses dataflow optimization. Now, open the profile summary report using vitis_analyzer as follows:
+The compute unit execution time can be seen by looking at the profile summary reports. The hardware emulation for kernel "kernel_idct"  was already run which uses dataflow optimization. Now, open the profile summary report using vitis_analyzer as follows:
 
 ```bash
 vitis_analyzer ./build_hw_emu/xclbin.run_summary
@@ -103,11 +103,11 @@ vitis_analyzer ./build_hw_emu/xclbin.run_summary
 
 ![](images/module_01/lab_04_idct/hwEmuComputMemTxOverLap.PNG)
 
-You can observe from this timeline that:
+It can be observed from this timeline that:
 
 - There is overlapping activity at the read and write interfaces for compute unit essentially meaning things are happening concurrently(read_block/execute/write_block functions running concurrently).
 
-- The amount of overlap seems marginal because a very small data size has been intentionally chosen for emulation. Overlapping is further reduced when you go to the actual hardware or system run where you can use a larger data size.
+- The amount of overlap seems marginal because a very small data size has been intentionally chosen for emulation. Overlapping is increase during the actual hardware or system run where a larger data size is used.
 
 #### Kernel without Dataflow Optimization
 
@@ -131,7 +131,7 @@ You can observe from this timeline that:
     vitis_analyzer ./build_hw_emu/xclbin.run_summary
     ```  
 
-    It will show something similar to the figure below. Look at the section highlighted by the yellow box and compare it to kernel execution with dataflow optimization, you will easily find out that all activity happened sequentially here there is no overlap at all, essentially the time line can be interpreted as:
+    It will show something similar to the figure below. Look at the section highlighted by the yellow box and compare it to kernel execution with dataflow optimization, one can easily find that all activity happened sequentially, it shows no overlap at all, essentially the time line can be interpreted as:
 
     * sequential read: kernel first executes read_block function marked by data read activity on **coeffs** and **inBlocks** interfaces
 
@@ -143,13 +143,13 @@ You can observe from this timeline that:
 
 ## Kernel Loop Pipelining Using Various Initiation Intervals (IIs)  
 
-In this section, you will experiment with the Initiation Interval for loop pipelining. To make this experiment easier, different kernels that are almost identical except with different names and IIs have been included. To understand the kernel code structure open:
+This section is about experimenting with the Initiation Interval for loop pipelining. To make this experiment easier, different kernels that are almost identical except with different names and IIs have been included. To understand the kernel code structure open:
 
 ```bash
 vim src/krnl_idct.cpp
 ```
 
-Go to label "FUNCTION_PIPELINE" near line 37. You will see four different function calls within the dataflow optimization region:
+Go to label "FUNCTION_PIPELINE" near line 37. one can see four different function calls within the dataflow optimization region:
 
 - read_blocks
 - read_blocks
@@ -158,9 +158,9 @@ Go to label "FUNCTION_PIPELINE" near line 37. You will see four different functi
 
 The read and write blocks simply reads data and writes data from memory interfaces and streams it to execute function which calls IDCT function to perform the core compute. The read and write functions can be pipelined with desired II with overall performance dictated by "execute" function II. It is a functional pipeline where all of these functions will be constructed as chain of independent hardware modules. The overall performance will be defined by any block that has the lowest performance which essentially means largest II. Since execute block carries out almost all compute so II variation on this block will show significant overall performance and resource utilization variations.
 
-Now, you will do actual system runs no emulations using a pre-built FPGA binary file. You can also build a binary using the provided makefile.
+Now lets do actual system runs a pre-built FPGA binary file. Xclbin or AFI for AWS F1 can built using the provided makefile but to save time a pre-built binary is provided.
 
-To see how pipeline pragmas with different II are applied to kernels, open different kernel source files and compare II constraints placed near label "PIPELINE_PRAGMA:" in each file around line 297, you will see II as follows:
+To see how pipeline pragmas with different II are applied to kernels, open different kernel source files and compare II constraints placed near label "PIPELINE_PRAGMA:" in each file around line 297, it have IIs as follows:
 
 - krnl_idct      : II=2
 - krnl_idct_med  : II=4
@@ -176,9 +176,9 @@ To see how pipeline pragmas with different II are applied to kernels, open diffe
 
 ### Initiation Interval versus FPGA Resource Usage
 
-You will not build an actual FGPA binary here. To get the look and feel of II effects on resources, you can use results from hardware emulation runs since it also performs kernel synthesis. Since you have ran hw_emulation in a previous experiment, you can go ahead and build a folder and look at the Vitis HLS reports to find out Initiation Interval and Latency for these kernels as well as resource utilization. The resource utilization will have a trend showing decrease in utilization with increase in II.
+To get the look and feel of II effects on resources, results from hardware emulation runs are used since it also performs kernel synthesis. Since hw_emulation was ran in a previous experiment, just go ahead into build folder and look at the Vitis HLS reports to find out Initiation Interval and Latency for these kernels as well as resource utilization. The resource utilization will have a trend showing decrease in utilization with increase in II.
 
-To do so, open and compare synthesis report to note down IIs/Latencies and resource utilization ( you can also use link summary as discussed in previous lab):
+To do so, open and compare synthesis report to note down IIs/Latencies and resource utilization ( one can also use link summary as discussed in previous lab):
 
     ```bash
     vim ./build_hw_emu/reports/krnl_idct_med.hw_emu/hls_reports/krnl_idct_med_csynth.rpt
@@ -188,7 +188,7 @@ To do so, open and compare synthesis report to note down IIs/Latencies and resou
 
 ### Initiation Interval versus Acceleration
 
-It is estimated in previous labs that kernel with II=4 may be able to run at maximum throughput but to show the effects of II on overall performance, you have to start with II=8 and then run with II=4 and finally with II=2. The results reported here and on the machine you are using may vary depending on the memory subsystem performance specially PCIe bandwidth available at run time to the application.
+It is estimated in previous labs that kernel with II=4 may be able to run at maximum throughput but to show the effects of II on overall performance start with II=8 and then run with II=4 and finally with II=2. The results reported here and on the machine you are using may vary depending on the memory subsystem performance specially PCIe bandwidth available at run time to the application.
 
 #### Performance with II=8
 
@@ -211,7 +211,7 @@ It is estimated in previous labs that kernel with II=4 may be able to run at max
 	./build/host.exe ./xclbin/krnl_idct.hw.awsxclbin $((1024*128)) 32 1
 	```
 
-	You will see an output like this, which shows FGPA acceleration by a factor of 7x:
+	it shows an output like the one shown below, which shows FGPA acceleration by a factor of 7x:
 
     ```
     Execution Finished
@@ -248,7 +248,7 @@ It is estimated in previous labs that kernel with II=4 may be able to run at max
 	./build/host.exe ./xclbin/krnl_idct.hw.awsxclbin $((1024*128)) 32 1
 	```
 
-	You will see an output like this, which shows FGPA acceleration by a factor of 9x:
+	it shows FGPA acceleration by a factor of 9x:
 
     ```
     Execution Finished
@@ -285,7 +285,7 @@ It is estimated in previous labs that kernel with II=4 may be able to run at max
     ./build/host.exe ./xclbin/krnl_idct.hw.awsxclbin $((1024*128)) 32 1
     ```
 
-    You will see an output like this, which shows FGPA acceleration by a factor of 11x:
+    it shows FGPA acceleration by a factor of 11x:
 
     ```
     Execution Finished
