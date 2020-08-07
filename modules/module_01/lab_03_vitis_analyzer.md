@@ -10,9 +10,9 @@
       - [Device Execution Timeline](#device-execution-timeline)
   - [Summary](#summary)
 
-This lab discusses the different types of reports produced by the Vitis software platform during emulation and FPGA/hardware runs. You will use these reports to analyze performance metrics and identify potential for performance improvement.
+This lab discusses the different types of reports produced by the Vitis software platform during emulation and FPGA/hardware runs. These reports will be used to analyze performance metrics and identify potential for performance improvement.
 
->**NOTE**: You will use most of the emulation results created by different runs performed in the last lab. If you have not completed it, complete it first.
+>**NOTE**: This lab will utilize most of the emulation results created by different runs performed in the last lab. If you have not completed it, complete it first.
 
 ## Analyzing the Reports  
 
@@ -36,11 +36,11 @@ After hardware emulation run completes, a run summary is generated in the `build
 
 2. Click through and inspect each of the tabs:
 
-  * **Top Operations**: Top operations tab provides metrics in terms of completion/execution times for kernel and data transfers between host and the device global memories giving at glance view of any potential performance bottlenecks. This allows you to identify throughput bottlenecks when transferring data or during kernel execution which ever is the slowest. Efficient transfer of data to the kernel/host allows for faster execution times.
+  * **Top Operations**: Top operations tab provides metrics in terms of completion/execution times for kernel and data transfers between host and the device global memories giving at glance view of any potential performance bottlenecks. This allows to identify throughput bottlenecks when transferring data or during kernel execution which ever is the slowest. Efficient transfer of data to the kernel/host allows for faster execution times.
 
   * **Kernels & Compute Units**: Shows the number of times the kernel was executed. Includes the total, minimum, average, and maximum run times. If the design has multiple compute units, it will show each compute unit’s utilization. When accelerating an algorithm, the faster the kernel executes, the higher the throughput which can be achieved. It is best to optimize the kernel to be as fast as it can be with the data it requires. In this table some numbers give key insight into potential for performance improvement. CU unit utilization being small essentially hints that CU was not busy processing data most of the time but waiting for data to arrive from host.
 
-  * **Data Transfers**: This tab has no bearing in software emulation as no actual data transfers are emulated across the host to the platform. In hardware emulation, this shows the throughput and bandwidth of the read/writes to the global memory that the host and kernel share. During hardware emulation these number give relatively accurate numbers, but generally hardware emulation is very slow and data set size used are smaller hence these number doesnt reflect very accurate picture. You will use these number for analysis in a realistic fashion in next lab while running on hardware where you can experiment with larger data sets.
+  * **Data Transfers**: This tab has no bearing in software emulation as no actual data transfers are emulated across the host to the platform. In hardware emulation, this shows the throughput and bandwidth of the read/writes to the global memory that the host and kernel share. During hardware emulation these number give relatively accurate numbers, but generally hardware emulation is very slow and data set size used are smaller hence these number doesnt reflect very accurate picture. These number will be used for analysis in a realistic fashion in next lab while running on hardware where experiments with larger data sets are performed.
 
   * **OpenCL APIs**: Shows all the OpenCL API command executions, how many time each was executed, and how long they take to execute or how much time was spent during which this call was active.
 
@@ -49,7 +49,7 @@ After hardware emulation run completes, a run summary is generated in the `build
 
 ### Vitis Link Summary and HLS reports
 
-The Vitis compiler also generates HLS Reports for each kernel. HLS Reports contain the results of compiling kernel into hardware. It contains many details (including clocking, resources or device utilization) about the performance and logic usage of the custom-generated hardware. These details provide many insights to guide the kernel optimization process. To build an xclbin file ( FPGA Binary File) with four different kernels, you need four different reports for each kernel. For an actual application, you need only one kernel; the other three are added for experimental purposes as pointed out in the previous lab. You will use them in the next labs. You will also use the Vitis Link Summary which contains all of these reports.
+The Vitis compiler also generates HLS Reports for each kernel. HLS Reports contain the results of compiling kernel into hardware. It contains many details (including clocking, resources or device utilization) about the performance and logic usage of the custom-generated hardware accelerator. These details provide many insights to guide the kernel optimization process. To build an xclbin file ( FPGA Binary File) with four different kernels, it will need four different reports for each kernel. For an actual application, only one kernel is required; the other three are added for experimental purposes as pointed out in the previous lab. Next labs will use them for experiments. This lab also explores the use the Vitis Link Summary which contains all of these reports.
 
 1.  Opening the link summary:
 
@@ -62,7 +62,7 @@ The Vitis compiler also generates HLS Reports for each kernel. HLS Reports conta
     
      ![](images/module_01/lab_03_idct/hwEmuLinkSummary.PNG)
      
-     In the left panel, it first lists details of link summary, then compiles a summary for each kernel. You will first have a look at details from the link summary. In the left panel, click **System Diagram** to display the system diagram as shown below:
+     In the left panel, it first lists details of link summary, then compiles a summary for each kernel. First have a look at details from the link summary. In the left panel, click **System Diagram** to display the system diagram as shown below:
       
     ![](images/module_01/lab_03_idct/hwEmuLinkSummarySysDia.PNG)
     
@@ -76,7 +76,7 @@ The Vitis compiler also generates HLS Reports for each kernel. HLS Reports conta
 
 2. Next open synthesis reports and compare them for kernel latencies and resource usage.
    
-    - To do this first select "krnl_idct" to bring the report as shown in figure below. Note down latency(min/max) and resource utilization. From resource utilization table, you can see that the resource usage for the kernels in absolute numbers and percentage of total resources on FPGA. The main resources on the FPGA are Digital Signal Processing modules (DSPs), block RAM memory modules (BRAMs), Flip Flops (FFs), URAMs and Look up tables (LUTs).
+    - To do this first select "krnl_idct" to bring the report as shown in figure below. Note down latency(min/max) and resource utilization. From resource utilization table, the resource usage for the kernels in absolute numbers and percentage of total resources on FPGA can be seen. The main resources on the FPGA are Digital Signal Processing modules (DSPs), block RAM memory modules (BRAMs), Flip Flops (FFs), URAMs and Look up tables (LUTs).
     
     ![](images/module_01/lab_03_idct/hwEmuHlsSynReportFast.PNG)
    
@@ -88,7 +88,7 @@ The Vitis compiler also generates HLS Reports for each kernel. HLS Reports conta
          
 From the latency numbers for all the kernels, it should be clear that the "krnl_idct" has the minimum latency and "krnl_idct_slow" has the maximum latency. These kernels are explicitly designed to have these latencies to perform some experiments.
 
-Next, you will see how these kernels have been genertaed with minor differences in terms of **HLS Pragmas** used for loop pipelining and dataflow optimization. To do this:
+Next, it can be seen how these kernels have been genertaed with minor differences in terms of **HLS Pragmas** used for loop pipelining and dataflow optimization. To do this:
     
 1. Open the file source file `krnl_idct.cpp` and go to label "PIPELINE_PRAGMA" near line 297:
  
@@ -104,7 +104,7 @@ Next, you will see how these kernels have been genertaed with minor differences 
     vim $LAB_WORK_DIR/Vitis-AWS-F1-Developer-Labs/modules/module_01/idct/src/krnl_idct_slow.cpp
     ```
     
-    You will notice here the II constrains is 8. This constraint allows Vitis HLS tool to share resources if possible and hence decrease resource utilization. Similarly you can have a look at third kernel namely **krnl_idct_med** which has II=4 constraint and compare resources. Generally increasing II can reduce resources but it may not be a linear relationship depending on the availability of resources in the design itself with the potential for getting shared.
+    It can be noticed here that the II constrains is 8. This constraint allows Vitis HLS tool to share resources if possible and hence decrease resource utilization. Similarly one can have a look at third kernel namely **krnl_idct_med** which has II=4 constraint and compare resources. Generally increasing II can reduce resources but it may not be a linear relationship depending on the availability of resources in the design itself with the potential for getting shared.
        
 ### Application Timeline report
 
@@ -113,7 +113,7 @@ In addition to the profile summary file, the emulation run also generates an tim
 - The interactions with FPGA
 - Execution times on hardware side (FPGA Card).
 
-You can analyze this report for host side application issues and other things like:
+The report can be analyzed for host side application issues and other things like:
 
  - Looking at specific data transfer rates
  - Kernel execution times for different enqueued operations.
@@ -131,7 +131,7 @@ After the Vitis_analyzer opens run summary, from left hand side pan select "**Ap
 ![](images/module_01/lab_03_idct/applicationTimelineHwEmu.PNG)
 
 
-The Application Timeline shown above collects and displays host and device events on a common timeline to help you understand and visualize the overall health and performance of your system. These events include OpenCL API calls from the host code, about when they happen and how long each of them takes. For example the rows marked by blue and yellow arrows trace read and write data movements from host side. The events inside blue and yellow circles show actual data transfers happening on this timeline. Application Timeline has two distinct sections for the host and the device.
+The Application Timeline shown above collects and displays host and device events on a common timeline to help understand and visualize the overall health and performance of the system. These events include OpenCL API calls from the host code, about when they happen and how long each of them takes. For example the rows marked by blue and yellow arrows trace read and write data movements from host side. The events inside blue and yellow circles show actual data transfers happening on this timeline. Application Timeline has two distinct sections for the host and the device.
 
 #### Host Application Timeline
 
@@ -149,14 +149,14 @@ Host side uses multiple sets of OpenCL buffers. Each set contains two input and 
 
 #### Device Execution Timeline
 
-Device side timeline trace gives details of activity happening on the FPGA device or acceleration card. Here, you can find actual hardware activity happening for different CUs. For IDCT, only one instance of IDCT kernel so a single CU is used. All its interfaces to device global memory are traced out. In the case of IDCT it uses three separate interfaces one for co-efficients, second for input data and third for output data ( even though two of these interfaces for co-efficients and input data use same DDR memory bank). You can zoom into one of the read/write transactions happening on device master AXI interfaces as shown in the figure below and see how fast these data transfers are happening and in which sort of bursts, the timeline will show different bursts and also burst lengths. Different colored ellipses are used to highlight interfaces and data movements happening on different interfaces between device DDR memories and kernel:
+Device side timeline trace gives details of activity happening on the FPGA device or acceleration card. Here actual hardware activity happening for different CUs can be found. For IDCT, only one instance of IDCT kernel so a single CU is used. All its interfaces to device global memory are traced out. In the case of IDCT it uses three separate interfaces one for co-efficients, second for input data and third for output data ( even though two of these interfaces for co-efficients and input data use same DDR memory bank). Zoom into one of the read/write transactions happening on device master AXI interfaces as shown in the figure below and see how fast these data transfers are happening and in which sort of bursts, the timeline will show different bursts and also burst lengths. Different colored ellipses are used to highlight interfaces and data movements happening on different interfaces between device DDR memories and kernel:
 
 * Green ellipse highlights read and write interfaces with same port names as used in kernel C/C++ description
 * Yellow ellipse highlights movement of co-efficients
 * Red ellipse highlights movement of input data from device memory to kernel and blocks within the transaction show different number of bursts that happened.
 * Blue ellipse highlights data movement from kernel to device memory in different bursts, by hovering mouse on these burst it displays a tooltip with burst statistics ( kernel, compute, start, stop, size, data rate etc.).
 
- You can also note that since IDCT coefficients and input data use same DDR memory bank and happen in non-overlapping fashion whereas output write operation has some overlap with device read operation because it uses a separate DDR memory bank. In next labs, you will see how maximizing this kind of overlap considerably improves application performance.
+ One can also note that since IDCT coefficients and input data use same DDR memory bank and happen in non-overlapping fashion whereas output write operation has some overlap with device read operation because it uses a separate DDR memory bank. The next labs, will show how maximizing this kind of overlap considerably improves application performance.
 
 
 ![](images/module_01/lab_03_idct/memTxHwEmuDevice.PNG) 
