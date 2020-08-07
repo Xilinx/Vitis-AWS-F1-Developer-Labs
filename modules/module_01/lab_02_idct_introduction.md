@@ -14,7 +14,7 @@
 
 This lab is designed to teach the fundamentals of the Vitis&trade; development environment and programming model. Its contents are tailored to familiarize you with basic OpenCL APIs, software and hardware emulation flows, application performance estimation, profiling performance, and identifying how to optimize host code and kernel hardware implementation.
 
-The kernels or the functions used for FPGA acceleration in this lab are slightly different hardware implementations of the Inverse Discrete Cosine Transform (IDCT) algorithm, a function widely used for transform coding in applications like audio/image codecs such as JPEG and High Efficiency Video Coding(HEVC).
+The kernels or the functions used for FPGA acceleration in this lab are slightly different hardware implementations of the Inverse Discrete Cosine Transform (IDCT) algorithm, a function widely used for transform coding in applications like video/image codecs such as JPEG and High Efficiency Video Coding(HEVC).
 
 ## Setting Up the Vitis Environment
 
@@ -41,7 +41,7 @@ The kernels or the functions used for FPGA acceleration in this lab are slightly
     vi Makefile
     ```
 
-    In the 'platform selection' section, the default target platform is set as `xilinx_aws-vu9p-f1_shell-v04261818_201920_1` which is the AWS F1 platform.
+    In the 'platform selection' section, the default target platform is set as `xilinx_aws-vu9p-f1_shell-v04261818_201920_2.xpfm` using AWS_PLATFORM enviroment variable. It is an AWS F1 platform and the environment varialbe is set automatically with terminal launch.
 
     The next couple of lines define the design files location and file names. Following that is the host compiler settings, kernel compiler, and linker settings.  You do not need to modify any of the options here but you may want to play with them after finishing this tutorial.
 
@@ -85,9 +85,9 @@ The project comprises of multiple files under the `src` directory. The following
 
     1. **Test Vectors:** Next, test vectors are allocated and initialized
 
-    1. **Device Programming:**  In the next phase, the Xilinx device search is performed and the first found device is programmed with the user-provided Xilinx binary, which is also known as AFIs for AWS. An associated OpenCL Context and Command Queue are also created.
+    1. **Device Programming:**  In the next phase, the Xilinx device search is performed and the first found device is programmed with the user provided fpga binary, which is also called Amazon FPGA Image(AFI) for AWS. An associated OpenCL Context and Command Queue are also created.
 
-    1. **Kernel Handle:** After the device is programmed with the FPGA image, a kernel handle is created which can be used to process data.
+    1. **Kernel Handle:** After the device is programmed with the FPGA image, a kernel handle is created which can be used to enqueue calls for processing data.
 
     2. **CPU and FPGA Threads:** Next, the host launches two separate threads **runCPU** and **runFPGA** for the CPU run and the FPGA accelerated run, respectively, at the same time.
 
