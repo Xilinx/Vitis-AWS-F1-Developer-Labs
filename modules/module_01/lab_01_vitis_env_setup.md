@@ -84,9 +84,9 @@ The "Hello World" example is an OpenCL application with a simple vector addition
 	TEST PASSED
 	```
 
-1. You compiled a host application and successfully executed it on F1 using a pre-compiled Amazon FPGA Image (AFI).
+1.Host application was compiled and successfully executed on F1 using a pre-compiled Amazon FPGA Image (AFI).
 
-1. Close your terminal.
+1. Close terminal.
 
     ```bash
     exit
