@@ -25,7 +25,7 @@ In the following section, you will launch the application on F1 instance and ana
 
 ## Select Kernel for Execution
 
-1. Modify host code to make sure it runs appropriate hardware kernel. Open terminal if you don't have it already open from last lab and do:
+1. Modify host code to make sure it runs appropriate hardware kernel. Open terminal if it is not already open from last lab and do:
 
     ```bash
     source $AWS_FPGA_REPO_DIR/vitis_setup.sh
@@ -46,14 +46,14 @@ In the following section, you will launch the application on F1 instance and ana
     ```
 ## Launch Application and Generate Reports
 
-1. Run application as follows by first sourcing runtime setup script if you have not done so before:
+1. Run application as follows by first sourcing runtime setup script if it was not done before:
 
     ```bash
     source $AWS_FPGA_REPO_DIR/vitis_runtime_setup.sh 
     cd $LAB_WORK_DIR/Vitis-AWS-F1-Developer-Labs/modules/module_01/idct
     ./build/host.exe ./xclbin/krnl_idct.hw.awsxclbin $((1024*128)) 32 1
     ```
-   You will see an output similar to the one given below with an acceleration about 11x faster than CPU
+   it will show an output similar to the one given below with an acceleration about 11x faster than CPU
    
    ```
     Execution Finished
@@ -76,11 +76,11 @@ In the following section, you will launch the application on F1 instance and ana
    vitis_analyzer ./xclbin.run_summary
    ```
    
-   Now in the host side application timeline part go to first write transaction and zoom in appropriately and you will see a timeline similar to the one shown below:
+   Now in the host side application timeline part go to first write transaction and zoom in appropriately and it will show a timeline similar to the one shown below:
    
       ![](images/module_01/lab_05_idct/hwRunNoSwPipeLine.PNG) 
       
-  In next section, you will try to comprehend this waveform and will perform host side code optimization to improve performance.
+  In next section, we will try to comprehend this waveform and will perform host side code optimization to improve performance.
 
 ## Application Performance Analysis
 
@@ -93,7 +93,7 @@ Open the profile summary and by looking at the profile summary and timeline, fin
     ```bash
    vitis_analyzer ./build/xclbin.run_summary
     ```
-   From the left panel, select **"Profile Summary"** and from the profile summary view, go to **"Kernels and Compute Units"** and you will see numbers as shown in the figure below:
+   From the left panel, select **"Profile Summary"** and from the profile summary view, go to **"Kernels and Compute Units"** and it will show numbers as shown in the figure below:
    
       ![](images/module_01/lab_05_idct/hwRunCuUtil.PNG)
       
@@ -101,7 +101,7 @@ Open the profile summary and by looking at the profile summary and timeline, fin
   
 ### Application Timeline Analysis 
  
- From the waveform, you can observe that:
+ From the waveform, one can observe that:
  
  *  Host sends data through PCI on write interface for processing and only once the data transfer completes the enqueued kernel can kick starts compute unit.
  
@@ -109,7 +109,7 @@ Open the profile summary and by looking at the profile summary and timeline, fin
  
  * Whole of this cycle then repeats again and again till all batches of input are processed.
      
- One very important thing to note is that host does all of these transactions sequentially, only initiating new transaction (task getting enqueued on command queue) after previous one is finished. Given that most of the PCI and DDR interfaces have support for full duplex transports, you can preform a number of optimizations using the dependency analysis.
+ One very important thing to note is that host does all of these transactions sequentially, only initiating new transaction (task getting enqueued on command queue) after previous one is finished. Given that most of the PCI and DDR interfaces have support for full duplex transports, one can preform a number of optimizations using the dependency analysis.
  
  ### Task Dependency Analysis
   
@@ -121,11 +121,11 @@ Open the profile summary and by looking at the profile summary and timeline, fin
  
  In a nutshell, this dependency analysis clarifies and reveals that while the kernel is processing, the current data block host can start sending next input data block for next kernel compute. The kernel/CU can start processing next input data block as soon as it becomes available. The output data transfer to host (produced by kernel/CU execution) can start as soon as current kernel/CU call finishes and continue in background while kernel/CU starts processing next input block.
   
-Once you have identified these facts, you can capture relevant and required dependencies on host side and improve the performance considerably.
+Once these fact have been identified, one can capture relevant and required dependencies on host side and improve the performance considerably.
 
 ## Optimizing Host Application Code for Performance
 
-In this section, you will try to dissect the application host code and understand how it is structured and which kind of objects are used to capture the behavior and dependencies, as discussed in the last section, to gain maximum performance.
+This section will try to dissect the application host code and explain how it is structured and which kind of objects are used to capture the behavior and dependencies, as discussed in the last section, to gain maximum performance.
 
 ### Capturing Task Dependencies
  
@@ -158,18 +158,18 @@ For using IDCT kernel, three buffers to input data, input IDCT co-efficients, an
 
 To design on the host side such that different operations can overlap, duplicate buffers for all inputs and outputs, which the kernel needs to process per call, are needed. The host application has a parameter called **maxScheduledBatches** which is used to define the level of duplicity. Essentially, it defines how many buffers for storing different inputs or outputs for multiple kernel calls are needed. The host application is written such that this parameter can be passed to host application at command line as argument.
  
- - **maxScheduledBatches = 1:**  Setting its value to 1 means that you have one buffer for storing only one input and output block. Therefore, you cannot issue multiple memory movement commands and kernel enqueues at the same time and as such, no overlapping of transactions can happen from the host side. So write to device, kernel execution and read back from device all happen sequentially.
+ - **maxScheduledBatches = 1:**  Setting its value to 1 means that one buffer each is used for storing only one input and one output block. Therefore multiple memory movement commands and kernel enqueues at the same time cannot be issued. So as such no overlapping of transactions can happen from the host side. So write to device, kernel execution and read back from device all happen sequentially.
  
-  - **maxScheduledBatches > 1:**  Setting it to a value greater than 1 means that you have duplicate resources (multiple set of input and output buffers) and can potentially enable overlapping transactions from host side.
+  - **maxScheduledBatches > 1:**  Setting it to a value greater than 1 means that there are duplicate resources (multiple set of input and output buffers) and can potentially enable overlapping transactions from host side.
    
-  You can also observe that **maxScheduledBatches** is the parameter which sizes all other vectors such as event vectors and wait list. To understand how **maxScheduledBatches > 1** enable overlapping of different operations, define
+  one can also observe that **maxScheduledBatches** is the parameter which sizes all other vectors such as event vectors and wait list. To understand how **maxScheduledBatches > 1** enable overlapping of different operations, define
   **Full Transaction** as set of the following enqueue operations from host for single kernel call:
    
   * write input data to device (enqueueMigrateMemObjects)
   * execute kernel (enqueueTask)
   * read output data from device (enqueueMigrateMemObjects)
   
-  With multiple buffers available for each set of input and output data (maxScheduledBatches > 1), you can conceptually enqueue multiple full transactions on a command queue at a given time which will potentially set stage for overlapping between execution of different full transactions (i.e. write for first read for next, execute for first write for next etc.).
+  With multiple buffers available for each set of input and output data (maxScheduledBatches > 1), one can conceptually enqueue multiple full transactions on a command queue at a given time which will potentially set stage for overlapping between execution of different full transactions (i.e. write for first read for next, execute for first write for next etc.).
  
  #### Multiple Command Queues
  
@@ -196,7 +196,7 @@ To design on the host side such that different operations can overlap, duplicate
  
 ### Running Application with Software Pipeline
 
-Now that you know how to create a software pipeline on host side using pool of buffers and multiple command queues, experiment with it and see how performance changes.
+Now that it is known how to create a software pipeline on host side using pool of buffers and multiple command queues, following section proceeds to experiment with it and shows how performance changes.
 
 1. Run the application again and note that the final commandline argument is **4** instead of **1** as was the case in previous run which will enable host side write/execute/read overlapping (software pipeline).
 
@@ -204,7 +204,7 @@ Now that you know how to create a software pipeline on host side using pool of b
     cd $LAB_WORK_DIR/Vitis-AWS-F1-Developer-Labs/modules/module_01/idct
     ./build/host.exe ./xclbin/krnl_idct.hw.awsxclbin $((1024*128)) 32 4
     ```
-    You will see an output message like the one below and you can see the **performance has almost improved by 2x or more**.
+    it will print an output message like the one shown below and will that **performance has almost improved by 2x or more**.
     
     ```
     Execution Finished
@@ -239,9 +239,9 @@ which means it is now idling considerably less than what it was before this soft
 
 ### Running Application with Software Pipeline and Kernel With II=4
 
-Now that you have set up our host side software pipeline, which ensures that data movements between host device are happening at full throughput in an overlappping fashion, go back and try to choose a kernel that has II=4 and verify if the performance estimation you did in the previous lab comes close to what is predicted. Our prediction was kernel with II=4 may have similar throughput to kernel with II=2.
+Now that the host side software pipeline is setup, which ensures that data movements between host device are happening at full throughput in an overlappping fashion, go back and try to choose a kernel that has II=4 and verify if the performance estimation that was done in the previous lab comes close to what was predicted. The prediction was kernel with II=4 may have similar throughput to kernel with II=2.
 
-1. Modify host code to make sure it runs appropriate hardware kernel wiht II=4. Open terminal if you don't have it already open from last lab and do:
+1. Modify host code to make sure it runs appropriate hardware kernel wiht II=4. Open terminal if it is not already open from last lab and do:
 
     ```bash
     source $AWS_FPGA_REPO_DIR/vitis_setup.sh
@@ -281,7 +281,7 @@ The measured performance is as follows:
     Measured Kernel Latency =  = 1.8 ms
     Measured Overall Application Performance = 6.4 GB/s  
     ```
-The measured kernel latency can be found in run summary for application using Vitis Analyzer as explained in previous labs. From these numbers, you can see that in terms of throughput or latency estimates, almost 70% of what was estimated was achieved. The difference between estimates and the measured stems from the fact that once application software pipeline is created the device DDRs memories start to see contention between host and kernel where one is reading and other is writing. For example when host is reading kernel output moving data from device DDR to its global memory at the same time kernel is processing next block and writing new output data for next call, similar phenomenon happens for device DDR where kernel is reading and host is writing input data for next call** This contention can be resolved if more device DDR memories are available by using device DDRs in ping pong fashion. Another AWS training module namely [Bloom filter](https://github.com/Xilinx/SDAccel-AWS-F1-Developer-Labs/tree/master/modules/module_02) uses it.
+The measured kernel latency can be found in run summary for application using Vitis Analyzer as explained in previous labs. From these numbers, it can be seen that in terms of throughput or latency estimates, almost 70% of what was estimated was achieved. The difference between estimates and the measured stems from the fact that once application software pipeline is created the device DDRs memories start to see contention between host and kernel where one is reading and other is writing. For example when host is reading kernel output moving data from device DDR to its global memory at the same time kernel is processing next block and writing new output data for next call, similar phenomenon happens for device DDR where kernel is reading and host is writing input data for next call** This contention can be resolved if more device DDR memories are available by using device DDRs in ping pong fashion. Another AWS training module namely [Bloom filter](https://github.com/Xilinx/SDAccel-AWS-F1-Developer-Labs/tree/master/modules/module_02) uses it.
  
 ## Summary  
 
