@@ -12,7 +12,7 @@
     - [Running the Hardware Emulation](#running-the-hardware-emulation)
   - [Summary](#summary)
 
-This lab is designed to teach the fundamentals of the Vitis&trade; development environment and programming model. Its contents are tailored to familiarize you with basic OpenCL APIs, software and hardware emulation flows, application performance estimation, profiling performance, and identifying how to optimize host code and kernel hardware implementation.
+This lab is designed to teach the fundamentals of the Vitis&trade; development environment and programming model. Its contents are tailored to familiarize the reader with basic OpenCL APIs, software and hardware emulation flows, application performance estimation, profiling performance, and identifying how to optimize host code and kernel hardware implementation.
 
 The kernels or the functions used for FPGA acceleration in this lab are slightly different hardware implementations of the Inverse Discrete Cosine Transform (IDCT) algorithm, a function widely used for transform coding in applications like video/image codecs such as JPEG and High Efficiency Video Coding(HEVC).
 
@@ -43,7 +43,7 @@ The kernels or the functions used for FPGA acceleration in this lab are slightly
 
     In the 'platform selection' section, the default target platform is set as `xilinx_aws-vu9p-f1_shell-v04261818_201920_2.xpfm` using AWS_PLATFORM enviroment variable. It is an AWS F1 platform and the environment varialbe is set automatically with terminal launch.
 
-    The next couple of lines define the design files location and file names. Following that is the host compiler settings, kernel compiler, and linker settings.  You do not need to modify any of the options here but you may want to play with them after finishing this tutorial.
+    The next couple of lines define the design files location and file names. Following that is the host compiler settings, kernel compiler, and linker settings.  This lab does't requires any modification of these options here but the readers may be able to play with them after finishing this tutorial.
 
     Exit **Makefile** view window and let's take a look at the design files.
 
@@ -108,7 +108,7 @@ The project comprises of multiple files under the `src` directory. The following
    * **xcl::read_binary_file**: Xilinx provided API, reads a compiled binary file for FPGA
    * **cl::Program::Binaries**: Creates a binary file object from raw binary file which can be used to create a OpenCL program  associated with a device, essentially programming FPGA device there in.
    * **cl::Program**: Creates a cl::Program objects and also programs FPGA device. The programmed device may have multiple kernels compiled inside single programs so created object also provides a reference that can be used to create  handles to different kernels.
-   * **cl::Kernel**: Creates a kernel object given the cl::Program handle and kernel name as string. In the next lab, you will change this name string often. In this case, you have multiple kernels but here one kernel, namely "krnl_idct", is used.
+   * **cl::Kernel**: Creates a kernel object given the cl::Program handle and kernel name as string. The next lab, will will instruct to change this name string often. Next Lab uses multiple kernels but this lab only uses one kernel, namely "krnl_idct".
 
 
   >**NOTE**: Many function calls and object construction call use a macro **OCL_CHECK** which is used to parse the return status of type **cl_int**. It errors out after OpenCL call, if the call does not complete as expected.
@@ -151,8 +151,8 @@ All of the OpenCL API functions used here are documented by the [Khronos Group](
 
 ## Theoretical Application Performance Estimation
 
-You can estimate application performance and also the acceleration versus software performance if the software profiling results are available. The [recommended methodology guide](https://www.xilinx.com/html_docs/xilinx2020_1/vitis_doc/methodologyacceleratingapplications.html#wgb1568690490380
-) describes this process in detail. For this lab, you will estimate hardware performance using pen and paper style calculations. Once the hardware results become available, you can correlate estimated results with measured ones and also reason about these number in case of differences.
+The application performance and also the acceleration versus software performance can be estimated if the software profiling results are available. The [recommended methodology guide](https://www.xilinx.com/html_docs/xilinx2020_1/vitis_doc/methodologyacceleratingapplications.html#wgb1568690490380
+) describes this process in detail. Here in this lab hardware performance is estimated using pen and paper style calculations. Once the hardware results become available, estimates can be correlated with measured ones and also reasoning can be done in case of differences.
 
 ### Application Categories and Memory Subsystem Performance
 
@@ -169,11 +169,11 @@ The system architecture and memory subsystems play a crucial role in defining th
  3. Kernel writes output data back to DDR memories after processing
  4. Host reads output data from device DDR memories through PCIe&reg
  
- 2D IDCT carries a significant potential for acceleration compared to CPU performance as is evident from the final results but in general it is a memory bandwidth limited kernel so its performance is capped by any component in the memory subsystem that has minimum bandwidth. You can use memory subsystem data transfer rate specs from datasheets but to have better estimates, it is recommended to use Xilinx run time utility such as xbutil to perform bandwidth test and use its measurement for estimation. From the measurements for AWS F1 instance, it is found that this bottleneck bandwidth is around 8.4 GB/s. While kernel is processing data it reads and write to device DDR memories so another important number that you can use for estimating the latency of kernel is the device DDR read and write bandwidths which can be taken as 12GHz(250MHz * 64 Bytes *0.75). Here the assumption is that DDR interfaces are operating at 75% of maximum bandwidth depending on kernel read/write patterns and kernel will be running at 250MHz. 
+ 2D IDCT carries a significant potential for acceleration compared to CPU performance as is evident from the final results but in general it is a memory bandwidth limited kernel so its performance is capped by any component in the memory subsystem that has minimum bandwidth. Memory subsystem data transfer rate specs from datasheets can be used but to have better estimates, it is recommended to use Xilinx run time utility such as **xbutil** to perform bandwidth test and use its measurement for estimation. From the measurements for AWS F1 instance, it is found that this bottleneck bandwidth is around 8.4 GB/s. While kernel is processing data it reads and write to device DDR memories so another important number that can used for estimating the latency of kernel is the device DDR read and write bandwidths which can be taken as 12GHz(250MHz * 64 Bytes *0.75). Here the assumption is that DDR interfaces are operating at 75% of maximum bandwidth depending on kernel read/write patterns and kernel will be running at 250MHz. 
 
 ### Kernel Performance Estimation
 
- By looking at the kernel source code in `krnl_idct.cpp`, around line 370 you can easily see that the dataflow pipeline consists of four function calls, read_blocks, execute, and two calls to write_blocks. The write_block is called twice once for loading co-efficients and then for loading input data. The size of co-efficients is very small as compared to main input data chunk that is processed so it can be ignored. By looking at the definitions of these functions it is clear that all functions can be pipelined with II=1 except "execute" which performs 2D IDCT(8x8). The reason being it needs 1024(8 * 8 * 2 * 8) bits to process per cycle which is not possible since it reads and writes from device DDR memories with 512-bit device interfaces. Essentially read_blocs and write_blocks which connect to memories can provide IDCT with only 512-bit wide sample every cycle. The kernel latency and throughput can be estimated as follows:
+ By looking at the kernel source code in `krnl_idct.cpp`, around line 370 it can be easily seen that the dataflow pipeline consists of four function calls, read_blocks, execute, and two calls to write_blocks. The write_block is called twice once for loading co-efficients and then for loading input data. The size of co-efficients is very small as compared to main input data chunk that is processed so it can be ignored. By looking at the definitions of these functions it is clear that all functions can be pipelined with II=1 except "execute" which performs 2D IDCT(8x8). The reason being it needs 1024(8 * 8 * 2 * 8) bits to process per cycle which is not possible since it reads and writes from device DDR memories with 512-bit device interfaces. Essentially read_blocs and write_blocks which connect to memories can provide IDCT with only 512-bit wide sample every cycle. The kernel latency and throughput can be estimated as follows:
 
   ```
     Data Processed per Call     = 8*8*2 (size of short type in bytes) = 128 Bytes
@@ -196,7 +196,7 @@ Once the kernel performance estimates are available it is very easy to estimate 
    Overall Application Performance = min(IDCT Throughput (capped), PCI Bandwidth)
    Overall Application Performance = min(12 GB/s, 8.4 GB/s) = 8.4 GB/s  
   ``` 
-So, in the case of IDCT overall system performance estimate is 8.4 GB/s limited by PCIe performance. Once you have built the whole application, you can come back and compare the performance with this number and also compare the kernel latency using profile summary reports in the Vitis Analyzer.
+So, in the case of IDCT overall system performance estimate is 8.4 GB/s limited by PCIe performance. Once the whole application is built, one can come back and compare the performance with this number and also compare the kernel latency using profile summary reports in the Vitis Analyzer.
 
 ### Calibrating Kernel Initiation Interval (II)
 
@@ -236,11 +236,11 @@ Vitis applications can run in multiple modes. These modes include software emula
     ------ TEST PASSED ------
     ```
 
-    The generated files are put into `build` folder under `design` directory. You can use `ls` command to investigate the generated files.
+    The generated files are put into `build` folder under `design` directory. The `ls` command can be used to investigate the generated files.
 
 ### Running the Hardware Emulation
 
-1. After the software emulation finishes successfully, you can move forward and run the design in hardware emulation mode. The corresponding command is:
+1. After the software emulation finishes successfully, the design can be ran in hardware emulation mode. The corresponding command is:
 
     ```bash
     cd $LAB_WORK_DIR/Vitis-AWS-F1-Developer-Labs/modules/module_01/idct/
@@ -287,7 +287,7 @@ Vitis applications can run in multiple modes. These modes include software emula
  ```bash
 make run TARGET=sw_emu EMU_FULL=1 BATCH_SIZE=1024 NUM_OF_BATCHES=16 MAX_SCHEDULED_BATCHES=8
  ```   
-Here, you can choose the batch size, number of batches, maximum scheduled batches, and full length emulation mode by setting **EMU_FULL=1**. If it is set to '0', the emulation uses small data set for emulation. For the actual FPGA run, full length data is used. In general, the setting of these parameter is such that **NUM_OF_BATCHES** = N * **MAX_SCHEDULED_BATCHES**, where N is an integer number.
+Here, the batch size, number of batches, maximum scheduled batches can be chosen and full length emulation mode can be enabled by setting **EMU_FULL=1**. If it is set to '0', the emulation uses small data set for emulation. For the actual FPGA run, full length data is used. In general, the setting of these parameter is such that **NUM_OF_BATCHES** = N * **MAX_SCHEDULED_BATCHES**, where N is an integer number.
    
 ## Summary
 
