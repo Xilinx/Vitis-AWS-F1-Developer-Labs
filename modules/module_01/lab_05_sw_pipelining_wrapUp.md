@@ -19,7 +19,7 @@
   - [Congratulations!](#congratulations)
   - [Next steps](#next-steps)
   
-This lab discusses host code optimizations that can result in big performance improvements. You will wrap up this module by showing different steps on how to close your RDP session and stop your instance. It is important to always stop or terminate AWS EC2 instances when you are done using them. This is a recommended best practice to avoid unwanted charges.
+This lab discusses host code optimizations that can result in big performance improvements. This lab will wrap up module by showing different steps on how to close RDP session and stop AWS F1 instance. It is important to always stop or terminate AWS EC2 instances when you are done using them. This is a recommended best practice to avoid unwanted charges.
 
 In the following section, you will launch the application on F1 instance and analyze application execution using timeline.
 
@@ -80,7 +80,7 @@ In the following section, you will launch the application on F1 instance and ana
    
       ![](images/module_01/lab_05_idct/hwRunNoSwPipeLine.PNG) 
       
-  In next section, we will try to comprehend this waveform and will perform host side code optimization to improve performance.
+  In next section, we will try to comprehend this waveform and also perform host side code optimization to improve performance.
 
 ## Application Performance Analysis
 
@@ -97,7 +97,7 @@ Open the profile summary and by looking at the profile summary and timeline, fin
    
       ![](images/module_01/lab_05_idct/hwRunCuUtil.PNG)
       
-  It shows that compute unit utilization is around 23%. Meaning compute unit is busy crunching numbers only for 23% of the time and remaining 77% of time it is stalled/idling. This can be confirmed from the application timeline and which also provides insight why it is so. 
+  It shows that compute unit utilization is around 23%. Meaning compute unit is busy crunching numbers only for 23% of the time and remaining 77% of time it is stalled/idling. This can be confirmed from the application timeline which also provides insight why it is so. 
   
 ### Application Timeline Analysis 
  
@@ -105,21 +105,24 @@ Open the profile summary and by looking at the profile summary and timeline, fin
  
  *  Host sends data through PCI on write interface for processing and only once the data transfer completes the enqueued kernel can kick starts compute unit.
  
- * Once the compute unit finishes processing current batch of input data only then  output data produced by kernel requested by host enqueue start to flow.
+ * Once the compute unit finishes processing current batch of input data only then output data produced by kernel requested by host using enqueue command start to flow.
  
- * Whole of this cycle then repeats again and again till all batches of input are processed.
+ * Whole of this cycle then repeats till all batches of input are processed.
      
  One very important thing to note is that host does all of these transactions sequentially, only initiating new transaction (task getting enqueued on command queue) after previous one is finished. Given that most of the PCI and DDR interfaces have support for full duplex transports, one can preform a number of optimizations using the dependency analysis.
  
  ### Task Dependency Analysis
   
-  - **Input Data:** The host side writes to device memory can  continue in background back to back since it is input data coming from host to device for processing and has no dependencies
+  - **Input Data:** The host side writes to device memory can continue in background back to back since it is input data coming from host to device for processing and has no dependencies
   
-  - **Kernel Compute:** Kernel can be enqueued with dependency on corresponding input data and can kick start as soon as this data is transferred to device
+  - **Kernel Compute:** Kernel can be enqueued with dependency on corresponding input data block and can kick start as soon as this data block is transferred to device
   
-  - **Output Data Transfer to Host:** Next Kernels Compute has no dependency on output data calculated by current kernel call and transferred back to host. The output data transfer for current compute can continue in background while next kernel compute can start.
+  - **Output Data Transfer to Host:** Next Kernels Compute has no dependency on output data block calculated by current kernel call and which will be transferred back to host. The output data transfer for current compute can continue in background while next kernel compute can start.
  
- In a nutshell, this dependency analysis clarifies and reveals that while the kernel is processing, the current data block host can start sending next input data block for next kernel compute. The kernel/CU can start processing next input data block as soon as it becomes available. The output data transfer to host (produced by kernel/CU execution) can start as soon as current kernel/CU call finishes and continue in background while kernel/CU starts processing next input block.
+ In nutshell this dependency analysis clarifies and reveals that:
+  - While kernel is processing current data block host can start sending next input data block for next kernel compute
+  - kernel/CU can start processing next input data block as soon as it becomes available
+  - the output data transfer to host (produced by kernel/CU execution) can start as soon as current kernel/CU call finishes and continue in background while kernel/CU starts processing next input block. 
   
 Once these fact have been identified, one can capture relevant and required dependencies on host side and improve the performance considerably.
 
@@ -154,11 +157,14 @@ This section describes how the host code captures dependencies.
 
 #### Duplicating Input and Output Buffers
 
-For using IDCT kernel, three buffers to input data, input IDCT co-efficients, and output data are required.
+For using IDCT kernel three buffers are required one each for:
+-input data
+-input IDCT co-efficients, 
+-and output data.
 
-To design on the host side such that different operations can overlap, duplicate buffers for all inputs and outputs, which the kernel needs to process per call, are needed. The host application has a parameter called **maxScheduledBatches** which is used to define the level of duplicity. Essentially, it defines how many buffers for storing different inputs or outputs for multiple kernel calls are needed. The host application is written such that this parameter can be passed to host application at command line as argument.
+Since the host side is designed to make sure different operations can overlap, duplicate buffers for all inputs and outputs, which the kernel needs to process per call, are needed. The host application has a parameter called **maxScheduledBatches** which is used to define the level of duplicity. Essentially, it defines how many buffers for storing different inputs or outputs for multiple kernel calls are needed. The host application is written such that this parameter can be passed to host application as commandline argument.
  
- - **maxScheduledBatches = 1:**  Setting its value to 1 means that one buffer each is used for storing only one input and one output block. Therefore multiple memory movement commands and kernel enqueues at the same time cannot be issued. So as such no overlapping of transactions can happen from the host side. So write to device, kernel execution and read back from device all happen sequentially.
+ - **maxScheduledBatches = 1:**  Setting its value to 1 means that one buffer each is used for storing input and output blocks. Therefore multiple memory movement commands and kernel enqueues at the same time cannot be issued. So as such no overlapping of transactions can happen from the host side. So write to device, kernel execution and read back from device all happen sequentially.
  
   - **maxScheduledBatches > 1:**  Setting it to a value greater than 1 means that there are duplicate resources (multiple set of input and output buffers) and can potentially enable overlapping transactions from host side.
    
@@ -179,7 +185,7 @@ To design on the host side such that different operations can overlap, duplicate
   - Another is used to enqueue all kernel executions
   - Third one is used to enqueue all device to host output data movements
   
-  The in order queues are used to make sure that data dependencies between multiple similar tasks (like moving input data for second kernel call should not happen before input data for 1st kernel call has finished since it may create contention at memory interface and lower performance) are defined implicitly.
+  The in-order queues are used to make sure that data dependencies between multiple similar tasks (like moving input data for second kernel call should not happen before input data for 1st kernel call has finished since it may create contention at memory interface and lower performance) are defined implicitly.
   
   Now to understand main loop that does all task enqueueing and resource management please go to label "BATCH_PROCESSING_LOOP" near line 68 and observe the following:
 
@@ -204,7 +210,7 @@ Now that it is known how to create a software pipeline on host side using pool o
     cd $LAB_WORK_DIR/Vitis-AWS-F1-Developer-Labs/modules/module_01/idct
     ./build/host.exe ./xclbin/krnl_idct.hw.awsxclbin $((1024*128)) 32 4
     ```
-    it will print an output message like the one shown below and will that **performance has almost improved by 2x or more**.
+    it will print an output message like the one shown below where **performance has almost improved by 2x or more**.
     
     ```
     Execution Finished
@@ -239,7 +245,7 @@ which means it is now idling considerably less than what it was before this soft
 
 ### Running Application with Software Pipeline and Kernel With II=4
 
-Now that the host side software pipeline is setup, which ensures that data movements between host device are happening at full throughput in an overlappping fashion, go back and try to choose a kernel that has II=4 and verify if the performance estimation that was done in the previous lab comes close to what was predicted. The prediction was kernel with II=4 may have similar throughput to kernel with II=2.
+Now that the host side software pipeline is setup, which ensures that data movements between host and device are happening at full throughput in an overlappping fashion, go back and try to choose a kernel that has II=4 and verify if the performance estimation that was done in the previous lab comes close to what was predicted. The prediction was kernel with II=4 may have similar throughput to kernel with II=2.
 
 1. Modify host code to make sure it runs appropriate hardware kernel wiht II=4. Open terminal if it is not already open from last lab and do:
 
