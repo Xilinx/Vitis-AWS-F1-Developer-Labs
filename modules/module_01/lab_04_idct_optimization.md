@@ -16,7 +16,7 @@
 
 This lab builds on top of previous labs which gave an overview of the Vitis development environment and explained the various performance analysis capabilities provided by the tool using different reports. This lab, will demonstrate these analysis capabilities and use them to drive and measure performance improvements enabled by code optimizations. This lab illustrates the dataflow optimization and loop pipelining variations effects on overall performance.
 
->**NOTE**: Although the entire lab is performed on an F1 instance, only the steps that involve use hardware/FPGA card need to run on F1 instance. All the interactive development, profiling and optimization steps would normally be performed on-premise or on a cost-effective AWS EC2 instance such as C4. However, to avoid switching from C4 to F1 instance during this lab, all the steps are performed on the F1 instance.
+>**NOTE**: Although the entire lab is performed on an F1 instance, only the steps that involve the use of FPGA card need to run on F1 instance. All the interactive development, profiling and optimization steps would normally be performed on-premise or on a cost-effective AWS EC2 instance such as C4. However, to avoid switching from C4 to F1 instance during this lab, all the steps are performed on the F1 instance.
 
 If the terminal window at the end of the previous lab was closed, open a new one, run setup script and go back to the project folder:
 
@@ -35,7 +35,7 @@ If the terminal window at the end of the previous lab was closed, open a new one
 
 ## Optimizing the IDCT Kernel using Dataflow
 
-Carry out a simple experiment that will illustrate the effects and power of dataflow optimization. The FPGA binary built and used for experiments is built to have four different kernels. There are minor differences among them and they are created to illustrate different performance optimizations. This experiment will focus on two kernels namely **krnl_idct** and **krnl_idct_noflow** and compare them.
+In this section different simple experiments are carried out that will illustrate the effects and power of dataflow optimization. The FPGA binary used for experiments is built to have four different kernels. There are minor differences among them and they are created to illustrate different performance optimizations. This experiment will focus on two kernels namely **krnl_idct** and **krnl_idct_noflow** and compare them.
 
 ### Comparing FPGA Resource Usage
 
@@ -46,16 +46,16 @@ Carry out a simple experiment that will illustrate the effects and power of data
     vim src/krnl_idct_noflow.cpp
     ```
 
-   These files contain description for both of these kernels. They are exactly identical kernel with different names and one major difference: Dataflow optimization is enabled for **krnl_idct** in **krnl_idct.cpp** whereas it is not used for other kernel **krnl_idct_noflow** in **knrl_idct_noflow.cpp**. It can be sees by going to a label called "DATAFLOW_PRAGMA" which is placed as marker near line 358 in both the files. An HLS Pragma is applied here, it is enabled for "krnl_idct" and disabled for other by commenting out. The application of this pragma makes functions in the region execute concurrently and create a function pipeline which overlaps compute in different functions as compared to full sequential execution. The functions in this region are connected through FIFOs also called hls::streams, it is one of the recommended style for the functions used in dataflow region, given that the data is produced or consumed in order at every function boundary.
+   These files contain description for both of these kernels. They are exactly identical kernel with different names and one major difference: Dataflow optimization is enabled for **krnl_idct** in **krnl_idct.cpp** whereas it is not used for other kernel **krnl_idct_noflow** in **knrl_idct_noflow.cpp**. It can be sees by going to a label called "DATAFLOW_PRAGMA" which is placed as marker near line 358 in both the files. An HLS Pragma is applied here, it is enabled for "krnl_idct" and disabled for other by commenting out. The application of this pragma makes functions in the region execute concurrently and create a function pipeline which overlaps compute in different functions as compared to full sequential execution. The functions in this region are connected through FIFOs also called hls::streams, it is one of the recommended style for the functions used in dataflow region, given that the data is produced or consumed in same order at every function boundary.
 
-1. Look at the synthesis report for latency and II to compare expected performance, proceed as follows:
+1. To look at the synthesis report for latency and II to compare expected performance, proceed as follows:
 
     ```bash
     cd $LAB_WORK_DIR/Vitis-AWS-F1-Developer-Labs/modules/module_01/idct
     vim src/host.cpp
     ```
 
-    Go to label **CREATE_KERNEL** near line 226 and make sure the kernel name string is "krnl_idct" and not anything else. Run hardware emulation as follows:
+    Go to label **CREATE_KERNEL** near line 226 and make sure the kernel name string is "krnl_idct" and run hardware emulation as follows:
 
     ```bash
     make run TARGET=hw_emu
@@ -91,7 +91,7 @@ Carry out a simple experiment that will illustrate the effects and power of data
 
 #### Kernel with Dataflow Optimization
 
-The compute unit execution time can be seen by looking at the profile summary reports. The hardware emulation for kernel "kernel_idct"  was already run which uses dataflow optimization. Now, open the profile summary report using vitis_analyzer as follows:
+The next thing which can be seen is the compute unit execution time by using the profile summary reports. The hardware emulation for kernel "kernel_idct" was already ran, which uses dataflow optimization, now open the profile summary report using vitis_analyzer as follows:
 
 ```bash
 vitis_analyzer ./build_hw_emu/xclbin.run_summary
@@ -107,7 +107,7 @@ It can be observed from this timeline that:
 
 - There is overlapping activity at the read and write interfaces for compute unit essentially meaning things are happening concurrently(read_block/execute/write_block functions running concurrently).
 
-- The amount of overlap seems marginal because a very small data size has been intentionally chosen for emulation. Overlapping is increase during the actual hardware or system run where a larger data size is used.
+- The amount of overlap seems marginal because a very small data size has been intentionally chosen for emulation. Overlapping will increase during the actual hardware or system run where a larger data size is used.
 
 #### Kernel without Dataflow Optimization
 
@@ -158,7 +158,7 @@ Go to label "FUNCTION_PIPELINE" near line 37. one can see four different functio
 
 The read and write blocks simply reads data and writes data from memory interfaces and streams it to execute function which calls IDCT function to perform the core compute. The read and write functions can be pipelined with desired II with overall performance dictated by "execute" function II. It is a functional pipeline where all of these functions will be constructed as chain of independent hardware modules. The overall performance will be defined by any block that has the lowest performance which essentially means largest II. Since execute block carries out almost all compute so II variation on this block will show significant overall performance and resource utilization variations.
 
-Now lets do actual system runs a pre-built FPGA binary file. Xclbin or AFI for AWS F1 can built using the provided makefile but to save time a pre-built binary is provided.
+Now lets do actual system runs using a pre-built FPGA binary file. Xclbin or AFI for AWS F1 can built using the provided makefile but to save time a pre-built binary is provided.
 
 To see how pipeline pragmas with different II are applied to kernels, open different kernel source files and compare II constraints placed near label "PIPELINE_PRAGMA:" in each file around line 297, it have IIs as follows:
 
@@ -172,7 +172,7 @@ To see how pipeline pragmas with different II are applied to kernels, open diffe
     vim src/krnl_idct_slow.cpp     
 ```
 
->**NOTE**: II = 1 cannot be achieved because the device DDR memory width is 512 bits(64 Bytes) and IDCT compute if done is single cycle requires (64*size(short)*8=1024) 1024 bits (128 bytes) per cycle. In terms of how this fact manifest in our model can be seen by going to "execute" function to find that it will require 2 reads or writes on FIFO I/O interfaces in single cycle which is not possible.
+>**NOTE**: II = 1 cannot be achieved because the device DDR memory width is 512 bits(64 Bytes) and IDCT compute if done in single cycle requires (64*size(short)*8=1024) 1024 bits (128 bytes) per cycle. In terms of how this fact manifest in our model can be seen by going to "execute" function to find that it will require 2 reads or writes on FIFO I/O interfaces in single cycle which is not possible.
 
 ### Initiation Interval versus FPGA Resource Usage
 
@@ -237,7 +237,7 @@ It is estimated in previous labs that kernel with II=4 may be able to run at max
    vim src/host.cpp
     ```
 
-   Go to label "CREATE_KERNEL" near line 226 and make sure the kernel name string is "krnl_idct_med". and build host application again as follows:
+   Go to label "CREATE_KERNEL" near line 226 and make sure the kernel name string is "krnl_idct_med" and build host application again as follows:
 
    ```bash
    make compile_host TARGET=hw
@@ -248,7 +248,7 @@ It is estimated in previous labs that kernel with II=4 may be able to run at max
 	./build/host.exe ./xclbin/krnl_idct.hw.awsxclbin $((1024*128)) 32 1
 	```
 
-	it shows FGPA acceleration by a factor of 9x:
+	it will show FGPA acceleration by a factor of about 9x:
 
     ```
     Execution Finished
@@ -273,7 +273,7 @@ It is estimated in previous labs that kernel with II=4 may be able to run at max
    vim src/host.cpp
     ```
 
-   Go to label "CREATE_KERNEL" near line 226 and make sure the kernel name string is "krnl_idct". and build host application as follows:
+   Go to label "CREATE_KERNEL" near line 226 and make sure the kernel name string is "krnl_idct" and build host application as follows:
 
    ```bash
    make compile_host TARGET=hw
@@ -285,7 +285,7 @@ It is estimated in previous labs that kernel with II=4 may be able to run at max
     ./build/host.exe ./xclbin/krnl_idct.hw.awsxclbin $((1024*128)) 32 1
     ```
 
-    it shows FGPA acceleration by a factor of 11x:
+    it will show FGPA acceleration by a factor of about 11x:
 
     ```
     Execution Finished
