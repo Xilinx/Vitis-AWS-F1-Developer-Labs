@@ -49,7 +49,7 @@ After hardware emulation run completes, a run summary is generated in the `build
 
 ### Vitis Link Summary and HLS reports
 
-The Vitis compiler also generates HLS Reports for each kernel. HLS Reports contain the results of compiling kernel into hardware. It contains many details (including clocking, resources or device utilization) about the performance and logic usage of the custom-generated hardware accelerator. These details provide many insights to guide the kernel optimization process. To build an xclbin file ( FPGA Binary File) with four different kernels, it will need four different reports for each kernel. For an actual application, only one kernel is required; the other three are added for experimental purposes as pointed out in the previous lab. Next labs will use them for experiments. This lab also explores the use the Vitis Link Summary which contains all of these reports.
+The Vitis compiler also generates HLS Reports for each kernel. HLS Reports contain the results of compiling kernel into hardware. They contains many details (including clocking, resources or device utilization) about the performance and logic usage of the custom-generated hardware accelerator. These details provide many insights to guide the kernel optimization process. To build an xclbin file ( FPGA Binary File) with four different kernels, it will need four different reports for each kernel. For an the actual application, only one kernel is required, the other three are added for experimental purposes as pointed out in the previous lab. Next labs will use them for experiments. This lab also explores the use of Vitis Link Summary which contains all of these reports.
 
 1.  Opening the link summary:
 
@@ -108,9 +108,9 @@ Next, it can be seen how these kernels have been genertaed with minor difference
        
 ### Application Timeline report
 
-In addition to the profile summary file, the emulation run also generates an timeline trace file as part of run summary. This gives more details about:
+In addition to the profile summary file, the emulation run also generates a timeline trace file as part of run summary. This gives more details about:
 - Full application behavior
-- The interactions with FPGA
+- Application interactions with FPGA
 - Execution times on hardware side (FPGA Card).
 
 The report can be analyzed for host side application issues and other things like:
@@ -149,7 +149,7 @@ Host side uses multiple sets of OpenCL buffers. Each set contains two input and 
 
 #### Device Execution Timeline
 
-Device side timeline trace gives details of activity happening on the FPGA device or acceleration card. Here actual hardware activity happening for different CUs can be found. For IDCT, only one instance of IDCT kernel so a single CU is used. All its interfaces to device global memory are traced out. In the case of IDCT it uses three separate interfaces one for co-efficients, second for input data and third for output data ( even though two of these interfaces for co-efficients and input data use same DDR memory bank). Zoom into one of the read/write transactions happening on device master AXI interfaces as shown in the figure below and see how fast these data transfers are happening and in which sort of bursts, the timeline will show different bursts and also burst lengths. Different colored ellipses are used to highlight interfaces and data movements happening on different interfaces between device DDR memories and kernel:
+Device side timeline trace gives details of activity happening on the FPGA device or acceleration card. Here actual hardware activity happening for different CUs can be found. For IDCT, there is only one instance of IDCT kernel so a single CU is used. All its interfaces to device global memory are traced out. In the case of IDCT it uses three separate interfaces one for co-efficients, second for input data and third for output data ( even though two of these interfaces for co-efficients and input data use same DDR memory bank). Zoom into one of the read/write transactions happening on device master AXI interfaces as shown in the figure below and see how fast these data transfers are happening and in which sort of bursts, the timeline will show different bursts and also burst lengths. Different colored ellipses are used to highlight interfaces and data movements happening on these interfaces:
 
 * Green ellipse highlights read and write interfaces with same port names as used in kernel C/C++ description
 * Yellow ellipse highlights movement of co-efficients
