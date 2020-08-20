@@ -86,6 +86,7 @@ ifndef XILINX_VIVADO
 $(error [ERROR]: g++ version older. Please use 5.0 or above.)
 else
 CXX := $(XILINX_VIVADO)/tps/lnx64/gcc-6.2.0/bin/g++
+LD_LIBRARY_PATH:=$(LD_LIBRARY_PATH):$(XILINX_VIVADO)/tps/lnx64/gcc-6.2.0/lib64
 $(warning [WARNING]: g++ version older. Using g++ provided by the tool : $(CXX))
 endif
 endif
