@@ -65,10 +65,10 @@ channels.
     
     in        : Pointer to input data essentially generates a memory interface
     out       : stream of output data that connects to memroy interface 
-    numBlocks : number of blocks to read from memory
+    numBlocks : number of input blocks to read from memory
 *************************************************************************** */
 template<typename out_t>
-void read_blocks(const out_t *in, hls::stream<out_t> &out, unsigned int numBlocks) 
+void read_blocks_slow(const out_t *in, hls::stream<out_t> &out, unsigned int numBlocks) 
 {
   for(unsigned int i = 0; i < numBlocks*2; i++) 
   {
@@ -87,7 +87,7 @@ Dataflow block used to interface from streaming output channel to
 output memory.
 
 *************************************************************************** */
-void write_blocks(ap_int<512> *out,  hls::stream<int512_t> &in,  unsigned int numBlocks) 
+void write_blocks_slow(ap_int<512> *out,  hls::stream<int512_t> &in,  unsigned int numBlocks) 
 {
 	for(unsigned int i = 0; i < numBlocks*2; i++) 
 	{
@@ -116,7 +116,7 @@ Idct algorithm description describes synthesizable idct behavior.
 *************************************************************************** */
 
 
-void idct(const int16_t inputBlock[64], 
+void idct_slow(const int16_t inputBlock[64], 
 	  	  const uint16_t coeffs[64], 
 	  	  int16_t outputBlock[64], 
 	  	  bool ignoreDC
@@ -275,14 +275,14 @@ void idct(const int16_t inputBlock[64],
 
 /* *************************************************************************** 
 
-execute:
+execute_slow:
 
 Dataflow block used to manage full block computation. It uses wide
 arrays for single block computation to allow efficient access with
 ii=2 for the 8x8 data elements. 
 
 *************************************************************************** */
-void execute(hls::stream<int512_t> &iblock, 
+void execute_slow(hls::stream<int512_t> &iblock, 
 		     hls::stream<uint512_t> &icoeffs, 
 		     hls::stream<int512_t> &oblock, 
 		     bool ignoreDC, 
@@ -295,9 +295,9 @@ void execute(hls::stream<int512_t> &iblock,
     #pragma HLS loop_tripcount min=1024 max=1024
 
 //PIPELINE_PRAGMA:
-
-    #pragma HLS PIPELINE II=2
- 
+    
+    #pragma HLS PIPELINE II=8
+    
     int16_t iiblock[64];
     uint16_t iiq[64];
     int16_t iioutBlocks[64];
@@ -325,7 +325,7 @@ void execute(hls::stream<int512_t> &iblock,
 		}
     }
     
-    idct(iiblock, iiq, iioutBlocks, ignoreDC);
+    idct_slow(iiblock, iiq, iioutBlocks, ignoreDC);
     
     for(short j = 0; j < 64/32; j++) 
     {
@@ -342,13 +342,13 @@ void execute(hls::stream<int512_t> &iblock,
 
 /* *************************************************************************** 
 
-krnl_idct_dataflow:
+krnl_idct_dataflow_slow:
 
 Top idct kernel function, used to clearly isolate and identify
 dataflow blocks.
 
 *************************************************************************** */
-void krnl_idct_dataflow(const ap_int<512> *inBlocks, 
+void krnl_idct_dataflow_slow(const ap_int<512> *inBlocks, 
 			const ap_uint<512> *coeffs, 
 			ap_int<512> *outBlocks, 
 			int ignoreDC, 
@@ -357,7 +357,7 @@ void krnl_idct_dataflow(const ap_int<512> *inBlocks,
 
 //DATAFLOW_PRAGMA:
 
-	#pragma HLS DATAFLOW
+    #pragma HLS DATAFLOW
 
 	hls::stream<int512_t> iblock;
 	hls::stream<uint512_t> icoeffs;
@@ -368,24 +368,23 @@ void krnl_idct_dataflow(const ap_int<512> *inBlocks,
 	//#pragma  HLS stream variable=ioutBlocks depth=512
 
 //FUNCTION_PIPELINE:
-
-	read_blocks<uint512_t>(coeffs, icoeffs, 1);
-	read_blocks<int512_t>(inBlocks, iblock, blocks);
-	execute(iblock, icoeffs, ioutBlocks, ignoreDC ? true : false, blocks);
-	write_blocks(outBlocks, ioutBlocks, blocks);
+	read_blocks_slow<uint512_t>(coeffs, icoeffs, 1);
+	read_blocks_slow<int512_t>(inBlocks, iblock, blocks);
+	execute_slow(iblock, icoeffs, ioutBlocks, ignoreDC ? true : false, blocks);
+	write_blocks_slow(outBlocks, ioutBlocks, blocks);
 }
 
 
 /* *************************************************************************** 
 
-krnl_idct:
+krnl_idct_slow:
 
 Kernel idct interface definition. 
 
 *************************************************************************** */
 extern "C" 
 {
-	void krnl_idct( const ap_int<512> *inBlocks,
+	void krnl_idct_slow( const ap_int<512> *inBlocks,
 					const ap_uint<512> *coeffs,
 					ap_int<512> *outBlocks,
 					int ignoreDC,
@@ -408,7 +407,7 @@ extern "C"
 
 		#pragma HLS INTERFACE s_axilite port=return bundle=control
 
-		krnl_idct_dataflow(inBlocks, coeffs, outBlocks, ignoreDC, numBlocks);
+		krnl_idct_dataflow_slow(inBlocks, coeffs, outBlocks, ignoreDC, numBlocks);
 	}
 
 }
