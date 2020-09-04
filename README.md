@@ -18,21 +18,21 @@ These labs are based on Vitis 2019.2 available with the FPGA Developer AMI 1.8.1
 
 ### Developer Lab Modules
 
-#### Introduction to the Vitis Flow
+#### MODULE 1: Introduction to the Vitis Flow
 * Running the "Hello World" example
 * Introduction to the Vitis development environment
 * Using the Vitis GUI to optimize applications
 
 [**FOLLOW THE INSTRUCTIONS**](./modules/module_01/README.md)
 
-#### Optimize Interactions between the host CPU and the FPGA
+#### MODULE 2: Optimize Interactions between the host CPU and the FPGA
 * Profile the software application and determine which functions to accelerate on FPGA
 * Working with a predefined FPGA accelerator, optimize performance by overlapping data transfers and FPGA execution
 * Further speed-up the application by overlapping FPGA execution and CPU processing
 
 [**FOLLOW THE INSTRUCTIONS**](./modules/module_02/README.md)
 
-#### Methodology for Optimizing Accelerated FPGA Applications
+#### MODULE 3: Methodology for Optimizing Accelerated FPGA Applications
 * Determine the software functions to be accelerated
 * Begin with a baseline design of 2D convolution of an RGBA video and a set of filter coefficients using ffmpeg
 * Perform a series of optimization methods to achieve the performance target
