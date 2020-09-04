@@ -138,5 +138,5 @@ The FPGA Developer AMI doesn't include a GUI Desktop, but you can set it up by r
 ---------------------------------------
 
 <p align="center"><b>
-<a href="../README.md#module-1---introduction-to-the-sdaccel-flow">Start the SDAccel Developer Labs</a>
+<a href="../README.md#module-1---introduction-to-the-sdaccel-flow">Start the Vitis Developer Labs</a>
 </b></p>
