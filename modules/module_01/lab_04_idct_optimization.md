@@ -180,11 +180,11 @@ To get the look and feel of II effects on resources, results from hardware emula
 
 To do so, open and compare synthesis report to note down IIs/Latencies and resource utilization ( one can also use link summary as discussed in previous lab):
 
-    ```bash
-    vim ./build_hw_emu/reports/krnl_idct_med.hw_emu/hls_reports/krnl_idct_med_csynth.rpt
-    vim ./build_hw_emu/reports/krnl_idct.hw_emu/hls_reports/krnl_idct_csynth.rpt
-    vim ./build_hw_emu/reports/krnl_idct_slow.hw_emu/hls_reports/krnl_idct_slow_csynth.rpt
-    ```
+```bash
+vim ./build_hw_emu/reports/krnl_idct_med.hw_emu/hls_reports/krnl_idct_med_csynth.rpt
+vim ./build_hw_emu/reports/krnl_idct.hw_emu/hls_reports/krnl_idct_csynth.rpt
+vim ./build_hw_emu/reports/krnl_idct_slow.hw_emu/hls_reports/krnl_idct_slow_csynth.rpt
+```
 
 ### Initiation Interval versus Acceleration
 

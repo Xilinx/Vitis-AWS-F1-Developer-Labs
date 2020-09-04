@@ -67,8 +67,7 @@ The following steps explain how to launch an EC2 F1 instance starting from the F
 1. An ASCII art message welcomes you to your instance
 
 ##### Connect to your EC2 F1 from Windows Using PuTTy
-If you are working from windows and getting error in the while doing ssh from a terminal using .pem file. Follow the steps in last section untilyou get **IPv4 Public IP** address of the instance. After this please follow the instruction provided on the following page to convert .pem file to .ppk and connect using PuTTY
-https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/putty.h
+Follow steps 1-3 from last section to get the **IPv4 Public IP** address of the instance. Then refer to the following instructions to connect using PuTTY: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/putty.html
 
 #### Installing a GUI Desktop
 
@@ -139,5 +138,5 @@ The FPGA Developer AMI doesn't include a GUI Desktop, but you can set it up by r
 ---------------------------------------
 
 <p align="center"><b>
-<a href="../README.md#module-1---introduction-to-the-sdaccel-flow">Start the SDAccel Developer Labs</a>
+<a href="../README.md#module-1-introduction-to-the-vitis-flow">Start the Vitis Developer Labs</a>
 </b></p>
